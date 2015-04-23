@@ -11,8 +11,8 @@ add_definitions(${PCL_DEFINITIONS})
 set(PCL_BUILD_TYPE Release)
  
 file(GLOB PCL_TEST_DESCRIPTORES_SRC
-    "src/*.h"
-    "src/*.cpp"
+    "*.h"
+    "*.cpp"
 )
 add_executable(TestDescriptores ${PCL_TEST_DESCRIPTORES_SRC})
  
