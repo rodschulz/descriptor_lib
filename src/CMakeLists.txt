@@ -15,5 +15,4 @@ file(GLOB PCL_TEST_DESCRIPTORES_SRC
     "*.cpp"
 )
 add_executable(TestDescriptores ${PCL_TEST_DESCRIPTORES_SRC})
- 
 target_link_libraries(TestDescriptores ${PCL_LIBRARIES})
