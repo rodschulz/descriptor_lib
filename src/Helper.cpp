@@ -21,9 +21,9 @@ void Helper::removeNANs(PointCloud<PointXYZ>::Ptr &_cloud)
 
 void Helper::createColorCloud(const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<PointXYZRGB>::Ptr &_coloredCloud, const uint8_t _r, const uint8_t _g, const uint8_t _b)
 {
-	_coloredCloud->points.clear();
-	_coloredCloud->points.resize(_cloud->points.size());
-	_coloredCloud->width = _cloud->points.size();
+	_coloredCloud->clear();
+	_coloredCloud->resize(_cloud->size());
+	_coloredCloud->width = _cloud->size();
 	_coloredCloud->height = 1;
 
 	uint32_t color = ((uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
