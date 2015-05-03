@@ -17,7 +17,7 @@ int main(int _argn, char **_argv)
 {
 	system("rm -rf ./output/*");
 
-	if (_argn < 5)
+	if (_argn < 6)
 	{
 		cout << "Not enough arguments\n";
 		return EXIT_FAILURE;
@@ -30,21 +30,26 @@ int main(int _argn, char **_argv)
 		cout << "ERROR: Can't read file from disk (" << _argv[1] << ")\n";
 		return EXIT_FAILURE;
 	}
+	cout << "Cloud loaded points: " << cloud->size() << "\n";
 
 	int index = atoi(_argv[2]);
 	int method = atoi(_argv[3]);
+	double bandSize = atof(_argv[5]);
 
 	// Remove NANs and calculate normals
 	Helper::removeNANs(cloud);
 	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>);
 	Extractor::getNormals(cloud, 0.01, normals);
 
-	PointXYZ targetPoint = cloud->points[index];
-	PointCloud<PointXYZ>::Ptr patch(new PointCloud<PointXYZ>);
+	PointXYZ point = cloud->points[index];
+	Normal pointNormal = normals->points[index];
+
+	PointCloud<PointXYZ>::Ptr surfacePatch(new PointCloud<PointXYZ>);
+	PointCloud<Normal>::Ptr normalsPatch(new PointCloud<Normal>);
 	if (method == 0)
 	{
 		double searchRadius = atof(_argv[4]);
-		Extractor::getNeighborsInRadius(targetPoint, searchRadius, cloud, patch);
+		Extractor::getNeighborsInRadius(cloud, normals, point, searchRadius, surfacePatch, normalsPatch);
 	}
 	else if (method == 1)
 	{
@@ -52,21 +57,29 @@ int main(int _argn, char **_argv)
 		//getNeighborsK(searchPoint, neighborsNumber, cloud, neighbors);
 	}
 
+	// Create a colored version of the could to check the target point's position
 	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
 	Helper::createColorCloud(cloud, coloredCloud, 255, 0, 0);
 	(*coloredCloud)[index].rgb = Helper::getColor(0, 255, 0);
 
+	// Create a cloud holding the tangent plane
 	PointCloud<PointXYZRGB>::Ptr tangentPlane(new PointCloud<PointXYZRGB>());
-	Extractor::getTangentPlane(cloud, targetPoint, normals->points[index], tangentPlane);
+	Extractor::getTangentPlane(cloud, point, pointNormal, tangentPlane);
 
-	double bandSize = 0.01;
+	// Extract interesting bands
 	vector<Band> bands;
-	Extractor::getBands(cloud, normals, index, 0.01, bands);
+	Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, bandSize, bands);
+
+	// Calculate mean curvature
+	vector<double> curvatures;
+	Helper::calculateMeanCurvature(bands, point, curvatures);
+	for (size_t i = 0; i < curvatures.size(); i++)
+		cout << "Curvature " << 45 * i << ": " << curvatures[i] << "\n";
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";
 	io::savePCDFileASCII("./output/normals.pcd", *normals);
-	io::savePCDFileASCII("./output/patch.pcd", *patch);
+	io::savePCDFileASCII("./output/patch.pcd", *surfacePatch);
 	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
 	io::savePCDFileASCII("./output/plane.pcd", *tangentPlane);
 	io::savePCDFileASCII("./output/band0.pcd", *bands[0].dataBand);

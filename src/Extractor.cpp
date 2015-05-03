@@ -7,11 +7,7 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/features/normal_3d.h>
-#include <eigen3/Eigen/src/Core/Matrix.h>
-#include <eigen3/Eigen/src/Geometry/Hyperplane.h>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
-
-using namespace Eigen;
 
 Extractor::Extractor()
 {
@@ -21,7 +17,7 @@ Extractor::~Extractor()
 {
 }
 
-void Extractor::getNeighborsInRadius(const PointXYZ &_searchPoint, const double _searchRadius, const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<PointXYZ>::Ptr &_outputNeighbors)
+void Extractor::getNeighborsInRadius(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const PointXYZ &_searchPoint, const double _searchRadius, PointCloud<PointXYZ>::Ptr &_surfacePatch, PointCloud<Normal>::Ptr &_normalsPatch)
 {
 	KdTreeFLANN<PointXYZ> kdtree;
 	kdtree.setInputCloud(_cloud);
@@ -30,13 +26,16 @@ void Extractor::getNeighborsInRadius(const PointXYZ &_searchPoint, const double 
 	vector<float> pointRadiusSquaredDistance;
 	kdtree.radiusSearch(_searchPoint, _searchRadius, pointIndices, pointRadiusSquaredDistance);
 
-	_outputNeighbors->points.clear();
-	_outputNeighbors->points.reserve(pointIndices.size());
-	_outputNeighbors->width = pointIndices.size();
-	_outputNeighbors->height = 1;
+	_surfacePatch->clear();
+	_surfacePatch->reserve(pointIndices.size());
+	_normalsPatch->clear();
+	_normalsPatch->reserve(pointIndices.size());
 
 	for (size_t i = 0; i < pointIndices.size(); i++)
-		_outputNeighbors->points.push_back(_cloud->points[pointIndices[i]]);
+	{
+		_surfacePatch->push_back(_cloud->points[pointIndices[i]]);
+		_normalsPatch->push_back(_normals->points[pointIndices[i]]);
+	}
 }
 
 void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius, PointCloud<Normal>::Ptr &_normals)
@@ -51,11 +50,11 @@ void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double
 	normalEstimation.compute(*_normals);
 }
 
-void Extractor::getBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const int &_targetPoint, const double _bandWidth, vector<Band> &_bands)
+void Extractor::getBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const PointXYZ &_point, const Normal &_pointNormal, const double _bandWidth, vector<Band> &_bands)
 {
 	// Get the point, its normal and make a plane
-	Vector3f p = _cloud->points[_targetPoint].getVector3fMap();
-	Vector3f n = _normals->points[_targetPoint].getNormalVector3fMap();
+	Vector3f p = _point.getVector3fMap();
+	Vector3f n = _pointNormal.getNormalVector3fMap();
 	Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, p);
 
 	// Create a pair of perpendicular vectors to be used as axes in the plane
@@ -77,30 +76,52 @@ void Extractor::getBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointClo
 	ParametrizedLine<float, 3> line90 = ParametrizedLine<float, 3>(p, d2);
 	ParametrizedLine<float, 3> line135 = ParametrizedLine<float, 3>(p, diag135);
 
+	// Calculate planes going along each band
+	Vector3f normalDiag45 = n.cross(diag45);
+	normalDiag45.normalize();
+	Vector3f normalDiag135 = n.cross(diag135);
+	normalDiag135.normalize();
+	Hyperplane<float, 3> planeAlong0 = Hyperplane<float, 3>(d2, p);
+	Hyperplane<float, 3> planeAlong45 = Hyperplane<float, 3>(normalDiag45, p);
+	Hyperplane<float, 3> planeAlong90 = Hyperplane<float, 3>(d1, p);
+	Hyperplane<float, 3> planeAlong135 = Hyperplane<float, 3>(normalDiag135, p);
+
 	// Start extracting points
 	_bands.clear();
-	_bands.push_back(Band());
-	_bands.push_back(Band());
-	_bands.push_back(Band());
-	_bands.push_back(Band());
+	_bands.push_back(Band(n, planeAlong0));
+	_bands.push_back(Band(n, planeAlong45));
+	_bands.push_back(Band(n, planeAlong90));
+	_bands.push_back(Band(n, planeAlong135));
 
-	double halfBandSquared = _bandWidth * _bandWidth * 0.25;
+	double halfBand = _bandWidth * 0.5;
 	for (size_t i = 0; i < _cloud->size(); i++)
 	{
 		Vector3f point = _cloud->points[i].getVector3fMap();
 		Vector3f projection = plane.projection(point);
 
-		if (line0.squaredDistance(projection) <= halfBandSquared)
+		if (line0.distance(projection) <= halfBand)
+		{
 			_bands[0].dataBand->push_back(_cloud->points[i]);
+			_bands[0].normalBand->push_back(_normals->points[i]);
+		}
 
-		if (line45.squaredDistance(projection) <= halfBandSquared)
+		if (line45.distance(projection) <= halfBand)
+		{
 			_bands[1].dataBand->push_back(_cloud->points[i]);
+			_bands[1].normalBand->push_back(_normals->points[i]);
+		}
 
-		if (line90.squaredDistance(projection) <= halfBandSquared)
+		if (line90.distance(projection) <= halfBand)
+		{
 			_bands[2].dataBand->push_back(_cloud->points[i]);
+			_bands[2].normalBand->push_back(_normals->points[i]);
+		}
 
-		if (line135.squaredDistance(projection) <= halfBandSquared)
+		if (line135.distance(projection) <= halfBand)
+		{
 			_bands[3].dataBand->push_back(_cloud->points[i]);
+			_bands[3].normalBand->push_back(_normals->points[i]);
+		}
 	}
 }
 
@@ -116,6 +137,6 @@ void Extractor::getTangentPlane(const PointCloud<PointXYZ>::Ptr &_cloud, const P
 	{
 		Vector3f p = _cloud->points[i].getVector3fMap();
 		Vector3f projection = plane.projection(p);
-		_tangentPlane->push_back(Factory::makePointXYZRGB((float)projection[0], (float)projection[1], (float)projection[2], 0, 0, 255));
+		_tangentPlane->push_back(Factory::makePointXYZRGB((float) projection[0], (float) projection[1], (float) projection[2], 0, 0, 255));
 	}
 }

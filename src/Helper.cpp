@@ -42,3 +42,35 @@ float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
 	float finalColor = *reinterpret_cast<float*>(&color);
 	return finalColor;
 }
+
+void Helper::calculateMeanCurvature(vector<Band> &_bands, const PointXYZ &_point, vector<double> &_curvatures)
+{
+	_curvatures.reserve(_bands.size());
+	Vector3f targetPoint = _point.getVector3fMap();
+
+	for (size_t i = 0; i < _bands.size(); i++)
+	{
+		Vector3f targetNormal = _bands[i].pointNormal;
+
+		double curvature = 0;
+		for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+		{
+			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
+			Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap();
+
+			Vector3f projectedPoint = _bands[i].planeAlong.projection(point);
+			Vector3f projectedNormal = _bands[i].planeAlong.projection(normal);
+
+			Vector3f pointDiff = targetPoint - point;
+			double pointDistance = pointDiff.norm();
+			Vector3f normalDiff = targetNormal - projectedNormal;
+			double normalDistance = normalDiff.norm();
+
+			if (pointDistance > 0)
+				curvature += (normalDistance / pointDistance);
+		}
+
+		curvature /= _bands[i].normalBand->size();
+		_curvatures.push_back(curvature);
+	}
+}
