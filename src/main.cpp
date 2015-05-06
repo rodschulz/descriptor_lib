@@ -8,6 +8,7 @@
 #include "Helper.h"
 #include "Factory.h"
 #include "Extractor.h"
+#include "Parser.h"
 #include <eigen3/Eigen/src/Core/Matrix.h>
 
 using namespace std;
@@ -17,24 +18,33 @@ int main(int _argn, char **_argv)
 {
 	system("rm -rf ./output/*");
 
-	if (_argn < 6)
+	// Show help
+	if (strcmp(_argv[1], "-h") == 0)
+	{
+		Parser::printUsage();
+		return EXIT_SUCCESS;
+	}
+
+	if (_argn < 3)
 	{
 		cout << "Not enough arguments\n";
+		Parser::printUsage();
 		return EXIT_FAILURE;
 	}
 
+	Params params = Parser::parseExecutionParams(_argn, _argv);
+	int index = params.targetPoint;
+	int method = params.method;
+	double bandSize = params.bandWidth;
+
 	// Read a PCD file from disk.
 	PointCloud<PointXYZ>::Ptr cloud(new PointCloud<PointXYZ>);
-	if (io::loadPCDFile<PointXYZ>(_argv[1], *cloud) != 0)
+	if (io::loadPCDFile<PointXYZ>(params.inputLocation, *cloud) != 0)
 	{
 		cout << "ERROR: Can't read file from disk (" << _argv[1] << ")\n";
 		return EXIT_FAILURE;
 	}
 	cout << "Cloud loaded points: " << cloud->size() << "\n";
-
-	int index = atoi(_argv[2]);
-	int method = atoi(_argv[3]);
-	double bandSize = atof(_argv[5]);
 
 	// Remove NANs and calculate normals
 	Helper::removeNANs(cloud);
@@ -48,13 +58,11 @@ int main(int _argn, char **_argv)
 	PointCloud<Normal>::Ptr normalsPatch(new PointCloud<Normal>);
 	if (method == 0)
 	{
-		double searchRadius = atof(_argv[4]);
-		Extractor::getNeighborsInRadius(cloud, normals, point, searchRadius, surfacePatch, normalsPatch);
+		Extractor::getNeighborsInRadius(cloud, normals, point, params.searchRadius, surfacePatch, normalsPatch);
 	}
 	else if (method == 1)
 	{
-		int neighborsNumber = atoi(_argv[4]);
-		//getNeighborsK(searchPoint, neighborsNumber, cloud, neighbors);
+		//getNeighborsK(searchPoint, params.neighborsNumber, cloud, neighbors);
 	}
 
 	// Create a colored version of the could to check the target point's position
