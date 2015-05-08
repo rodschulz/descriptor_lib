@@ -19,6 +19,7 @@ public:
 	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
 	static void calculateMeanCurvature(vector<Band> &_bands, const PointXYZ &_point, vector<double> &_curvatures);
 
+	static bool isNumber(const string &_str);
 private:
 	Helper();
 	~Helper();

@@ -4,6 +4,7 @@
  */
 #include "Helper.h"
 #include <pcl/filters/filter.h>
+#include <ctype.h>
 
 Helper::Helper()
 {
@@ -73,4 +74,14 @@ void Helper::calculateMeanCurvature(vector<Band> &_bands, const PointXYZ &_point
 		curvature /= _bands[i].normalBand->size();
 		_curvatures.push_back(curvature);
 	}
+}
+
+bool Helper::isNumber(const string &_str)
+{
+	bool number = true;
+	for (size_t i = 0; i < _str.size(); i++)
+	{
+		number = number && isdigit(_str[i]);
+	}
+	return number;
 }
