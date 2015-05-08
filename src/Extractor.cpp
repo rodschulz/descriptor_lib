@@ -50,7 +50,7 @@ void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double
 	normalEstimation.compute(*_normals);
 }
 
-void Extractor::getBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const PointXYZ &_point, const Normal &_pointNormal, const double _bandWidth, vector<Band> &_bands)
+double Extractor::getBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const PointXYZ &_point, const Normal &_pointNormal, const ExecutionParams &_params, vector<Band> &_bands)
 {
 	// Get the point, its normal and make a plane
 	Vector3f p = _point.getVector3fMap();
@@ -64,65 +64,64 @@ void Extractor::getBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointClo
 	Vector3f d2 = n.cross(d1);
 	d2.normalize();
 
-	// Create diagonal unit vectors to create diagonal lines
-	Vector3f diag45 = d1 + d2;
-	diag45.normalize();
-	Vector3f diag135 = d2 - d1;
-	diag135.normalize();
+	// Angular step for bands definitions
+	double angleRange = _params.bidirectional ? M_PI : 2 * M_PI;
+	double angleStep = angleRange / _params.bandNumber;
 
-	// Directions to extract points
-	ParametrizedLine<float, 3> line0 = ParametrizedLine<float, 3>(p, d1);
-	ParametrizedLine<float, 3> line45 = ParametrizedLine<float, 3>(p, diag45);
-	ParametrizedLine<float, 3> line90 = ParametrizedLine<float, 3>(p, d2);
-	ParametrizedLine<float, 3> line135 = ParametrizedLine<float, 3>(p, diag135);
+	// Create the lines defining each band and also each band's longitudinal plane
+	_bands.clear();
+	vector<ParametrizedLine<float, 3> > lines;
+	vector<Vector3f> planeNormals;
+	vector<Vector3f> directors;
+	for (int i = 0; i < _params.bandNumber; i++)
+	{
+		// Calculate the line's director vector and define the line
+		Vector3f director = d1 * cos(angleStep * i) + d2 * sin(angleStep * i);
+		directors.push_back(director);
+		lines.push_back(ParametrizedLine<float, 3>(p, director));
 
-	// Calculate planes going along each band
-	Vector3f normalDiag45 = n.cross(diag45);
-	normalDiag45.normalize();
-	Vector3f normalDiag135 = n.cross(diag135);
-	normalDiag135.normalize();
-	Hyperplane<float, 3> planeAlong0 = Hyperplane<float, 3>(d2, p);
-	Hyperplane<float, 3> planeAlong45 = Hyperplane<float, 3>(normalDiag45, p);
-	Hyperplane<float, 3> planeAlong90 = Hyperplane<float, 3>(d1, p);
-	Hyperplane<float, 3> planeAlong135 = Hyperplane<float, 3>(normalDiag135, p);
+		// Calculate the plane's normal and then define the plane
+		Vector3f bandPlaneNormal = n.cross(director);
+		bandPlaneNormal.normalize();
+		_bands.push_back(Band(n, Hyperplane<float, 3>(bandPlaneNormal, p)));
+		planeNormals.push_back(bandPlaneNormal);
+	}
 
 	// Start extracting points
-	_bands.clear();
-	_bands.push_back(Band(n, planeAlong0));
-	_bands.push_back(Band(n, planeAlong45));
-	_bands.push_back(Band(n, planeAlong90));
-	_bands.push_back(Band(n, planeAlong135));
-
-	double halfBand = _bandWidth * 0.5;
+	double halfBand = _params.bandWidth * 0.5;
 	for (size_t i = 0; i < _cloud->size(); i++)
 	{
 		Vector3f point = _cloud->points[i].getVector3fMap();
 		Vector3f projection = plane.projection(point);
 
-		if (line0.distance(projection) <= halfBand)
+		for (size_t j = 0; j < lines.size(); j++)
 		{
-			_bands[0].dataBand->push_back(_cloud->points[i]);
-			_bands[0].normalBand->push_back(_normals->points[i]);
-		}
+			if (_params.bidirectional)
+			{
+				if (lines[j].distance(projection) <= halfBand)
+				{
+					_bands[j].dataBand->push_back(_cloud->points[i]);
+					_bands[j].normalBand->push_back(_normals->points[i]);
+				}
+			}
+			else
+			{
+				// Create a vector going from the plane to the current point and the use the dot
+				// product to check if the vector points the same direction than the director vector
+				Vector3f pointOnPlane = p + planeNormals[j];
+				Vector3f planeToPoint = point - pointOnPlane;
+				double orientation = directors[j].dot(planeToPoint);
 
-		if (line45.distance(projection) <= halfBand)
-		{
-			_bands[1].dataBand->push_back(_cloud->points[i]);
-			_bands[1].normalBand->push_back(_normals->points[i]);
-		}
-
-		if (line90.distance(projection) <= halfBand)
-		{
-			_bands[2].dataBand->push_back(_cloud->points[i]);
-			_bands[2].normalBand->push_back(_normals->points[i]);
-		}
-
-		if (line135.distance(projection) <= halfBand)
-		{
-			_bands[3].dataBand->push_back(_cloud->points[i]);
-			_bands[3].normalBand->push_back(_normals->points[i]);
+				if (orientation >= 0 && lines[j].distance(projection) <= halfBand)
+				{
+					_bands[j].dataBand->push_back(_cloud->points[i]);
+					_bands[j].normalBand->push_back(_normals->points[i]);
+				}
+			}
 		}
 	}
+
+	return angleStep;
 }
 
 void Extractor::getTangentPlane(const PointCloud<PointXYZ>::Ptr &_cloud, const PointXYZ &_point, const Normal &_pointNormal, PointCloud<PointXYZRGB>::Ptr &_tangentPlane)

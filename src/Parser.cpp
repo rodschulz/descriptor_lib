@@ -26,9 +26,9 @@ void Parser::printUsage()
 		<< "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n\n";
 }
 
-Params Parser::parseExecutionParams(int _argn, char **_argv)
+ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 {
-	Params params;
+	ExecutionParams params;
 
 	if (_argn > 3)
 	{

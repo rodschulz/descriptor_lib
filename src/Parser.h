@@ -13,7 +13,7 @@ typedef enum PatchGenerationMethod
 	SEARCH_RADIUS, K_NEIGHBORS
 } PatchGenerationMethod;
 
-struct Params
+struct ExecutionParams
 {
 	string inputLocation;		// Location of the input file
 	int targetPoint;		// Target point
@@ -26,7 +26,7 @@ struct Params
 	double bandWidth;		// Width of each band
 	bool bidirectional;		// Flag indicating if each band has to be analyzed bidirectional or not
 
-	Params()
+	ExecutionParams()
 	{
 		inputLocation = "";
 		method = SEARCH_RADIUS;
@@ -43,7 +43,7 @@ class Parser
 {
 public:
 	static void printUsage();
-	static Params parseExecutionParams(int _argn, char **_argv);
+	static ExecutionParams parseExecutionParams(int _argn, char **_argv);
 private:
 	Parser();
 	~Parser();

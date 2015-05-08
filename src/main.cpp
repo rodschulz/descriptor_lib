@@ -5,17 +5,22 @@
 #include <stdlib.h>
 #include <iostream>
 #include <pcl/io/pcd_io.h>
+#include <string>
 #include "Helper.h"
 #include "Factory.h"
 #include "Extractor.h"
 #include "Parser.h"
-#include <eigen3/Eigen/src/Core/Matrix.h>
 
 using namespace std;
 using namespace pcl;
 
 int main(int _argn, char **_argv)
 {
+	// todo create radial bands to calculate the descriptor in different surroundings
+	// todo implement generation of histograms of curvature in each band
+	// todo implement directions in bands
+	// todo implement dynamic number of bands
+
 	system("rm -rf ./output/*");
 
 	// Show help
@@ -32,10 +37,9 @@ int main(int _argn, char **_argv)
 		return EXIT_FAILURE;
 	}
 
-	Params params = Parser::parseExecutionParams(_argn, _argv);
+	ExecutionParams params = Parser::parseExecutionParams(_argn, _argv);
 	int index = params.targetPoint;
 	int method = params.method;
-	double bandSize = params.bandWidth;
 
 	// Read a PCD file from disk.
 	PointCloud<PointXYZ>::Ptr cloud(new PointCloud<PointXYZ>);
@@ -76,13 +80,19 @@ int main(int _argn, char **_argv)
 
 	// Extract interesting bands
 	vector<Band> bands;
-	Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, bandSize, bands);
+	double bandAngularStep = Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, params, bands);
+	for (size_t i = 0; i < bands.size(); i++)
+	{
+		char name[100];
+		sprintf(name, "./output/band%d.pcd", (int) i);
+		io::savePCDFileASCII(name, *bands[i].dataBand);
+	}
 
 	// Calculate mean curvature
 	vector<double> curvatures;
 	Helper::calculateMeanCurvature(bands, point, curvatures);
 	for (size_t i = 0; i < curvatures.size(); i++)
-		cout << "Curvature " << 45 * i << ": " << curvatures[i] << "\n";
+		cout << "Curvature " << bandAngularStep * i << ": " << curvatures[i] << "\n";
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";
@@ -90,10 +100,6 @@ int main(int _argn, char **_argv)
 	io::savePCDFileASCII("./output/patch.pcd", *surfacePatch);
 	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
 	io::savePCDFileASCII("./output/plane.pcd", *tangentPlane);
-	io::savePCDFileASCII("./output/band0.pcd", *bands[0].dataBand);
-	io::savePCDFileASCII("./output/band45.pcd", *bands[1].dataBand);
-	io::savePCDFileASCII("./output/band90.pcd", *bands[2].dataBand);
-	io::savePCDFileASCII("./output/band135.pcd", *bands[3].dataBand);
 
 	cout << "Finished\n";
 	return EXIT_SUCCESS;
