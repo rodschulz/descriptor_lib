@@ -35,33 +35,33 @@ Params Parser::parseExecutionParams(int _argn, char **_argv)
 		params.inputLocation = _argv[1];
 		params.targetPoint = atoi(_argv[2]);
 
-		int i = 0;
+		int i = 3;
 		while (i < _argn)
 		{
 			if (strcmp(_argv[i], "-m") == 0)
 			{
 				// Set method
-				params.method = (PatchGenerationMethod) atoi(_argv[i++]);
+				params.method = (PatchGenerationMethod) atoi(_argv[++i]);
 			}
 			else if (strcmp(_argv[i], "-r") == 0)
 			{
 				// Set search radius
-				params.searchRadius = atof(_argv[i++]);
+				params.searchRadius = atof(_argv[++i]);
 			}
 			else if (strcmp(_argv[i], "-n") == 0)
 			{
 				// Set desired neighbors number
-				params.neighborsNumber = atoi(_argv[i++]);
+				params.neighborsNumber = atoi(_argv[++i]);
 			}
 			else if (strcmp(_argv[i], "-b") == 0)
 			{
 				// Set band number
-				params.bandNumber = atoi(_argv[i++]);
+				params.bandNumber = atoi(_argv[++i]);
 			}
 			else if (strcmp(_argv[i], "-w") == 0)
 			{
 				// Set band width
-				params.bandWidth = atof(_argv[i++]);
+				params.bandWidth = atof(_argv[++i]);
 			}
 			else if (strcmp(_argv[i], "-u") == 0)
 			{
