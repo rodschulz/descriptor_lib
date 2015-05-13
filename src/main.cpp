@@ -10,13 +10,13 @@
 #include "Factory.h"
 #include "Extractor.h"
 #include "Parser.h"
+#include "Hist.h"
 
 using namespace std;
 using namespace pcl;
 
 int main(int _argn, char **_argv)
 {
-	// todo create radial bands to calculate the descriptor in different surroundings
 	// todo implement generation of histograms of curvature in each band
 
 	system("rm -rf ./output/*");
@@ -77,6 +77,28 @@ int main(int _argn, char **_argv)
 	Helper::calculateMeanCurvature(bands, point, curvatures);
 	for (size_t i = 0; i < curvatures.size(); i++)
 		cout << "Curvature band " << i << ": " << curvatures[i] << "\n";
+	
+	cout << "***** Curvatures *****\n";
+	vector <Hist> curvatureHistograms;
+	Helper::calculateCurvatureHistograms(bands, point, curvatureHistograms);
+	for (size_t i = 0; i < curvatureHistograms.size(); i++)
+	{
+		Bins bins;
+		curvatureHistograms[i].getBins(8, bins);
+		cout << "BAND" << i << ": ";
+		printBins(bins);
+	}
+	
+	cout << "***** Angles *****\n";
+	vector <Hist> angleHistograms;
+	Helper::calculateAngleHistograms(bands, point, angleHistograms);
+	for (size_t i = 0; i < angleHistograms.size(); i++)
+	{
+		Bins bins;
+		angleHistograms[i].getBins(8, 0, M_PI, bins);
+		cout << "BAND" << i << ": ";
+		printBins(bins);
+	}
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";
