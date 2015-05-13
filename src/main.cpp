@@ -18,8 +18,6 @@ int main(int _argn, char **_argv)
 {
 	// todo create radial bands to calculate the descriptor in different surroundings
 	// todo implement generation of histograms of curvature in each band
-	// todo implement directions in bands
-	// todo implement dynamic number of bands
 
 	system("rm -rf ./output/*");
 
@@ -39,7 +37,6 @@ int main(int _argn, char **_argv)
 
 	ExecutionParams params = Parser::parseExecutionParams(_argn, _argv);
 	int index = params.targetPoint;
-	int method = params.method;
 
 	// Read a PCD file from disk.
 	PointCloud<PointXYZ>::Ptr cloud(new PointCloud<PointXYZ>);
@@ -60,14 +57,7 @@ int main(int _argn, char **_argv)
 
 	PointCloud<PointXYZ>::Ptr surfacePatch(new PointCloud<PointXYZ>);
 	PointCloud<Normal>::Ptr normalsPatch(new PointCloud<Normal>);
-	if (method == 0)
-	{
-		Extractor::getNeighborsInRadius(cloud, normals, point, params.searchRadius, surfacePatch, normalsPatch);
-	}
-	else if (method == 1)
-	{
-		//getNeighborsK(searchPoint, params.neighborsNumber, cloud, neighbors);
-	}
+	Extractor::getNeighborsInRadius(cloud, normals, point, params.searchRadius, surfacePatch, normalsPatch);
 
 	// Create a colored version of the could to check the target point's position
 	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
@@ -80,19 +70,13 @@ int main(int _argn, char **_argv)
 
 	// Extract interesting bands
 	vector<Band> bands;
-	double bandAngularStep = Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, params, bands);
-	for (size_t i = 0; i < bands.size(); i++)
-	{
-		char name[100];
-		sprintf(name, "./output/band%d.pcd", (int) i);
-		io::savePCDFileASCII(name, *bands[i].dataBand);
-	}
+	double step = Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, params, bands);
 
 	// Calculate mean curvature
 	vector<double> curvatures;
 	Helper::calculateMeanCurvature(bands, point, curvatures);
 	for (size_t i = 0; i < curvatures.size(); i++)
-		cout << "Curvature " << bandAngularStep * i << ": " << curvatures[i] << "\n";
+		cout << "Curvature band " << i << ": " << curvatures[i] << "\n";
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";
@@ -100,6 +84,12 @@ int main(int _argn, char **_argv)
 	io::savePCDFileASCII("./output/patch.pcd", *surfacePatch);
 	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
 	io::savePCDFileASCII("./output/plane.pcd", *tangentPlane);
+	for (size_t i = 0; i < bands.size(); i++)
+	{
+		char name[100];
+		sprintf(name, "./output/band%d.pcd", (int) i);
+		io::savePCDFileASCII(name, *bands[i].dataBand);
+	}
 
 	cout << "Finished\n";
 	return EXIT_SUCCESS;

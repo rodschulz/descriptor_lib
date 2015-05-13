@@ -21,6 +21,7 @@ struct Band
 	PointCloud<Normal>::Ptr normalBand;
 	Vector3f pointNormal;
 	Hyperplane<float, 3> planeAlong;
+	bool radialBand;
 
 	Band(const Vector3f &_pointNormal, const Hyperplane<float, 3> &_planeAlong)
 	{
@@ -28,6 +29,16 @@ struct Band
 		normalBand = PointCloud<Normal>::Ptr(new PointCloud<Normal>());
 		pointNormal = _pointNormal;
 		planeAlong = _planeAlong;
+		radialBand = false;
+	}
+
+	Band(const Vector3f &_pointNormal, const bool &_radialBand)
+	{
+		dataBand = PointCloud<PointXYZ>::Ptr(new PointCloud<PointXYZ>());
+		normalBand = PointCloud<Normal>::Ptr(new PointCloud<Normal>());
+		pointNormal = _pointNormal;
+		planeAlong = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
+		radialBand = _radialBand;
 	}
 
 	Band()
@@ -36,6 +47,7 @@ struct Band
 		normalBand = PointCloud<Normal>::Ptr(new PointCloud<Normal>());
 		pointNormal = Vector3f(1, 0, 0);
 		planeAlong = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
+		radialBand = false;
 	}
 };
 
@@ -50,4 +62,7 @@ public:
 private:
 	Extractor();
 	~Extractor();
+
+	static double getRadialBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const Vector3f &_p, const Vector3f &_n, const Hyperplane<float, 3> &_plane, const ExecutionParams &_params, vector<Band> &_bands);
+	static double getLongitudinalBands(const PointCloud<PointXYZ>::Ptr &_cloud, const PointCloud<Normal>::Ptr &_normals, const Vector3f &_p, const Vector3f &_n, const Hyperplane<float, 3> &_plane, const ExecutionParams &_params, vector<Band> &_bands);
 };

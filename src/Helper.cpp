@@ -44,8 +44,35 @@ float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
 	return finalColor;
 }
 
+template<typename T>
+class data_filler
+{
+public:
+	data_filler()
+	{
+	}
+	T operator()()
+	{
+		return rand() / (T) RAND_MAX;
+	}
+};
+
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/density.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <vector>
+#include <algorithm>
+using namespace boost;
+using namespace boost::accumulators;
 void Helper::calculateMeanCurvature(vector<Band> &_bands, const PointXYZ &_point, vector<double> &_curvatures)
 {
+	//accumulator_set<double, stats<tag::density> > acc(tag::density::cache_size = 10, tag::density::num_bins = 5);
+	//iterator_range<std::vector<std::pair<double, double> >::iterator> hist = density(acc);
+	//for (int k = 0; k < hist.size(); k++)
+	//	cout << "first: " << hist[k].first << " - second: " << hist[k].second << "\n";
+
+	//////
+
 	_curvatures.reserve(_bands.size());
 	Vector3f targetPoint = _point.getVector3fMap();
 
@@ -53,26 +80,58 @@ void Helper::calculateMeanCurvature(vector<Band> &_bands, const PointXYZ &_point
 	{
 		Vector3f targetNormal = _bands[i].pointNormal;
 
-		double curvature = 0;
-		for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+		if (_bands[i].radialBand)
 		{
-			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap();
+			double curvature = 0;
+			for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+			{
+				Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
+				Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap();
 
-			Vector3f projectedPoint = _bands[i].planeAlong.projection(point);
-			Vector3f projectedNormal = _bands[i].planeAlong.projection(normal);
+				// Create a plane containing the target point, its normal and the current point
+				Vector3f targetToPoint = point - targetPoint;
+				Vector3f planeNormal = targetNormal.cross(targetToPoint);
+				planeNormal.normalize();
+				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
 
-			Vector3f pointDiff = targetPoint - point;
-			double pointDistance = pointDiff.norm();
-			Vector3f normalDiff = targetNormal - projectedNormal;
-			double normalDistance = normalDiff.norm();
+				// Project current point's normal onto the plane and calculate the point's curvature
+				Vector3f projectedNormal = plane.projection(normal);
 
-			if (pointDistance > 0)
-				curvature += (normalDistance / pointDistance);
+				Vector3f pointDiff = targetPoint - point;
+				double pointDistance = pointDiff.norm();
+				Vector3f normalDiff = targetNormal - projectedNormal;
+				double normalDistance = normalDiff.norm();
+
+				if (pointDistance > 0)
+					curvature += (normalDistance / pointDistance);
+			}
+			curvature /= _bands[i].normalBand->size();
+			_curvatures.push_back(curvature);
+
 		}
+		else
+		{
+			double curvature = 0;
+			for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+			{
+				Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
+				Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap();
 
-		curvature /= _bands[i].normalBand->size();
-		_curvatures.push_back(curvature);
+				Vector3f projectedPoint = _bands[i].planeAlong.projection(point);
+				Vector3f projectedNormal = _bands[i].planeAlong.projection(normal);
+
+				Vector3f pointDiff = targetPoint - projectedPoint;
+				double pointDistance = pointDiff.norm();
+				Vector3f normalDiff = targetNormal - projectedNormal;
+				double normalDistance = normalDiff.norm();
+
+				if (pointDistance > 0)
+					curvature += (normalDistance / pointDistance);
+			}
+
+			curvature /= _bands[i].normalBand->size();
+			_curvatures.push_back(curvature);
+		}
 	}
 }
 

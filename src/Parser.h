@@ -8,34 +8,26 @@
 
 using namespace std;
 
-typedef enum PatchGenerationMethod
-{
-	SEARCH_RADIUS, K_NEIGHBORS
-} PatchGenerationMethod;
-
 struct ExecutionParams
 {
-	string inputLocation;		// Location of the input file
-	int targetPoint;		// Target point
+	string inputLocation;	// Location of the input file
+	int targetPoint;	// Target point
 
-	PatchGenerationMethod method;	// Method used to generate the surface patch to use
-	double searchRadius;		// Search radius used with the SEARCH_RADIUS method
-	int neighborsNumber;		// Number of neighbors to sample, used with the method K_NEIGHBORS
-
-	int bandNumber;			// Number of bands to sample
-	double bandWidth;		// Width of each band
-	bool bidirectional;		// Flag indicating if each band has to be analyzed bidirectional or not
+	double searchRadius;	// Search radius used with the SEARCH_RADIUS method
+	int bandNumber;		// Number of bands to sample
+	double bandWidth;	// Width of each band
+	bool bidirectional;	// Flag indicating if each band has to be analyzed bidirectional or not
+	bool radialBands;	// Flag indicating if the bands are radial or longitudinal
 
 	ExecutionParams()
 	{
 		inputLocation = "";
-		method = SEARCH_RADIUS;
 		searchRadius = 0.05;
-		neighborsNumber = 100;
 		targetPoint = 1000;
 		bandNumber = 4;
 		bandWidth = 0.01;
 		bidirectional = true;
+		radialBands = false;
 	}
 };
 

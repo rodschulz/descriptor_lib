@@ -18,7 +18,12 @@ Parser::~Parser()
 
 void Parser::printUsage()
 {
-	cout << "Usage:\n" << "   -m INT\tSets the patch extraction method, 0 for radius method, \n\t\t1 for k neighbors method (by default 0)\n" << "   -r FLOAT\tSets the search radius used to extract the surface patch, \n\t\tused with method 0 (by default 0.01)\n" << "   -n INT\tSets the number of neighbors desired in the surface patch, \n\t\tused with method 1 (by default 1000)\n" << "   -b INT\tSets the number of bands to create for analysis (by default 4)\n" << "   -w FLOAT\tSets the band's width (by default 0.05)\n" << "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n\n";
+	cout << "Usage:\n"
+			<< "   -r FLOAT\tSets the search radius used to extract the surface patch, \n"
+			<< "   -b INT\tSets the number of bands to create for analysis (by default 4)\n"
+			<< "   -w FLOAT\tSets the band's width (by default 0.05)\n"
+			<< "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n"
+			<< "   -R\t\tWhen present bands are defined as radial zones and the width of each\n\t\twill be defined by the patch's size the number of bands\n\n";
 }
 
 ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
@@ -40,20 +45,15 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 			int i = 3;
 			while (i < _argn)
 			{
-				if (strcmp(_argv[i], "-m") == 0)
+				if (strcmp(_argv[i], "-R") == 0)
 				{
-					// Set method
-					params.method = (PatchGenerationMethod) atoi(_argv[++i]);
+					// Set radial flag
+					params.radialBands = true;
 				}
 				else if (strcmp(_argv[i], "-r") == 0)
 				{
 					// Set search radius
 					params.searchRadius = atof(_argv[++i]);
-				}
-				else if (strcmp(_argv[i], "-n") == 0)
-				{
-					// Set desired neighbors number
-					params.neighborsNumber = atoi(_argv[++i]);
 				}
 				else if (strcmp(_argv[i], "-b") == 0)
 				{
