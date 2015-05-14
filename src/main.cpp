@@ -17,8 +17,6 @@ using namespace pcl;
 
 int main(int _argn, char **_argv)
 {
-	// todo implement generation of histograms of curvature in each band
-
 	system("rm -rf ./output/*");
 
 	// Show help
@@ -72,33 +70,40 @@ int main(int _argn, char **_argv)
 	vector<Band> bands;
 	double step = Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, params, bands);
 
+	fstream output;
+	output.open("./output/curvature.dat", fstream::out);
+
 	// Calculate mean curvature
 	vector<double> curvatures;
 	Helper::calculateMeanCurvature(bands, point, curvatures);
 	for (size_t i = 0; i < curvatures.size(); i++)
-		cout << "Curvature band " << i << ": " << curvatures[i] << "\n";
+		output << "Curvature band " << i << ": " << curvatures[i] << "\n";
 	
-	cout << "***** Curvatures *****\n";
+	cout << "Generating curvature histograms\n";
+	output << "Curvature histograms\n";
 	vector <Hist> curvatureHistograms;
 	Helper::calculateCurvatureHistograms(bands, point, curvatureHistograms);
 	for (size_t i = 0; i < curvatureHistograms.size(); i++)
 	{
 		Bins bins;
 		curvatureHistograms[i].getBins(8, bins);
-		cout << "BAND" << i << ": ";
-		printBins(bins);
+		output << "BAND" << i << ": " << bins;
+//		printBins(bins);
 	}
 	
-	cout << "***** Angles *****\n";
+	cout << "Generating angle histograms\n";
+	output << "Angle histograms\n";
 	vector <Hist> angleHistograms;
 	Helper::calculateAngleHistograms(bands, point, angleHistograms);
 	for (size_t i = 0; i < angleHistograms.size(); i++)
 	{
 		Bins bins;
 		angleHistograms[i].getBins(8, 0, M_PI, bins);
-		cout << "BAND" << i << ": ";
-		printBins(bins);
+		output << "BAND" << i << ": " << bins;
+//		printBins(bins);
 	}
+
+	output.close();
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";

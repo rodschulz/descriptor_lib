@@ -39,4 +39,5 @@ private:
 	double maxData;
 };
 
+ostream& operator<<(ostream &_stream, const Bins &_bins);
 void printBins(const Bins &_data);

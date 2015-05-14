@@ -15,11 +15,25 @@ Hist::~Hist()
 {
 }
 
+ostream& operator<<(ostream &_stream, const Bins &_bins)
+{
+	_stream.precision(2);
+	for (size_t i = 0; i < _bins.bins.size(); i++)
+	{
+		_stream << fixed << "[" << _bins.step * i << "]:";
+		_stream << _bins.bins[i];
+		if (i != _bins.bins.size() - 1)
+			_stream << "\t";
+	}
+	_stream << "\n";
+	return _stream;
+}
+
 void printBins(const Bins &_data)
 {
 	for (size_t i = 0; i < _data.bins.size(); i++)
 	{
-		printf("[%1.2f]:%1.2f",  _data.step * i,  _data.bins[i]);
+		printf("[%1.2f]:%1.2f", _data.step * i, _data.bins[i]);
 		if (i != _data.bins.size() - 1)
 			printf(" - ");
 	}
@@ -29,7 +43,7 @@ void printBins(const Bins &_data)
 void Hist::add(const double _element)
 {
 	data.push_back(_element);
-	
+
 	minData = minData > _element ? _element : minData;
 	maxData = maxData < _element ? _element : maxData;
 }
@@ -37,8 +51,8 @@ void Hist::add(const double _element)
 void Hist::getBins(const int _binsNumber, const double _lowerBound, const double _upperBound, Bins &_bins)
 {
 	double step = (_upperBound - _lowerBound) / _binsNumber;
-	vector <double> binsVector(_binsNumber, 0);
-	
+	vector<double> binsVector(_binsNumber, 0);
+
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index = data[i] / step;
