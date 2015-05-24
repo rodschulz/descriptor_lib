@@ -19,16 +19,8 @@ int main(int _argn, char **_argv)
 {
 	system("rm -rf ./output/*");
 
-	// Show help
-	if (strcmp(_argv[1], "-h") == 0)
+	if (_argn < 3 || strcmp(_argv[1], "-h") == 0)
 	{
-		Parser::printUsage();
-		return EXIT_SUCCESS;
-	}
-
-	if (_argn < 3)
-	{
-		cout << "Not enough arguments\n";
 		Parser::printUsage();
 		return EXIT_FAILURE;
 	}
@@ -48,7 +40,7 @@ int main(int _argn, char **_argv)
 	// Remove NANs and calculate normals
 	Helper::removeNANs(cloud);
 	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>);
-	Extractor::getNormals(cloud, 0.01, normals);
+	Extractor::getNormals(cloud, params.normalEstimationRadius, normals);
 
 	PointXYZ point = cloud->points[index];
 	Normal pointNormal = normals->points[index];
@@ -56,6 +48,7 @@ int main(int _argn, char **_argv)
 	PointCloud<PointXYZ>::Ptr surfacePatch(new PointCloud<PointXYZ>);
 	PointCloud<Normal>::Ptr normalsPatch(new PointCloud<Normal>);
 	Extractor::getNeighborsInRadius(cloud, normals, point, params.searchRadius, surfacePatch, normalsPatch);
+	cout << "Patch size: " << surfacePatch->size() << "\n";
 
 	// Create a colored version of the could to check the target point's position
 	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
@@ -78,29 +71,27 @@ int main(int _argn, char **_argv)
 	Helper::calculateMeanCurvature(bands, point, curvatures);
 	for (size_t i = 0; i < curvatures.size(); i++)
 		output << "Curvature band " << i << ": " << curvatures[i] << "\n";
-	
+
 	cout << "Generating curvature histograms\n";
 	output << "Curvature histograms\n";
-	vector <Hist> curvatureHistograms;
+	vector<Hist> curvatureHistograms;
 	Helper::calculateCurvatureHistograms(bands, point, curvatureHistograms);
 	for (size_t i = 0; i < curvatureHistograms.size(); i++)
 	{
 		Bins bins;
 		curvatureHistograms[i].getBins(8, bins);
 		output << "BAND" << i << ": " << bins;
-//		printBins(bins);
 	}
-	
+
 	cout << "Generating angle histograms\n";
 	output << "Angle histograms\n";
-	vector <Hist> angleHistograms;
+	vector<Hist> angleHistograms;
 	Helper::calculateAngleHistograms(bands, point, angleHistograms);
 	for (size_t i = 0; i < angleHistograms.size(); i++)
 	{
 		Bins bins;
 		angleHistograms[i].getBins(8, 0, M_PI, bins);
 		output << "BAND" << i << ": " << bins;
-//		printBins(bins);
 	}
 
 	output.close();
@@ -113,9 +104,12 @@ int main(int _argn, char **_argv)
 	io::savePCDFileASCII("./output/plane.pcd", *tangentPlane);
 	for (size_t i = 0; i < bands.size(); i++)
 	{
-		char name[100];
-		sprintf(name, "./output/band%d.pcd", (int) i);
-		io::savePCDFileASCII(name, *bands[i].dataBand);
+		if (!bands[i].dataBand->empty())
+		{
+			char name[100];
+			sprintf(name, "./output/band%d.pcd", (int) i);
+			io::savePCDFileASCII(name, *bands[i].dataBand);
+		}
 	}
 
 	cout << "Finished\n";

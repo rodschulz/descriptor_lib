@@ -3,5 +3,5 @@
 alias pcv='pcl_viewer'
 
 cd ./output/
-pcv pointPosition.pcd &
-pcv pointPosition.pcd band* &
+pcv pointPosition.pcd -use_point_picking &
+pcv pointPosition.pcd band* -use_point_picking &

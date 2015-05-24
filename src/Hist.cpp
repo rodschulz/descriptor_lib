@@ -6,9 +6,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Hist::Hist()
+#define RAD2DEG(x)	((x) * 57.29578)
+
+Hist::Hist(const Dimension _dimension)
 {
 	minData = maxData = 0;
+	dimension = _dimension;
 }
 
 Hist::~Hist()
@@ -18,9 +21,11 @@ Hist::~Hist()
 ostream& operator<<(ostream &_stream, const Bins &_bins)
 {
 	_stream.precision(2);
+
+	double step = _bins.dimension == ANGLE ? RAD2DEG(_bins.step) : _bins.step;
 	for (size_t i = 0; i < _bins.bins.size(); i++)
 	{
-		_stream << fixed << "[" << _bins.step * i << "]:";
+		_stream << fixed << "[" << step * i << "]:";
 		_stream << _bins.bins[i];
 		if (i != _bins.bins.size() - 1)
 			_stream << "\t";
@@ -63,6 +68,7 @@ void Hist::getBins(const int _binsNumber, const double _lowerBound, const double
 
 	_bins.bins = binsVector;
 	_bins.step = step;
+	_bins.dimension = dimension;
 }
 
 void Hist::getBins(const int _binsNumber, Bins &_bins)
