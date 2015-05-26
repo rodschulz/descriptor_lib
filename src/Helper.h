@@ -28,8 +28,14 @@ public:
 	static void calculateAngleHistograms(const vector<Band> &_bands, const PointXYZ &_point, vector<Hist> &_histograms);
 	static void calculateCurvatureHistograms(const vector<Band> &_bands, const PointXYZ &_point, vector<Hist> &_histograms);
 	static void calculateMeanCurvature(const vector<Band> &_bands, const PointXYZ &_point, vector<double> &_curvatures);
-
 	static bool isNumber(const string &_str);
+
+	 template <class T>
+	 static inline double angleBetween(const T &_vector1, const T &_vector2)
+	{
+		return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+	}
+
 private:
 	Helper();
 	~Helper();

@@ -63,23 +63,24 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointXYZ
 			{
 				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = point - targetPoint;
-				Vector3f planeNormal = targetNormal.cross(targetToPoint);
-				planeNormal.normalize();
+
+				// Skip if the point is equal to the target point
+				if (fabs(targetToPoint.norm()) < 1E-15)
+					continue;
+
+				Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
 				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
 
 				// Project current point's normal onto the plane and calculate normal's angle
-				Vector3f projectedNormal = plane.projection(normal);
-				projectedNormal.normalize();
-
-				double angle = acos(normal.dot(projectedNormal));
-				histogram.add(angle);
+				Vector3f projectedNormal = plane.projection(normal).normalized();
+				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
+				histogram.add(theta);
 			}
 			else
 			{
 				Vector3f projectedNormal = _bands[i].planeAlong.projection(normal).normalized();
-
-				//double theta = atan2(normal.cross(projectedNormal).norm(), normal.dot(projectedNormal)) * sign<double>(normal.dot(normal.cross(projectedNormal)));
-				double theta = atan2(normal.cross(projectedNormal).norm(), normal.dot(projectedNormal));
+				//double theta = atan2(targetNormal.cross(projectedNormal).norm(), targetNormal.dot(projectedNormal)) * sign<double>(targetNormal.dot(normal.cross(projectedNormal)));
+				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
 				histogram.add(theta);
 			}
 		}
@@ -106,7 +107,12 @@ void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const Poin
 			if (_bands[i].radialBand)
 			{
 				// Create a plane containing the target point, its normal and the current point
-				Vector3f targetToPoint = point - targetPoint;
+				Vector3f targetToPoint = targetPoint - point;
+
+				// Skip if the point is equal to the target point
+				if (fabs(targetToPoint.norm()) < 1E-15)
+					continue;
+
 				Vector3f planeNormal = targetNormal.cross(targetToPoint);
 				planeNormal.normalize();
 				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
@@ -160,8 +166,7 @@ void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointXYZ &
 			{
 				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = point - targetPoint;
-				Vector3f planeNormal = targetNormal.cross(targetToPoint);
-				planeNormal.normalize();
+				Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
 				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
 
 				// Project current point's normal onto the plane and get the point's curvature

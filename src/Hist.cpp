@@ -53,7 +53,7 @@ void Hist::add(const double _element)
 	maxData = maxData < _element ? _element : maxData;
 }
 
-void Hist::getBins(const int _binsNumber, const double _lowerBound, const double _upperBound, Bins &_bins)
+void Hist::getBins(const int _binsNumber, const double _lowerBound, const double _upperBound, Bins &_bins) const
 {
 	double step = (_upperBound - _lowerBound) / _binsNumber;
 	vector<double> binsVector(_binsNumber, 0);
@@ -71,7 +71,7 @@ void Hist::getBins(const int _binsNumber, const double _lowerBound, const double
 	_bins.dimension = dimension;
 }
 
-void Hist::getBins(const int _binsNumber, Bins &_bins)
+void Hist::getBins(const int _binsNumber, Bins &_bins) const
 {
 	getBins(_binsNumber, minData, maxData, _bins);
 }

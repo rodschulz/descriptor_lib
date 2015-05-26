@@ -11,12 +11,15 @@
 #include "Extractor.h"
 #include "Parser.h"
 #include "Hist.h"
+#include "Writer.h"
 
 using namespace std;
 using namespace pcl;
 
 int main(int _argn, char **_argv)
 {
+	// todo evaluate if pcl histograms can be used to plot data
+
 	system("rm -rf ./output/*");
 
 	if (_argn < 3 || strcmp(_argv[1], "-h") == 0)
@@ -42,6 +45,12 @@ int main(int _argn, char **_argv)
 	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>);
 	Extractor::getNormals(cloud, params.normalEstimationRadius, normals);
 
+	if (normals->empty())
+	{
+		cout << "ERROR: can't estimate normals\n";
+		return EXIT_FAILURE;
+	}
+
 	PointXYZ point = cloud->points[index];
 	Normal pointNormal = normals->points[index];
 
@@ -63,38 +72,19 @@ int main(int _argn, char **_argv)
 	vector<Band> bands;
 	double step = Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, params, bands);
 
-	fstream output;
-	output.open("./output/curvature.dat", fstream::out);
-
-	// Calculate mean curvature
+	// Calculate histograms
 	vector<double> curvatures;
 	Helper::calculateMeanCurvature(bands, point, curvatures);
-	for (size_t i = 0; i < curvatures.size(); i++)
-		output << "Curvature band " << i << ": " << curvatures[i] << "\n";
-
-	cout << "Generating curvature histograms\n";
-	output << "Curvature histograms\n";
 	vector<Hist> curvatureHistograms;
+	cout << "Generating curvature histograms\n";
 	Helper::calculateCurvatureHistograms(bands, point, curvatureHistograms);
-	for (size_t i = 0; i < curvatureHistograms.size(); i++)
-	{
-		Bins bins;
-		curvatureHistograms[i].getBins(8, bins);
-		output << "BAND" << i << ": " << bins;
-	}
-
 	cout << "Generating angle histograms\n";
-	output << "Angle histograms\n";
 	vector<Hist> angleHistograms;
 	Helper::calculateAngleHistograms(bands, point, angleHistograms);
-	for (size_t i = 0; i < angleHistograms.size(); i++)
-	{
-		Bins bins;
-		angleHistograms[i].getBins(8, 0, M_PI, bins);
-		output << "BAND" << i << ": " << bins;
-	}
 
-	output.close();
+	Writer::writeData("curvature.dat", curvatures, curvatureHistograms, angleHistograms);
+//	Writer::writeHistogram("curvature", "Curvature Distribution", curvatureHistograms, 10);
+	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, 18, 0, M_PI);
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";
