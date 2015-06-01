@@ -18,7 +18,15 @@ Parser::~Parser()
 
 void Parser::printUsage()
 {
-	cout << "Usage:\n" << "   TestDescriptores <input_file> <target_point_index> [OPTIONS]\n\n" << "   -r FLOAT\tSets the search radius used to extract the surface patch\n" << "   -n FLOAT\tSets the radius used to perform the normal estimation. If none is given, then the search radius is used\n" << "   -b INT\tSets the number of bands to create for analysis (by default 4)\n" << "   -w FLOAT\tSets the band's width (by default 0.05)\n" << "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n" << "   -R\t\tWhen present bands are defined as radial zones and the width of each\n\t\twill be defined by the patch's size the number of bands\n\n";
+	cout << "Usage:\n";
+	cout << "   TestDescriptores <input_file or synthetic cloud> <target_point_index> [OPTIONS]\n\n";
+	cout << "   -sc INT\tRuns the application using a synthetic cloud. Options are 1=cube, 2=cylinder and 3=sphere\n";
+	cout << "   -r FLOAT\tSets the search radius used to extract the surface patch\n";
+	cout << "   -n FLOAT\tSets the radius used to perform the normal estimation. If none is given, then the search radius is used\n";
+	cout << "   -b INT\tSets the number of bands to create for analysis (by default 4)\n";
+	cout << "   -w FLOAT\tSets the band's width (by default 0.05)\n";
+	cout << "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n";
+	cout << "   -R\t\tWhen present bands are defined as radial zones and the width of each\n\t\twill be defined by the patch's size the number of bands\n\n";
 }
 
 ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
@@ -33,10 +41,23 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 		}
 		else
 		{
-			params.inputLocation = _argv[1];
-			params.targetPoint = atoi(_argv[2]);
+			int i;
+			if (strcmp(_argv[1], "-sc") == 0)
+			{
+				// Using a synthetic cloud
+				params.useSynthetic = true;
+				params.synCloudType = getType(_argv[2]);
+				params.targetPoint = atoi(_argv[3]);
+				i = 4;
+			}
+			else
+			{
+				// Not using a synthetic cloud
+				params.inputLocation = _argv[1];
+				params.targetPoint = atoi(_argv[2]);
+				i = 3;
+			}
 
-			int i = 3;
 			bool normalRadiusSet = false;
 			while (i < _argn)
 			{
@@ -80,4 +101,14 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 	}
 
 	return params;
+}
+
+SynCloudType Parser::getType(const string &_type)
+{
+	int type = atoi(_type.c_str());
+
+	if (0 < type || type < 3)
+		return (SynCloudType) type;
+	else
+		return NONE;
 }

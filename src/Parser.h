@@ -8,6 +8,14 @@
 
 using namespace std;
 
+enum SynCloudType
+{
+	NONE,
+	CUBE,
+	CYLINDER,
+	SPHERE,
+};
+
 struct ExecutionParams
 {
 	string inputLocation;		// Location of the input file
@@ -20,6 +28,9 @@ struct ExecutionParams
 	bool bidirectional;		// Flag indicating if each band has to be analyzed bidirectional or not
 	bool radialBands;		// Flag indicating if the bands are radial or longitudinal
 
+	bool useSynthetic;		// Flag indicating if a synthetic has to be used
+	SynCloudType synCloudType;	// Desired synthetic cloud
+
 	ExecutionParams()
 	{
 		inputLocation = "";
@@ -30,6 +41,9 @@ struct ExecutionParams
 		bandWidth = 0.01;
 		bidirectional = true;
 		radialBands = false;
+
+		useSynthetic = false;
+		synCloudType = NONE;
 	}
 };
 
@@ -41,5 +55,7 @@ public:
 private:
 	Parser();
 	~Parser();
+
+	static SynCloudType getType(const string &_type);
 };
 
