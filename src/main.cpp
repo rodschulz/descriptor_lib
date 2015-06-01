@@ -12,13 +12,15 @@
 #include "Parser.h"
 #include "Hist.h"
 #include "Writer.h"
+#include "CloudFactory.h"
 
 using namespace std;
 using namespace pcl;
 
 int main(int _argn, char **_argv)
 {
-	// todo evaluate if pcl histograms can be used to plot data
+	// todo use a synthetic cloud to check if histograms are being built properly
+	// todo remove curvature histogram generation
 
 	system("rm -rf ./output/*");
 
@@ -40,6 +42,13 @@ int main(int _argn, char **_argv)
 	}
 	cout << "Cloud loaded points: " << cloud->size() << "\n";
 
+//	CloudFactory::generateCube(0.5, Factory::makePointXYZ(1, 1, 1), cloud);
+//	io::savePCDFileASCII("./output/cube.pcd", *cloud);
+//	CloudFactory::generateCylinder(0.5, 1, Factory::makePointXYZ(1, 1, 1), cloud);
+//	io::savePCDFileASCII("./output/cylinder.pcd", *cloud);
+//	CloudFactory::generateSphere(1, Factory::makePointXYZ(1, 1, 1), cloud);
+//	io::savePCDFileASCII("./output/sphere.pcd", *cloud);
+
 	// Remove NANs and calculate normals
 	Helper::removeNANs(cloud);
 	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>);
@@ -58,6 +67,10 @@ int main(int _argn, char **_argv)
 	PointCloud<Normal>::Ptr normalsPatch(new PointCloud<Normal>);
 	Extractor::getNeighborsInRadius(cloud, normals, point, params.searchRadius, surfacePatch, normalsPatch);
 	cout << "Patch size: " << surfacePatch->size() << "\n";
+
+	Vector3f n1 = normals->at(9058).getNormalVector3fMap();
+	Vector3f n2 = normals->at(2193).getNormalVector3fMap();
+	double theta = Helper::angleBetween<Vector3f>(n1, n2);
 
 	// Create a colored version of the could to check the target point's position
 	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
