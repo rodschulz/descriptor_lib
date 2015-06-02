@@ -39,7 +39,7 @@ bool getCloud(PointCloud<PointXYZ>::Ptr &_cloud, const ExecutionParams &_params)
 				break;
 
 			case CYLINDER:
-				CloudFactory::generateCylinder(0.2, 0.5, Factory::makePointXYZ(0.2, 0.5, 0.2), _cloud);
+				CloudFactory::generateCylinder(0.2, 0.5, Factory::makePointXYZ(0.4, 0.4, 0.4), _cloud);
 				break;
 
 			case SPHERE:
@@ -110,8 +110,7 @@ int main(int _argn, char **_argv)
 	cout << "Patch size: " << patch->size() << "\n";
 
 	// Create a colored version of the could to check the target point's position
-	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
-	Helper::createColorCloud(cloudXYZ, coloredCloud, 255, 0, 0);
+	PointCloud<PointXYZRGB>::Ptr coloredCloud = Helper::createColorCloud(cloudXYZ, 255, 0, 0);
 	(*coloredCloud)[index].rgb = Helper::getColor(0, 255, 0);
 
 	// Extract interesting bands

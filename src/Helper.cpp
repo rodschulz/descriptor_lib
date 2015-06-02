@@ -5,6 +5,7 @@
 #include "Helper.h"
 #include <pcl/filters/filter.h>
 #include <ctype.h>
+#include "Factory.h"
 
 Helper::Helper()
 {
@@ -20,21 +21,15 @@ void Helper::removeNANs(PointCloud<PointXYZ>::Ptr &_cloud)
 	removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
 }
 
-void Helper::createColorCloud(const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<PointXYZRGB>::Ptr &_coloredCloud, const uint8_t _r, const uint8_t _g, const uint8_t _b)
+PointCloud<PointXYZRGB>::Ptr Helper::createColorCloud(const PointCloud<PointXYZ>::Ptr &_cloud, const uint8_t _r, const uint8_t _g, const uint8_t _b)
 {
-	_coloredCloud->clear();
-	_coloredCloud->resize(_cloud->size());
-	_coloredCloud->width = _cloud->size();
-	_coloredCloud->height = 1;
+	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
+	coloredCloud->reserve(_cloud->size());
 
-	uint32_t color = ((uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
 	for (int i = 0; i < _cloud->width; i++)
-	{
-		_coloredCloud->points[i].x = _cloud->points[i].x;
-		_coloredCloud->points[i].y = _cloud->points[i].y;
-		_coloredCloud->points[i].z = _cloud->points[i].z;
-		_coloredCloud->points[i].rgb = *reinterpret_cast<float*>(&color);
-	}
+		coloredCloud->push_back(Factory::makePointXYZRGB(_cloud->points[i].x, _cloud->points[i].y, _cloud->points[i].z, _r, _g, _b));
+
+	return coloredCloud;
 }
 
 float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
@@ -80,7 +75,7 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointNor
 			{
 				Vector3f projectedNormal = _bands[i].planeAlong.projection(normal).normalized();
 				//double theta = atan2(targetNormal.cross(projectedNormal).norm(), targetNormal.dot(projectedNormal)) * sign<double>(targetNormal.dot(normal.cross(projectedNormal)));
-				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
+				double theta = angleBetween<Vector3f>(targetNormal, normal);
 				histogram.add(theta);
 			}
 		}

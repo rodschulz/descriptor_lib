@@ -74,8 +74,8 @@ void CloudFactory::generateCylinder(const double _radius, const double _height, 
 	{
 		for (double r = _radius; r > 0; r -= radialStep)
 		{
-			_cloud->push_back(Factory::makePointXYZ(r * cos(angle), r * sin(angle), minZ));
-			_cloud->push_back(Factory::makePointXYZ(r * cos(angle), r * sin(angle), maxZ));
+			_cloud->push_back(Factory::makePointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, minZ));
+			_cloud->push_back(Factory::makePointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, maxZ));
 		}
 	}
 
@@ -84,7 +84,7 @@ void CloudFactory::generateCylinder(const double _radius, const double _height, 
 	{
 		for (double angle = 0; angle < 2 * M_PI; angle += angularStep)
 		{
-			_cloud->push_back(Factory::makePointXYZ(_radius * cos(angle), _radius * sin(angle), z));
+			_cloud->push_back(Factory::makePointXYZ(_radius * cos(angle) + _center.x, _radius * sin(angle) + _center.y, z));
 		}
 	}
 }
@@ -98,7 +98,7 @@ void CloudFactory::generateSphere(const double _radius, const PointXYZ &_center,
 	{
 		for (double phi = 0; phi < 2 * M_PI; phi += angularStep)
 		{
-			_cloud->push_back(Factory::makePointXYZ(_radius * sin(theta) * cos(phi), _radius * sin(theta) * sin(phi), _radius * cos(theta)));
+			_cloud->push_back(Factory::makePointXYZ(_radius * sin(theta) * cos(phi) + _center.x, _radius * sin(theta) * sin(phi) + _center.y, _radius * cos(theta) + _center.z));
 		}
 	}
 }

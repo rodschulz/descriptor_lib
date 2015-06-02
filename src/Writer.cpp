@@ -9,7 +9,7 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define RAD2DEG(x)		((x) * 57.29578)
+#define RAD2DEG(x)		((x) * 57.2957795131)
 #define SCRIPT_NAME		"plot.script"
 #define DATA_NAME		"histogram.dat"
 #define PLOT_SCRIPT_NAME	OUTPUT_FOLDER SCRIPT_NAME

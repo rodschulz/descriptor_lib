@@ -35,28 +35,31 @@ void Extractor::getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud,
 
 void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius, PointCloud<Normal>::Ptr &_normals)
 {
+	// TODO remove use of search radius in favor of the use of k-search
+
 	// Search method used for the knn search
 	search::KdTree<PointXYZ>::Ptr kdtree(new search::KdTree<PointXYZ>);
 
 	NormalEstimation<PointXYZ, Normal> normalEstimation;
 	normalEstimation.setInputCloud(_cloud);
-	normalEstimation.setRadiusSearch(_searchRadius);
+	//normalEstimation.setRadiusSearch(_searchRadius);
+	normalEstimation.setKSearch(10);
 	normalEstimation.setSearchMethod(kdtree);
 	normalEstimation.compute(*_normals);
 }
 
 double Extractor::getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands)
 {
-	// Get the point, its normal and make a plane
+	// Get the point, its normal and make a plane tangent to the point
 	Vector3f p = _point.getVector3fMap();
 	Vector3f n = _point.getNormalVector3fMap();
-	Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, p);
+	Hyperplane<float, 3> tangentPlane = Hyperplane<float, 3>(n, p);
 
 	double step;
 	if (_params.radialBands)
-		step = getRadialBands(_cloud, p, n, plane, _params, _bands);
+		step = getRadialBands(_cloud, p, n, tangentPlane, _params, _bands);
 	else
-		step = getLongitudinalBands(_cloud, p, n, plane, _params, _bands);
+		step = getLongitudinalBands(_cloud, p, n, tangentPlane, _params, _bands);
 
 	return step;
 }
@@ -108,34 +111,32 @@ double Extractor::getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, con
 
 double Extractor::getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_cloud, const Vector3f &_p, const Vector3f &_n, const Hyperplane<float, 3> &_plane, const ExecutionParams &_params, vector<Band> &_bands)
 {
+	_bands.clear();
+
 	// Create a pair of perpendicular vectors to be used as axes in the plane
-	Vector3f d1(_p[0] + 10, _p[1], _p[2]);
-	d1 = _plane.projection(d1);
-	d1.normalize();
-	Vector3f d2 = _n.cross(d1);
-	d2.normalize();
+	Vector3f v1 = _p + Vector3f(10, 10, 10); // TODO find a better way to get this initial director vector
+	v1 = _plane.projection(v1).normalized();
+	Vector3f v2 = _n.cross(v1).normalized();
 
 	// Angular step for bands definitions
 	double angleRange = _params.bidirectional ? M_PI : 2 * M_PI;
 	double angleStep = angleRange / _params.bandNumber;
 
 	// Create the lines defining each band and also each band's longitudinal plane
-	_bands.clear();
 	vector<ParametrizedLine<float, 3> > lines;
-	vector<Vector3f> planeNormals;
+	vector<Vector3f> normals;
 	vector<Vector3f> directors;
 	for (int i = 0; i < _params.bandNumber; i++)
 	{
 		// Calculate the line's director vector and define the line
-		Vector3f director = d1 * cos(angleStep * i) + d2 * sin(angleStep * i);
+		Vector3f director = v1 * cos(angleStep * i) + v2 * sin(angleStep * i);
 		directors.push_back(director);
 		lines.push_back(ParametrizedLine<float, 3>(_p, director));
 
-		// Calculate the plane's normal and then define the plane
-		Vector3f bandPlaneNormal = _n.cross(director);
-		bandPlaneNormal.normalize();
-		_bands.push_back(Band(_n, Hyperplane<float, 3>(bandPlaneNormal, _p)));
-		planeNormals.push_back(bandPlaneNormal);
+		// Calculate the normal to a plane going along the band and then define the plane
+		Vector3f planeNormal = _n.cross(director).normalized();
+		_bands.push_back(Band(_n, Hyperplane<float, 3>(planeNormal, _p)));
+		normals.push_back(planeNormal);
 	}
 
 	// Start extracting points
@@ -156,7 +157,7 @@ double Extractor::getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_clou
 			{
 				// Create a vector going from the plane to the current point and the use the dot
 				// product to check if the vector points the same direction than the director vector
-				Vector3f pointOnPlane = _p + planeNormals[j];
+				Vector3f pointOnPlane = _p + normals[j];
 				Vector3f planeToPoint = point - pointOnPlane;
 				double orientation = directors[j].dot(planeToPoint);
 
