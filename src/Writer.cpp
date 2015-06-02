@@ -51,56 +51,59 @@ void Writer::writeData(const string &_filename, const vector<double> &_curvature
 
 void Writer::writeHistogram(const string &_filename, const string &_histogramTitle, const vector<Hist> &_histograms, const int _binsNumber, const double _lowerBound, const double _upperBound)
 {
-	// Generate the plotting script
-	generateScript(_filename, _histogramTitle, _histograms.size());
-
-	ostringstream stream;
-	vector<string> rows(_binsNumber, "");
-
-	// Generate the data to plot
-	Bins aux;
-	(_lowerBound == -1 || _upperBound == -1) ? _histograms[0].getBins(_binsNumber, aux) : _histograms[0].getBins(_binsNumber, _lowerBound, _upperBound, aux);
-
-	double step = aux.dimension == ANGLE ? RAD2DEG(aux.step) : aux.step;
-	for (int j = 0; j < _binsNumber; j++)
+	if (!_histograms.empty())
 	{
-		stream.str(string());
-		stream << step * j;
-		rows[j] = stream.str();
-	}
+		// Generate the plotting script
+		generateScript(_filename, _histogramTitle, _histograms.size());
 
-	for (size_t i = 0; i < _histograms.size(); i++)
-	{
-		Bins bins;
-		(_lowerBound == -1 || _upperBound == -1) ? _histograms[i].getBins(_binsNumber, bins) : _histograms[i].getBins(_binsNumber, _lowerBound, _upperBound, bins);
+		ostringstream stream;
+		vector<string> rows(_binsNumber, "");
 
+		// Generate the data to plot
+		Bins aux;
+		(_lowerBound == -1 || _upperBound == -1) ? _histograms[0].getBins(_binsNumber, aux) : _histograms[0].getBins(_binsNumber, _lowerBound, _upperBound, aux);
+
+		double step = aux.dimension == ANGLE ? RAD2DEG(aux.step) : aux.step;
 		for (int j = 0; j < _binsNumber; j++)
 		{
 			stream.str(string());
-			stream << "\t" << bins.bins[j];
-			rows[j] += stream.str();
+			stream << step * j;
+			rows[j] = stream.str();
 		}
+
+		for (size_t i = 0; i < _histograms.size(); i++)
+		{
+			Bins bins;
+			(_lowerBound == -1 || _upperBound == -1) ? _histograms[i].getBins(_binsNumber, bins) : _histograms[i].getBins(_binsNumber, _lowerBound, _upperBound, bins);
+
+			for (int j = 0; j < _binsNumber; j++)
+			{
+				stream.str(string());
+				stream << "\t" << bins.bins[j];
+				rows[j] += stream.str();
+			}
+		}
+
+		// Generate data file
+		ofstream output;
+		output.open(PLOT_DATA_NAME, fstream::out);
+		for (size_t i = 0; i < rows.size(); i++)
+			output << rows[i] << "\n";
+		output.close();
+
+		// Execute script to generate plot
+		string cmd = "gnuplot ";
+		cmd += PLOT_SCRIPT_NAME;
+		system(cmd.c_str());
+
+		// Remove script and data
+		cmd = "rm -rf ";
+		cmd += PLOT_SCRIPT_NAME;
+		system(cmd.c_str());
+		cmd = "rm -rf ";
+		cmd += PLOT_DATA_NAME;
+		system(cmd.c_str());
 	}
-
-	// Generate data file
-	ofstream output;
-	output.open(PLOT_DATA_NAME, fstream::out);
-	for (size_t i = 0; i < rows.size(); i++)
-		output << rows[i] << "\n";
-	output.close();
-
-	// Execute script to generate plot
-	string cmd = "gnuplot ";
-	cmd += PLOT_SCRIPT_NAME;
-	system(cmd.c_str());
-
-	// Remove script and data
-	cmd = "rm -rf ";
-	cmd += PLOT_SCRIPT_NAME;
-	system(cmd.c_str());
-	cmd = "rm -rf ";
-	cmd += PLOT_DATA_NAME;
-	system(cmd.c_str());
 }
 
 void Writer::generateScript(const string &_filename, const string &_histogramTitle, const int _bandsNumber)

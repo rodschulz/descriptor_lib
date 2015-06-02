@@ -54,10 +54,28 @@ bool getCloud(PointCloud<PointXYZ>::Ptr &_cloud, const ExecutionParams &_params)
 	return true;
 }
 
+bool getFullCloud(PointCloud<PointXYZ>::Ptr &_cloudXYZ, const ExecutionParams &_params, PointCloud<PointNormal>::Ptr &_fullCloud)
+{
+	// Remove NANs and calculate normals
+	Helper::removeNANs(_cloudXYZ);
+	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>());
+	Extractor::getNormals(_cloudXYZ, _params.normalEstimationRadius, normals);
+
+	if (normals->empty())
+	{
+		cout << "ERROR: can't estimate normals\n";
+		return false;
+	}
+
+	// Create a XYZ data and normals
+	_fullCloud->clear();
+	concatenateFields(*_cloudXYZ, *normals, *_fullCloud);
+
+	return true;
+}
+
 int main(int _argn, char **_argv)
 {
-	// todo remove curvature histogram generation
-
 	system("rm -rf ./output/*");
 
 	if (_argn < 3 || strcmp(_argv[1], "-h") == 0)
@@ -69,51 +87,36 @@ int main(int _argn, char **_argv)
 	ExecutionParams params = Parser::parseExecutionParams(_argn, _argv);
 	int index = params.targetPoint;
 
-	PointCloud<PointXYZ>::Ptr cloud(new PointCloud<PointXYZ>());
-	if (!getCloud(cloud, params))
+	// Load XYZ data
+	PointCloud<PointXYZ>::Ptr cloudXYZ(new PointCloud<PointXYZ>());
+	if (!getCloud(cloudXYZ, params))
 	{
 		cout << "ERROR: Can't get cloud\n";
 		return EXIT_FAILURE;
 	}
-	cout << "Cloud loaded points: " << cloud->size() << "\n";
+	cout << "Cloud loaded points: " << cloudXYZ->size() << "\n";
 
-	// Remove NANs and calculate normals
-	Helper::removeNANs(cloud);
-	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>());
-	Extractor::getNormals(cloud, params.normalEstimationRadius, normals);
-
-	if (normals->empty())
-	{
-		cout << "ERROR: can't estimate normals\n";
+	// Calculate normals and join them to get the full cloud
+	PointCloud<PointNormal>::Ptr cloud(new PointCloud<PointNormal>());
+	if (!getFullCloud(cloudXYZ, params, cloud))
 		return EXIT_FAILURE;
-	}
 
-	// Create a joint cloud of points and normals
-	PointCloud<PointNormal>::Ptr jointCloud(new PointCloud<PointNormal>());
-	concatenateFields(*cloud, *normals, *jointCloud);
-
-	// Get target point and normal
-	PointXYZ point = cloud->points[index];
-	Normal pointNormal = normals->points[index];
+	// Get target point
+	PointNormal point = cloud->points[index];
 
 	// Extract patch
-	PointCloud<PointXYZ>::Ptr surfacePatch(new PointCloud<PointXYZ>);
-	PointCloud<Normal>::Ptr normalsPatch(new PointCloud<Normal>);
-	Extractor::getNeighborsInRadius(cloud, normals, point, params.searchRadius, surfacePatch, normalsPatch);
-	cout << "Patch size: " << surfacePatch->size() << "\n";
+	PointCloud<PointNormal>::Ptr patch(new PointCloud<PointNormal>());
+	Extractor::getNeighborsInRadius(cloud, point, params.searchRadius, patch);
+	cout << "Patch size: " << patch->size() << "\n";
 
 	// Create a colored version of the could to check the target point's position
 	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
-	Helper::createColorCloud(cloud, coloredCloud, 255, 0, 0);
+	Helper::createColorCloud(cloudXYZ, coloredCloud, 255, 0, 0);
 	(*coloredCloud)[index].rgb = Helper::getColor(0, 255, 0);
-
-	// Create a cloud holding the tangent plane
-	PointCloud<PointXYZRGB>::Ptr tangentPlane(new PointCloud<PointXYZRGB>());
-	Extractor::getTangentPlane(cloud, point, pointNormal, tangentPlane);
 
 	// Extract interesting bands
 	vector<Band> bands;
-	double step = Extractor::getBands(surfacePatch, normalsPatch, point, pointNormal, params, bands);
+	double step = Extractor::getBands(patch, point, params, bands);
 
 	// Calculate histograms
 	cout << "Generating angle histograms\n";
@@ -123,11 +126,10 @@ int main(int _argn, char **_argv)
 
 	// Write clouds to disk
 	cout << "Writing clouds to disk\n";
-	io::savePCDFileASCII("./output/jointCloud.pcd", *jointCloud);
-	io::savePCDFileASCII("./output/normals.pcd", *normals);
-	io::savePCDFileASCII("./output/patch.pcd", *surfacePatch);
+	io::savePCDFileASCII("./output/cloud.pcd", *cloud);
+	io::savePCDFileASCII("./output/patch.pcd", *patch);
 	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
-	io::savePCDFileASCII("./output/plane.pcd", *tangentPlane);
+	io::savePCDFileASCII("./output/plane.pcd", *Extractor::getTangentPlane(cloudXYZ, point));
 	for (size_t i = 0; i < bands.size(); i++)
 	{
 		if (!bands[i].dataBand->empty())

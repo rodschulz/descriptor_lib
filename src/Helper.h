@@ -25,13 +25,13 @@ public:
 	static void removeNANs(PointCloud<PointXYZ>::Ptr &_cloud);
 	static void createColorCloud(const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<PointXYZRGB>::Ptr &_coloredCloud, const uint8_t _r, const uint8_t _g, const uint8_t _b);
 	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
-	static void calculateAngleHistograms(const vector<Band> &_bands, const PointXYZ &_point, vector<Hist> &_histograms);
-	static void calculateCurvatureHistograms(const vector<Band> &_bands, const PointXYZ &_point, vector<Hist> &_histograms);
-	static void calculateMeanCurvature(const vector<Band> &_bands, const PointXYZ &_point, vector<double> &_curvatures);
+	static void calculateAngleHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms);
+	static void calculateCurvatureHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms);
+	static void calculateMeanCurvature(const vector<Band> &_bands, const PointNormal &_point, vector<double> &_curvatures);
 	static bool isNumber(const string &_str);
 
-	 template <class T>
-	 static inline double angleBetween(const T &_vector1, const T &_vector2)
+	template<class T>
+	static inline double angleBetween(const T &_vector1, const T &_vector2)
 	{
 		return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
 	}

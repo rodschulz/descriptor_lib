@@ -44,7 +44,7 @@ float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
 	return finalColor;
 }
 
-void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointXYZ &_point, vector<Hist> &_histograms)
+void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms)
 {
 	_histograms.reserve(_bands.size());
 	Vector3f targetPoint = _point.getVector3fMap();
@@ -54,10 +54,10 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointXYZ
 		Vector3f targetNormal = _bands[i].pointNormal;
 		Hist histogram(ANGLE);
 
-		for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+		for (size_t j = 0; j < _bands[i].dataBand->size(); j++)
 		{
 			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap().normalized();
+			Vector3f normal = _bands[i].dataBand->points[j].getNormalVector3fMap().normalized();
 
 			if (_bands[i].radialBand)
 			{
@@ -89,7 +89,7 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointXYZ
 	}
 }
 
-void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const PointXYZ &_point, vector<Hist> &_histograms)
+void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms)
 {
 	_histograms.reserve(_bands.size());
 	Vector3f targetPoint = _point.getVector3fMap();
@@ -99,10 +99,10 @@ void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const Poin
 		Vector3f targetNormal = _bands[i].pointNormal;
 		Hist histogram;
 
-		for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+		for (size_t j = 0; j < _bands[i].dataBand->size(); j++)
 		{
 			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap();
+			Vector3f normal = _bands[i].dataBand->points[j].getNormalVector3fMap();
 
 			if (_bands[i].radialBand)
 			{
@@ -147,7 +147,7 @@ void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const Poin
 	}
 }
 
-void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointXYZ &_point, vector<double> &_curvatures)
+void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointNormal &_point, vector<double> &_curvatures)
 {
 	_curvatures.reserve(_bands.size());
 	Vector3f targetPoint = _point.getVector3fMap();
@@ -157,10 +157,10 @@ void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointXYZ &
 		Vector3f targetNormal = _bands[i].pointNormal;
 
 		double curvature = 0;
-		for (size_t j = 0; j < _bands[i].normalBand->size(); j++)
+		for (size_t j = 0; j < _bands[i].dataBand->size(); j++)
 		{
 			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].normalBand->points[j].getNormalVector3fMap();
+			Vector3f normal = _bands[i].dataBand->points[j].getNormalVector3fMap();
 
 			if (_bands[i].radialBand)
 			{
@@ -194,7 +194,7 @@ void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointXYZ &
 					curvature += (normalDistance / pointDistance);
 			}
 		}
-		curvature /= _bands[i].normalBand->size();
+		curvature /= _bands[i].dataBand->size();
 		_curvatures.push_back(curvature);
 	}
 }
