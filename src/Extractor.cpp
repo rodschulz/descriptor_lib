@@ -50,16 +50,11 @@ void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double
 
 double Extractor::getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands)
 {
-	// Get the point, its normal and make a plane tangent to the point
-	Vector3f p = _point.getVector3fMap();
-	Vector3f n = _point.getNormalVector3fMap();
-	Hyperplane<float, 3> tangentPlane = Hyperplane<float, 3>(n, p);
-
 	double step;
 	if (_params.radialBands)
-		step = getRadialBands(_cloud, p, n, tangentPlane, _params, _bands);
+		step = getRadialBands(_cloud, _point, _params, _bands);
 	else
-		step = getLongitudinalBands(_cloud, p, n, tangentPlane, _params, _bands);
+		step = getLongitudinalBands(_cloud, _point, _params, _bands);
 
 	return step;
 }
@@ -84,39 +79,48 @@ PointCloud<PointXYZRGB>::Ptr Extractor::getTangentPlane(const PointCloud<PointXY
 	return tangentPlane;
 }
 
-double Extractor::getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, const Vector3f &_p, const Vector3f &_n, const Hyperplane<float, 3> &_plane, const ExecutionParams &_params, vector<Band> &_bands)
+double Extractor::getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands)
 {
+	// Get the point, its normal and make a plane tangent to the point
+	Vector3f p = _point.getVector3fMap();
+	Vector3f n = _point.getNormalVector3fMap();
+	Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, p);
+
 	double radialStep = _params.searchRadius / _params.bandNumber;
 
 	// Create bands
 	_bands.clear();
 	for (int i = 0; i < _params.bandNumber; i++)
-		_bands.push_back(Band(_n, true));
+		_bands.push_back(Band(_point, true));
 
 	// Extract points
 	for (size_t i = 0; i < _cloud->size(); i++)
 	{
 		Vector3f point = _cloud->points[i].getVector3fMap();
-		Vector3f projection = _plane.projection(point);
+		Vector3f projection = plane.projection(point);
 
-		Vector3f diff = _p - projection;
+		Vector3f diff = p - projection;
 		double distance = diff.norm();
 		int index = (int) (distance / radialStep);
 
-		_bands[index].dataBand->push_back(_cloud->points[i]);
+		_bands[index].data->push_back(_cloud->points[i]);
 	}
 
 	return radialStep;
 }
 
-double Extractor::getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_cloud, const Vector3f &_p, const Vector3f &_n, const Hyperplane<float, 3> &_plane, const ExecutionParams &_params, vector<Band> &_bands)
+double Extractor::getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands)
 {
 	_bands.clear();
 
+	Vector3f p = _point.getVector3fMap();
+	Vector3f n = _point.getNormalVector3fMap();
+	Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, p);
+
 	// Create a pair of perpendicular vectors to be used as axes in the plane
-	Vector3f v1 = _p + Vector3f(10, 10, 10); // TODO find a better way to get this initial director vector
-	v1 = _plane.projection(v1).normalized();
-	Vector3f v2 = _n.cross(v1).normalized();
+	Vector3f v1 = p + Vector3f(10, 10, 10); // TODO find a better way to get this initial director vector
+	v1 = plane.projection(v1).normalized();
+	Vector3f v2 = n.cross(v1).normalized();
 
 	// Angular step for bands definitions
 	double angleRange = _params.bidirectional ? M_PI : 2 * M_PI;
@@ -131,11 +135,11 @@ double Extractor::getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_clou
 		// Calculate the line's director vector and define the line
 		Vector3f director = v1 * cos(angleStep * i) + v2 * sin(angleStep * i);
 		directors.push_back(director);
-		lines.push_back(ParametrizedLine<float, 3>(_p, director));
+		lines.push_back(ParametrizedLine<float, 3>(p, director));
 
 		// Calculate the normal to a plane going along the band and then define the plane
-		Vector3f planeNormal = _n.cross(director).normalized();
-		_bands.push_back(Band(_n, Hyperplane<float, 3>(planeNormal, _p)));
+		Vector3f planeNormal = n.cross(director).normalized();
+		_bands.push_back(Band(_point, Hyperplane<float, 3>(planeNormal, p)));
 		normals.push_back(planeNormal);
 	}
 
@@ -144,25 +148,25 @@ double Extractor::getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_clou
 	for (size_t i = 0; i < _cloud->size(); i++)
 	{
 		Vector3f point = _cloud->points[i].getVector3fMap();
-		Vector3f projection = _plane.projection(point);
+		Vector3f projection = plane.projection(point);
 
 		for (size_t j = 0; j < lines.size(); j++)
 		{
 			if (_params.bidirectional)
 			{
 				if (lines[j].distance(projection) <= halfBand)
-					_bands[j].dataBand->push_back(_cloud->points[i]);
+					_bands[j].data->push_back(_cloud->points[i]);
 			}
 			else
 			{
 				// Create a vector going from the plane to the current point and the use the dot
 				// product to check if the vector points the same direction than the director vector
-				Vector3f pointOnPlane = _p + normals[j];
+				Vector3f pointOnPlane = p + normals[j];
 				Vector3f planeToPoint = point - pointOnPlane;
 				double orientation = directors[j].dot(planeToPoint);
 
 				if (orientation >= 0 && lines[j].distance(projection) <= halfBand)
-					_bands[j].dataBand->push_back(_cloud->points[i]);
+					_bands[j].data->push_back(_cloud->points[i]);
 			}
 		}
 	}

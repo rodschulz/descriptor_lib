@@ -42,3 +42,16 @@ PointXYZRGB Factory::makePointXYZRGB(const float _x, const float _y, const float
 	p.rgb = *reinterpret_cast<float*>(&color);
 	return p;
 }
+
+PointNormal Factory::makePointNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature)
+{
+	PointNormal p;
+	p.x = _x;
+	p.y = _y;
+	p.z = _z;
+	p.normal_x = _nx;
+	p.normal_y = _ny;
+	p.normal_z = _nz;
+	p.curvature = _curvature;
+	return p;
+}

@@ -131,11 +131,11 @@ int main(int _argn, char **_argv)
 	io::savePCDFileASCII("./output/plane.pcd", *Extractor::getTangentPlane(cloudXYZ, point));
 	for (size_t i = 0; i < bands.size(); i++)
 	{
-		if (!bands[i].dataBand->empty())
+		if (!bands[i].data->empty())
 		{
 			char name[100];
 			sprintf(name, "./output/band%d.pcd", (int) i);
-			io::savePCDFileASCII(name, *bands[i].dataBand);
+			io::savePCDFileASCII(name, *bands[i].data);
 		}
 	}
 

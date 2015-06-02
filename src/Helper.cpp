@@ -41,20 +41,22 @@ float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
 
 void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms)
 {
+	_histograms.clear();
 	_histograms.reserve(_bands.size());
+
 	Vector3f targetPoint = _point.getVector3fMap();
+	Vector3f targetNormal = _point.getNormalVector3fMap();
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
-		Vector3f targetNormal = _bands[i].pointNormal;
-		Hist histogram(ANGLE);
+		_histograms.push_back(Hist(ANGLE));
 
-		for (size_t j = 0; j < _bands[i].dataBand->size(); j++)
+		for (size_t j = 0; j < _bands[i].data->size(); j++)
 		{
-			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].dataBand->points[j].getNormalVector3fMap().normalized();
+			Vector3f point = _bands[i].data->points[j].getVector3fMap();
+			Vector3f normal = _bands[i].data->points[j].getNormalVector3fMap().normalized();
 
-			if (_bands[i].radialBand)
+			if (_bands[i].isRadialBand)
 			{
 				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = point - targetPoint;
@@ -69,37 +71,37 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointNor
 				// Project current point's normal onto the plane and calculate normal's angle
 				Vector3f projectedNormal = plane.projection(normal).normalized();
 				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
-				histogram.add(theta);
+				_histograms.back().add(theta);
 			}
 			else
 			{
-				Vector3f projectedNormal = _bands[i].planeAlong.projection(normal).normalized();
+				Vector3f projectedNormal = _bands[i].plane.projection(normal).normalized();
 				//double theta = atan2(targetNormal.cross(projectedNormal).norm(), targetNormal.dot(projectedNormal)) * sign<double>(targetNormal.dot(normal.cross(projectedNormal)));
 				double theta = angleBetween<Vector3f>(targetNormal, normal);
-				histogram.add(theta);
+				_histograms.back().add(theta);
 			}
 		}
-
-		_histograms.push_back(histogram);
 	}
 }
 
 void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms)
 {
+	_histograms.clear();
 	_histograms.reserve(_bands.size());
+
 	Vector3f targetPoint = _point.getVector3fMap();
+	Vector3f targetNormal = _point.getNormalVector3fMap();
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
-		Vector3f targetNormal = _bands[i].pointNormal;
 		Hist histogram;
 
-		for (size_t j = 0; j < _bands[i].dataBand->size(); j++)
+		for (size_t j = 0; j < _bands[i].data->size(); j++)
 		{
-			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].dataBand->points[j].getNormalVector3fMap();
+			Vector3f point = _bands[i].data->points[j].getVector3fMap();
+			Vector3f normal = _bands[i].data->points[j].getNormalVector3fMap();
 
-			if (_bands[i].radialBand)
+			if (_bands[i].isRadialBand)
 			{
 				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = targetPoint - point;
@@ -125,8 +127,8 @@ void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const Poin
 			}
 			else
 			{
-				Vector3f projectedPoint = _bands[i].planeAlong.projection(point);
-				Vector3f projectedNormal = _bands[i].planeAlong.projection(normal);
+				Vector3f projectedPoint = _bands[i].plane.projection(point);
+				Vector3f projectedNormal = _bands[i].plane.projection(normal);
 
 				Vector3f pointDiff = targetPoint - projectedPoint;
 				double pointDistance = pointDiff.norm();
@@ -144,20 +146,21 @@ void Helper::calculateCurvatureHistograms(const vector<Band> &_bands, const Poin
 
 void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointNormal &_point, vector<double> &_curvatures)
 {
+	_curvatures.clear();
 	_curvatures.reserve(_bands.size());
+
 	Vector3f targetPoint = _point.getVector3fMap();
+	Vector3f targetNormal = _point.getNormalVector3fMap();
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
-		Vector3f targetNormal = _bands[i].pointNormal;
-
 		double curvature = 0;
-		for (size_t j = 0; j < _bands[i].dataBand->size(); j++)
+		for (size_t j = 0; j < _bands[i].data->size(); j++)
 		{
-			Vector3f point = _bands[i].dataBand->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].dataBand->points[j].getNormalVector3fMap();
+			Vector3f point = _bands[i].data->points[j].getVector3fMap();
+			Vector3f normal = _bands[i].data->points[j].getNormalVector3fMap();
 
-			if (_bands[i].radialBand)
+			if (_bands[i].isRadialBand)
 			{
 				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = point - targetPoint;
@@ -177,8 +180,8 @@ void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointNorma
 			}
 			else
 			{
-				Vector3f projectedPoint = _bands[i].planeAlong.projection(point);
-				Vector3f projectedNormal = _bands[i].planeAlong.projection(normal);
+				Vector3f projectedPoint = _bands[i].plane.projection(point);
+				Vector3f projectedNormal = _bands[i].plane.projection(normal);
 
 				Vector3f pointDiff = targetPoint - projectedPoint;
 				double pointDistance = pointDiff.norm();
@@ -189,7 +192,7 @@ void Helper::calculateMeanCurvature(const vector<Band> &_bands, const PointNorma
 					curvature += (normalDistance / pointDistance);
 			}
 		}
-		curvature /= _bands[i].dataBand->size();
+		curvature /= _bands[i].data->size();
 		_curvatures.push_back(curvature);
 	}
 }
