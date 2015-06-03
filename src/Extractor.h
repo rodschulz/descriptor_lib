@@ -52,7 +52,7 @@ class Extractor
 {
 public:
 	static void getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius, PointCloud<PointNormal>::Ptr &_surfacePatch);
-	static void getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius, PointCloud<Normal>::Ptr &_normals);
+	static void getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<Normal>::Ptr &_normals, const double _searchRadius = -1);
 	static double getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands);
 	static PointCloud<PointXYZRGB>::Ptr getTangentPlane(const PointCloud<PointXYZ>::Ptr &_cloud, const PointNormal &_point);
 

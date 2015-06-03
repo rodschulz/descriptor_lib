@@ -58,7 +58,6 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 				i = 3;
 			}
 
-			bool normalRadiusSet = false;
 			while (i < _argn)
 			{
 				if (strcmp(_argv[i], "-R") == 0)
@@ -70,14 +69,11 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 				{
 					// Set search radius
 					params.searchRadius = atof(_argv[++i]);
-					if (!normalRadiusSet)
-						params.normalEstimationRadius = params.searchRadius;
 				}
 				else if (strcmp(_argv[i], "-n") == 0)
 				{
 					// Set the normal estimation radius
 					params.normalEstimationRadius = atof(_argv[++i]);
-					normalRadiusSet = true;
 				}
 				else if (strcmp(_argv[i], "-b") == 0)
 				{

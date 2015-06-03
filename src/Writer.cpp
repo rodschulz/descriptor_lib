@@ -39,7 +39,7 @@ void Writer::writeData(const string &_filename, const vector<double> &_curvature
 		_curvatureHistograms[i].getBins(8, bins);
 		output << "BAND" << i << ": " << bins;
 	}
-	output << "Angle histograms\n";
+	output << "Angle Histograms\n";
 	for (size_t i = 0; i < _angleHistograms.size(); i++)
 	{
 		Bins bins;
@@ -112,23 +112,19 @@ void Writer::generateScript(const string &_filename, const string &_histogramTit
 	output.open(PLOT_SCRIPT_NAME, fstream::out);
 
 	output << "set title '" << _histogramTitle << "'\n";
+	output << "set ylabel 'Percentage'\n";
+	output << "set xlabel 'Degrees'\n";
+
 	output << "set auto x\n";
 	output << "set yrange [0:1]\n";
 	output << "set style data linespoints\n";
-
-	//output << "set style data histogram\n";
-	//output << "set style histogram cluster gap 2\n";
-	//output << "set style fill solid border -1\n";
-	//output << "set boxwidth 0.9\n";
 
 	output << "set term png\n";
 	output << "set output '" << OUTPUT_FOLDER << _filename << ".png'\n";
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)
-		output << "'" << PLOT_DATA_NAME << "' using 1:" << i + 2 << " title 'Banda " << i << "', \\\n";
-
-	//output << "#pause -1\n";
+		output << "'" << PLOT_DATA_NAME << "' using 1:" << i + 2 << " title 'Band " << i << "', \\\n";
 
 	output.close();
 }

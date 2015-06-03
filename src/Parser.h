@@ -10,10 +10,7 @@ using namespace std;
 
 enum SynCloudType
 {
-	NONE,
-	CUBE,
-	CYLINDER,
-	SPHERE,
+	NONE, CUBE, CYLINDER, SPHERE,
 };
 
 struct ExecutionParams
@@ -35,7 +32,7 @@ struct ExecutionParams
 	{
 		inputLocation = "";
 		searchRadius = 0.05;
-		normalEstimationRadius = 0.05;
+		normalEstimationRadius = -1;
 		targetPoint = 1000;
 		bandNumber = 4;
 		bandWidth = 0.01;

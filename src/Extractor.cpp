@@ -33,17 +33,19 @@ void Extractor::getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud,
 		_surfacePatch->push_back(_cloud->points[pointIndices[i]]);
 }
 
-void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius, PointCloud<Normal>::Ptr &_normals)
+void Extractor::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<Normal>::Ptr &_normals, const double _searchRadius)
 {
-	// TODO remove use of search radius in favor of the use of k-search
-
 	// Search method used for the knn search
 	search::KdTree<PointXYZ>::Ptr kdtree(new search::KdTree<PointXYZ>);
 
 	NormalEstimation<PointXYZ, Normal> normalEstimation;
 	normalEstimation.setInputCloud(_cloud);
-	//normalEstimation.setRadiusSearch(_searchRadius);
-	normalEstimation.setKSearch(10);
+
+	if (_searchRadius > 0)
+		normalEstimation.setRadiusSearch(_searchRadius);
+	else
+		normalEstimation.setKSearch(10);
+
 	normalEstimation.setSearchMethod(kdtree);
 	normalEstimation.compute(*_normals);
 }

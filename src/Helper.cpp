@@ -50,11 +50,10 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointNor
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
 		_histograms.push_back(Hist(ANGLE));
-
 		for (size_t j = 0; j < _bands[i].data->size(); j++)
 		{
 			Vector3f point = _bands[i].data->points[j].getVector3fMap();
-			Vector3f normal = _bands[i].data->points[j].getNormalVector3fMap().normalized();
+			Vector3f normal = _bands[i].data->points[j].getNormalVector3fMap();
 
 			if (_bands[i].isRadialBand)
 			{
@@ -75,9 +74,10 @@ void Helper::calculateAngleHistograms(const vector<Band> &_bands, const PointNor
 			}
 			else
 			{
+				// TODO I think this angle should be against the original normal, not the projected one
 				Vector3f projectedNormal = _bands[i].plane.projection(normal).normalized();
-				//double theta = atan2(targetNormal.cross(projectedNormal).norm(), targetNormal.dot(projectedNormal)) * sign<double>(targetNormal.dot(normal.cross(projectedNormal)));
-				double theta = angleBetween<Vector3f>(targetNormal, normal);
+				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
+				//double theta = angleBetween<Vector3f>(targetNormal, normal);
 				_histograms.back().add(theta);
 			}
 		}

@@ -59,7 +59,7 @@ bool getFullCloud(PointCloud<PointXYZ>::Ptr &_cloudXYZ, const ExecutionParams &_
 	// Remove NANs and calculate normals
 	Helper::removeNANs(_cloudXYZ);
 	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>());
-	Extractor::getNormals(_cloudXYZ, _params.normalEstimationRadius, normals);
+	Extractor::getNormals(_cloudXYZ, normals, _params.normalEstimationRadius);
 
 	if (normals->empty())
 	{
