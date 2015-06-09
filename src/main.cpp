@@ -14,8 +14,6 @@
 #include "Writer.h"
 #include "CloudFactory.h"
 
-#include <pcl/visualization/pcl_visualizer.h>
-
 using namespace std;
 using namespace pcl;
 
@@ -76,7 +74,8 @@ bool getFullCloud(PointCloud<PointXYZ>::Ptr &_cloudXYZ, const ExecutionParams &_
 
 int main(int _argn, char **_argv)
 {
-	system("rm -rf ./output/*");
+	if (system("rm -rf ./output/*") != 0)
+		cout << "ERROR, wrong command\n";
 
 	if (_argn < 3 || strcmp(_argv[1], "-h") == 0)
 	{

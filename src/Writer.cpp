@@ -94,15 +94,19 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 		// Execute script to generate plot
 		string cmd = "gnuplot ";
 		cmd += PLOT_SCRIPT_NAME;
-		system(cmd.c_str());
+		if (system(cmd.c_str()) != 0)
+			cout << "WARNING, bad return for command: " << cmd << "\n";
 
 		// Remove script and data
 		cmd = "rm -rf ";
 		cmd += PLOT_SCRIPT_NAME;
-		system(cmd.c_str());
+		if (system(cmd.c_str()))
+			cout << "WARNING, bad return for command: " << cmd << "\n";
+
 		cmd = "rm -rf ";
 		cmd += PLOT_DATA_NAME;
-		system(cmd.c_str());
+		if (system(cmd.c_str()))
+			cout << "WARNING, bad return for command: " << cmd << "\n";
 	}
 }
 
