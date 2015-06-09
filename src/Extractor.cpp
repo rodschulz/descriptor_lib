@@ -61,7 +61,7 @@ double Extractor::getBands(const PointCloud<PointNormal>::Ptr &_cloud, const Poi
 	return step;
 }
 
-PointCloud<PointXYZRGB>::Ptr Extractor::getTangentPlane(const PointCloud<PointXYZ>::Ptr &_cloud, const PointNormal &_point)
+PointCloud<PointXYZRGB>::Ptr Extractor::getTangentPlane(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point)
 {
 	PointCloud<PointXYZRGB>::Ptr tangentPlane(new PointCloud<PointXYZRGB>());
 
