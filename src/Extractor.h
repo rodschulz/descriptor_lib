@@ -47,19 +47,20 @@ struct Band
 		isRadialBand = false;
 	}
 };
+typedef boost::shared_ptr<Band> BandPtr;
 
 class Extractor
 {
 public:
-	static void getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius, PointCloud<PointNormal>::Ptr &_surfacePatch);
-	static void getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, PointCloud<Normal>::Ptr &_normals, const double _searchRadius = -1);
-	static double getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands);
+	static PointCloud<PointNormal>::Ptr getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius);
+	static vector<BandPtr> getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
 	static PointCloud<PointXYZRGB>::Ptr getTangentPlane(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point);
+	static void getSequences(const vector<BandPtr> &_bands);
 
 private:
 	Extractor();
 	~Extractor();
 
-	static double getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands);
-	static double getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params, vector<Band> &_bands);
+	static vector<BandPtr> getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
+	static vector<BandPtr> getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
 };

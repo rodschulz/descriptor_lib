@@ -23,13 +23,14 @@ class Helper
 {
 public:
 	static void removeNANs(PointCloud<PointXYZ>::Ptr &_cloud);
-	static PointCloud<Normal>::Ptr getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius);
+	static PointCloud<Normal>::Ptr getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius = -1);
 	static bool getCloudAndNormals(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
 	static PointCloud<PointXYZRGB>::Ptr createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, const uint8_t _r, const uint8_t _g, const uint8_t _b);
+
 	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
-	static void calculateAngleHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms);
-	static void calculateCurvatureHistograms(const vector<Band> &_bands, const PointNormal &_point, vector<Hist> &_histograms);
-	static void calculateMeanCurvature(const vector<Band> &_bands, const PointNormal &_point, vector<double> &_curvatures);
+	static void calculateAngleHistograms(const vector<BandPtr> &_bands, const PointNormal &_point, vector<Hist> &_histograms);
+	static void calculateCurvatureHistograms(const vector<BandPtr> &_bands, const PointNormal &_point, vector<Hist> &_histograms);
+	static void calculateMeanCurvature(const vector<BandPtr> &_bands, const PointNormal &_point, vector<double> &_curvatures);
 	static bool isNumber(const string &_str);
 
 	template<class T>
