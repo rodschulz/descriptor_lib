@@ -3,6 +3,12 @@
  * 2015
  */
 #include "Calculator.h"
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics.hpp>
+#include <map>
+
+using namespace boost::accumulators;
 
 Calculator::Calculator()
 {
@@ -170,7 +176,7 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 	}
 }
 
-void Calculator::getSequences(const vector<BandPtr> &_bands, const double _binSize)
+void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep)
 {
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
@@ -178,17 +184,26 @@ void Calculator::getSequences(const vector<BandPtr> &_bands, const double _binSi
 
 		Vector3f pointNormal = band->point.getNormalVector3fMap();
 		Vector3f planeNormal = band->plane.normal();
-		Vector3f n = pointNormal.cross(planeNormal).normalized();
+		Vector3f n = planeNormal.cross(pointNormal).normalized();
 		Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, band->point.getVector3fMap());
 
-//		map<int, acc>
+		map<int, accumulator_set<double, features<tag::mean, tag::variance> > > dataMap;
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
 			PointNormal p = band->data->at(j);
 			Vector3f projectedNormal = band->plane.projection((Vector3f) p.getNormalVector3fMap()).normalized();
-			double theta = angleBetween<Vector3f>(pointNormal, projectedNormal);
 
-			plane.signedDistance((Vector3f) p.getVector3fMap());
+			double theta = angleBetween<Vector3f>(pointNormal, projectedNormal);
+			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / _binSize;
+
+			if (dataMap.find(index) == dataMap.end())
+				dataMap[index] = accumulator_set<double, features<tag::mean, tag::variance> >();
+
+			dataMap[index](theta);
 		}
+
+		band->sequence = "";
+		for (map<int, accumulator_set<double, features<tag::mean, tag::variance> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
+			band->sequence += getSequenceChar((double)mean(it->second), _sequenceStep);
 	}
 }

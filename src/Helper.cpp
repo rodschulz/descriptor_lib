@@ -94,13 +94,31 @@ bool Helper::getCloudAndNormals(PointCloud<PointNormal>::Ptr &_cloud, const Exec
 	return loadOk;
 }
 
-PointCloud<PointXYZRGB>::Ptr Helper::createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, const uint8_t _r, const uint8_t _g, const uint8_t _b)
+PointCloud<PointXYZRGBNormal>::Ptr Helper::createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, uint32_t _color)
 {
-	PointCloud<PointXYZRGB>::Ptr coloredCloud(new PointCloud<PointXYZRGB>());
+	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud(new PointCloud<PointXYZRGBNormal>());
+	coloredCloud->reserve(_cloud->size());
+
+	float color = *reinterpret_cast<float*>(&_color);
+	for (int i = 0; i < _cloud->width; i++)
+	{
+		PointNormal p = _cloud->points[i];
+		coloredCloud->push_back(Factory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, color));
+	}
+
+	return coloredCloud;
+}
+
+PointCloud<PointXYZRGBNormal>::Ptr Helper::createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b)
+{
+	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud(new PointCloud<PointXYZRGBNormal>());
 	coloredCloud->reserve(_cloud->size());
 
 	for (int i = 0; i < _cloud->width; i++)
-		coloredCloud->push_back(Factory::makePointXYZRGB(_cloud->points[i].x, _cloud->points[i].y, _cloud->points[i].z, _r, _g, _b));
+	{
+		PointNormal p = _cloud->points[i];
+		coloredCloud->push_back(Factory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
+	}
 
 	return coloredCloud;
 }
@@ -120,4 +138,12 @@ bool Helper::isNumber(const string &_str)
 		number = number && isdigit(_str[i]);
 	}
 	return number;
+}
+
+unsigned int Helper::getColor(const int _index)
+{
+	static uint32_t palette[12] =
+	{ 0xa6cee3, 0x1f78b4, 0xb2df8a, 0x33a02c, 0xfb9a99, 0xe31a1c, 0xfdbf6f, 0xff7f00, 0xcab2d6, 0x6a3d9a, 0xffff99, 0xb15928 };
+
+	return palette[_index % 12];
 }

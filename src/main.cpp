@@ -18,13 +18,17 @@ using namespace pcl;
 
 void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, const int _targetIndex)
 {
-	cout << "Writing clouds to disk\n";
-	io::savePCDFileASCII("./output/cloud.pcd", *_cloud);
-	io::savePCDFileASCII("./output/patch.pcd", *_patch);
+	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
 
-	PointCloud<PointXYZRGB>::Ptr coloredCloud = Helper::createColorCloud(_cloud, 255, 0, 0);
-	(*coloredCloud)[_targetIndex].rgb = Helper::getColor(0, 255, 0);
+	cout << "Writing clouds to disk\n";
+	io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
+	io::savePCDFileASCII("./output/patch.pcd", *Helper::createColorCloud(_patch, Helper::getColor(11)));
+
+	(*coloredCloud)[_targetIndex].rgb = Helper::getColor(255, 0, 0);
 	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
+
+	ofstream sequences;
+	sequences.open("./output/sequences", fstream::out);
 
 	io::savePCDFileASCII("./output/plane.pcd", *Extractor::getTangentPlane(_cloud, _cloud->at(_targetIndex)));
 	for (size_t i = 0; i < _bands.size(); i++)
@@ -33,9 +37,13 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 		{
 			char name[100];
 			sprintf(name, "./output/band%d.pcd", (int) i);
-			io::savePCDFileASCII(name, *_bands[i]->data);
+			io::savePCDFileASCII(name, *Helper::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
+
+			sequences << "band" << i << ": " << _bands[i]->sequence << "\n";
 		}
 	}
+
+	sequences.close();
 }
 
 int main(int _argn, char **_argv)
@@ -68,9 +76,8 @@ int main(int _argn, char **_argv)
 
 	// Extract bands
 	vector<BandPtr> bands = Extractor::getBands(patch, point, params);
-
 	if (!params.radialBands)
-		Calculator::getSequences(bands, params.bandWidth);
+		Calculator::calculateSequences(bands, params.bandWidth, M_PI / 18);
 
 	// Calculate histograms
 	cout << "Generating angle histograms\n";

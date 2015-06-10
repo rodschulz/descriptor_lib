@@ -22,6 +22,7 @@ struct Band
 	PointNormal point;
 	Hyperplane<float, 3> plane;
 	bool isRadialBand;
+	string sequence;
 
 	Band(const PointNormal &_point, const Hyperplane<float, 3> &_plane)
 	{
@@ -29,6 +30,7 @@ struct Band
 		point = _point;
 		plane = _plane;
 		isRadialBand = false;
+		sequence = "";
 	}
 
 	Band(const PointNormal &_point, const bool &_radialBand)
@@ -37,6 +39,7 @@ struct Band
 		point = _point;
 		plane = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
 		isRadialBand = _radialBand;
+		sequence = "";
 	}
 
 	Band()
@@ -45,6 +48,7 @@ struct Band
 		point = Factory::makePointNormal(1, 0, 0, 1, 0, 0);
 		plane = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
 		isRadialBand = false;
+		sequence = "";
 	}
 };
 typedef boost::shared_ptr<Band> BandPtr;
