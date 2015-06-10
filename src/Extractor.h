@@ -52,10 +52,9 @@ typedef boost::shared_ptr<Band> BandPtr;
 class Extractor
 {
 public:
-	static PointCloud<PointNormal>::Ptr getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius);
+	static PointCloud<PointNormal>::Ptr getNeighbors(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius);
 	static vector<BandPtr> getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
 	static PointCloud<PointXYZRGB>::Ptr getTangentPlane(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point);
-	static void getSequences(const vector<BandPtr> &_bands);
 
 private:
 	Extractor();

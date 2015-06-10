@@ -7,12 +7,11 @@
 #include <pcl/io/pcd_io.h>
 #include <string>
 #include "Helper.h"
-#include "Factory.h"
 #include "Extractor.h"
 #include "Parser.h"
 #include "Hist.h"
 #include "Writer.h"
-#include "CloudFactory.h"
+#include "Calculator.h"
 
 using namespace std;
 using namespace pcl;
@@ -64,19 +63,19 @@ int main(int _argn, char **_argv)
 
 	// Get target point and surface patch
 	PointNormal point = cloud->points[index];
-	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighborsInRadius(cloud, point, params.searchRadius);
+	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.searchRadius);
 	cout << "Patch size: " << patch->size() << "\n";
 
 	// Extract bands
 	vector<BandPtr> bands = Extractor::getBands(patch, point, params);
 
 	if (!params.radialBands)
-		Extractor::getSequences(bands);
+		Calculator::getSequences(bands, params.bandWidth);
 
 	// Calculate histograms
 	cout << "Generating angle histograms\n";
 	vector<Hist> angleHistograms;
-	Helper::calculateAngleHistograms(bands, point, angleHistograms);
+	Calculator::calculateAngleHistograms(bands, angleHistograms);
 	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, 18, 0, M_PI);
 
 	// Write

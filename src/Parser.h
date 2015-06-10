@@ -28,6 +28,8 @@ struct ExecutionParams
 	bool useSynthetic;		// Flag indicating if a synthetic has to be used
 	SynCloudType synCloudType;	// Desired synthetic cloud
 
+	double sequenceBinSize;		// Size of the bins used in the sequence construction
+
 	ExecutionParams()
 	{
 		inputLocation = "";
@@ -41,6 +43,8 @@ struct ExecutionParams
 
 		useSynthetic = false;
 		synCloudType = NONE;
+
+		sequenceBinSize = 0.01;
 	}
 };
 

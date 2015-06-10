@@ -17,7 +17,7 @@ Extractor::~Extractor()
 {
 }
 
-PointCloud<PointNormal>::Ptr Extractor::getNeighborsInRadius(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius)
+PointCloud<PointNormal>::Ptr Extractor::getNeighbors(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius)
 {
 	PointCloud<PointNormal>::Ptr surfacePatch(new PointCloud<PointNormal>());
 
@@ -61,10 +61,6 @@ PointCloud<PointXYZRGB>::Ptr Extractor::getTangentPlane(const PointCloud<PointNo
 	}
 
 	return tangentPlane;
-}
-
-void Extractor::getSequences(const vector<BandPtr> &_bands)
-{
 }
 
 vector<BandPtr> Extractor::getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params)
