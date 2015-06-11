@@ -159,3 +159,34 @@ vector<BandPtr> Extractor::getLongitudinalBands(const PointCloud<PointNormal>::P
 
 	return bands;
 }
+
+vector<PointCloud<PointNormal>::Ptr> Extractor::getBandPlanes(const vector<BandPtr> &_bands, const ExecutionParams &_params)
+{
+	vector<PointCloud<PointNormal>::Ptr> planes;
+	planes.reserve(_bands.size());
+
+	float delta = _params.searchRadius;
+	float begin = _params.bidirectional ? -delta : 0;
+	float step = (delta - begin) / 10;
+
+	for (size_t i = 0; i < _bands.size(); i++)
+	{
+		Vector3f point = _bands[i]->point.getVector3fMap();
+		Vector3f normal = _bands[i]->plane.normal();
+		planes.push_back(PointCloud<PointNormal>::Ptr(new PointCloud<PointNormal>()));
+
+		for (float x = begin; x <= delta; x += step)
+		{
+			for (float y = begin; y <= delta; y += step)
+			{
+				for (float z = begin; z <= delta; z += step)
+				{
+					Vector3f p = _bands[i]->plane.projection(point + Vector3f(x, y, z));
+					planes.back()->push_back((PointNormal)Factory::makePointNormal(p.x(), p.y(), p.z(), normal[0], normal[1], normal[2]));
+				}
+			}
+		}
+	}
+
+	return planes;
+}

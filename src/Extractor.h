@@ -59,6 +59,7 @@ public:
 	static PointCloud<PointNormal>::Ptr getNeighbors(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius);
 	static vector<BandPtr> getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
 	static PointCloud<PointXYZRGB>::Ptr getTangentPlane(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point);
+	static vector<PointCloud<PointNormal>::Ptr> getBandPlanes(const vector<BandPtr> &_bands, const ExecutionParams &_params);
 
 private:
 	Extractor();

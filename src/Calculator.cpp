@@ -169,7 +169,6 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 				// TODO I think this angle should be against the original normal, not the projected one
 				Vector3f projectedNormal = _bands[i]->plane.projection(normal).normalized();
 				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
-				//double theta = angleBetween<Vector3f>(targetNormal, normal);
 				_histograms.back().add(theta);
 			}
 		}
@@ -204,6 +203,6 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 
 		band->sequence = "";
 		for (map<int, accumulator_set<double, features<tag::mean, tag::variance> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
-			band->sequence += getSequenceChar((double)mean(it->second), _sequenceStep);
+			band->sequence += getSequenceChar((double) mean(it->second), _sequenceStep);
 	}
 }

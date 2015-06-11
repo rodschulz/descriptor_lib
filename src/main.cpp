@@ -16,7 +16,7 @@
 using namespace std;
 using namespace pcl;
 
-void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, const int _targetIndex)
+void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, const ExecutionParams &_params, const int _targetIndex)
 {
 	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
 
@@ -26,6 +26,8 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 
 	(*coloredCloud)[_targetIndex].rgb = Helper::getColor(255, 0, 0);
 	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
+
+	vector<PointCloud<PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
 
 	ofstream sequences;
 	sequences.open("./output/sequences", fstream::out);
@@ -40,6 +42,9 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 			io::savePCDFileASCII(name, *Helper::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
 
 			sequences << "band" << i << ": " << _bands[i]->sequence << "\n";
+
+			sprintf(name, "./output/planeBand%d.pcd", (int) i);
+			io::savePCDFileASCII(name, *planes[i]);
 		}
 	}
 
@@ -62,7 +67,7 @@ int main(int _argn, char **_argv)
 
 	// Load cloud
 	PointCloud<PointNormal>::Ptr cloud(new PointCloud<PointNormal>());
-	if (!Helper::getCloudAndNormals(cloud, params))
+	if (!Helper::getCloud(cloud, params))
 	{
 		cout << "ERROR: loading failed\n";
 		return EXIT_FAILURE;
@@ -86,7 +91,7 @@ int main(int _argn, char **_argv)
 	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, 18, 0, M_PI);
 
 	// Write
-	writeOuput(cloud, patch, bands, index);
+	writeOuput(cloud, patch, bands, params, index);
 
 	cout << "Finished\n";
 	return EXIT_SUCCESS;
