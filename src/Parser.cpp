@@ -29,6 +29,10 @@ void Parser::printUsage()
 	cout << "   -R\t\tWhen present bands are defined as radial zones and the width of each\n\t\twill be defined by the patch's size the number of bands\n\n";
 }
 
+void parseSection()
+{
+}
+
 ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 {
 	ExecutionParams params;
@@ -46,7 +50,7 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 			{
 				// Using a synthetic cloud
 				params.useSynthetic = true;
-				params.synCloudType = getType(_argv[2]);
+				params.synCloudType = ExecutionParams::getType(_argv[2]);
 				params.targetPoint = atoi(_argv[3]);
 				i = 4;
 			}
@@ -68,7 +72,7 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 				else if (strcmp(_argv[i], "-r") == 0)
 				{
 					// Set search radius
-					params.searchRadius = atof(_argv[++i]);
+					params.patchSize = atof(_argv[++i]);
 				}
 				else if (strcmp(_argv[i], "-n") == 0)
 				{
@@ -97,14 +101,4 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 	}
 
 	return params;
-}
-
-SynCloudType Parser::getType(const string &_type)
-{
-	int type = atoi(_type.c_str());
-
-	if (0 < type || type < 3)
-		return (SynCloudType) type;
-	else
-		return NONE;
 }

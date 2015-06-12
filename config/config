@@ -1,0 +1,18 @@
+# Descriptor calculation
+targetPoint	8480
+patchSize	0.03
+normalRadius	-1
+bandNumber	8
+bandWidth	0.01
+sequenceBin	0.005
+bidirectional	false
+radialBands	false
+
+# Use of synthetic clouds
+useSynthetic	false
+synCloudType	1
+
+# Filter parameters
+smoothCloud	true
+sigma		2
+searchRadius	0.02

@@ -73,7 +73,7 @@ vector<BandPtr> Extractor::getRadialBands(const PointCloud<PointNormal>::Ptr &_c
 	Vector3f n = _point.getNormalVector3fMap();
 	Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, p);
 
-	double radialStep = _params.searchRadius / _params.bandNumber;
+	double radialStep = _params.patchSize / _params.bandNumber;
 
 	// Create bands
 	for (int i = 0; i < _params.bandNumber; i++)
@@ -165,7 +165,7 @@ vector<PointCloud<PointNormal>::Ptr> Extractor::getBandPlanes(const vector<BandP
 	vector<PointCloud<PointNormal>::Ptr> planes;
 	planes.reserve(_bands.size());
 
-	float delta = _params.searchRadius;
+	float delta = _params.patchSize;
 	float begin = _params.bidirectional ? -delta : 0;
 	float step = (delta - begin) / 10;
 

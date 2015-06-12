@@ -6,12 +6,14 @@
 #include <iostream>
 #include <pcl/io/pcd_io.h>
 #include <string>
+#include "Config.h"
 #include "Helper.h"
 #include "Extractor.h"
-#include "Parser.h"
 #include "Hist.h"
 #include "Writer.h"
 #include "Calculator.h"
+
+#define CONFIG_LOCATION "./config/config"
 
 using namespace std;
 using namespace pcl;
@@ -56,13 +58,13 @@ int main(int _argn, char **_argv)
 	if (system("rm -rf ./output/*") != 0)
 		cout << "ERROR, wrong command\n";
 
-	if (_argn < 3 || strcmp(_argv[1], "-h") == 0)
+	if (!Config::load(CONFIG_LOCATION, _argn, _argv))
 	{
-		Parser::printUsage();
+		cout << "Can't read configuration file at " << CONFIG_LOCATION << "\n";
 		return EXIT_FAILURE;
 	}
 
-	ExecutionParams params = Parser::parseExecutionParams(_argn, _argv);
+	ExecutionParams params = Config::getExecutionParams();
 	int index = params.targetPoint;
 
 	// Load cloud
@@ -76,7 +78,7 @@ int main(int _argn, char **_argv)
 
 	// Get target point and surface patch
 	PointNormal point = cloud->points[index];
-	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.searchRadius);
+	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.patchSize);
 	cout << "Patch size: " << patch->size() << "\n";
 
 	// Extract bands

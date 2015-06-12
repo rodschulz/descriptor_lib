@@ -106,21 +106,14 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 	return loadOk;
 }
 
-PointCloud<PointXYZ>::Ptr Helper::smoothCloud(const PointCloud<PointXYZ>::Ptr &_cloud)
+PointCloud<PointXYZ>::Ptr Helper::gaussianSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud)
 {
 	PointCloud<PointXYZ>::Ptr smoothedCloud(new PointCloud<PointXYZ>());
 
-//	KdTreeFLANN<PointXYZ> kdtree;
-//	kdtree.setInputCloud(_cloud);
-
-//	vector<int> indices;
-//	vector<float> distance;
-//	kdtree.radiusSearch(_searchPoint, _searchRadius, indices, distance);
-
 	//Set up the Gaussian Kernel
 	GaussianKernel<PointXYZ, PointXYZ>::Ptr kernel(new GaussianKernel<PointXYZ, PointXYZ>());
-	kernel->setSigma(10);
-	kernel->setThresholdRelativeToSigma(4);
+	kernel->setSigma(2);
+	kernel->setThresholdRelativeToSigma(3);
 
 	//Set up the KDTree
 	search::KdTree<pcl::PointXYZ>::Ptr kdtree(new search::KdTree<pcl::PointXYZ>);

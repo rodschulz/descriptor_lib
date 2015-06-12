@@ -24,7 +24,7 @@ public:
 	static void removeNANs(PointCloud<PointXYZ>::Ptr &_cloud);
 	static PointCloud<Normal>::Ptr getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius = -1);
 	static bool getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
-	static PointCloud<PointXYZ>::Ptr smoothCloud(const PointCloud<PointXYZ>::Ptr &_cloud);
+	static PointCloud<PointXYZ>::Ptr gaussianSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud);
 
 	static PointCloud<PointXYZRGBNormal>::Ptr createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, const uint32_t _color);
 	static PointCloud<PointXYZRGBNormal>::Ptr createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b);
