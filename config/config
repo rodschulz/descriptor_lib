@@ -7,6 +7,7 @@ bandWidth	0.01
 sequenceBin	0.005
 bidirectional	false
 radialBands	false
+useProjection	true
 
 # Use of synthetic clouds (cube, cylinder or sphere)
 useSynthetic	false
@@ -14,7 +15,7 @@ synCloudType	cube
 
 
 # Filter parameters (gaussian, mls or none)
-smoothingType	mls
+smoothingType	gaussian
 
 # Gaussian smoothing params
 gaussianSigma	4

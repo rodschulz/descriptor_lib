@@ -43,7 +43,9 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 			sprintf(name, "./output/band%d.pcd", (int) i);
 			io::savePCDFileASCII(name, *Helper::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
 
-			sequences << "band" << i << ": " << _bands[i]->sequence << "\n";
+			sequences << "band " << i << "\n";
+			sequences << "\tmean  : " << _bands[i]->sequenceMean << "\n";
+			sequences << "\tmedian: " << _bands[i]->sequenceMedian << "\n";
 
 			sprintf(name, "./output/planeBand%d.pcd", (int) i);
 			io::savePCDFileASCII(name, *planes[i]);
@@ -58,6 +60,7 @@ int main(int _argn, char **_argv)
 	if (system("rm -rf ./output/*") != 0)
 		cout << "ERROR, wrong command\n";
 
+	cout << "Loading configuration file\n";
 	if (!Config::load(CONFIG_LOCATION, _argn, _argv))
 	{
 		cout << "Can't read configuration file at " << CONFIG_LOCATION << "\n";
@@ -66,6 +69,7 @@ int main(int _argn, char **_argv)
 
 	ExecutionParams params = Config::getExecutionParams();
 	int index = params.targetPoint;
+	cout << "Calcutating descriptor for point " << index << "\n";
 
 	// Load cloud
 	PointCloud<PointNormal>::Ptr cloud(new PointCloud<PointNormal>());
@@ -76,8 +80,6 @@ int main(int _argn, char **_argv)
 	}
 	cout << "Loaded " << cloud->size() << " points in cloud\n";
 
-	cout << "Calcutating descriptor for point " << params.targetPoint << "\n";
-
 	// Get target point and surface patch
 	PointNormal point = cloud->points[index];
 	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.patchSize);
@@ -86,12 +88,12 @@ int main(int _argn, char **_argv)
 	// Extract bands
 	vector<BandPtr> bands = Extractor::getBands(patch, point, params);
 	if (!params.radialBands)
-		Calculator::calculateSequences(bands, params.bandWidth, M_PI / 18);
+		Calculator::calculateSequences(bands, params.sequenceBin, M_PI / 18, params.useProjection);
 
 	// Calculate histograms
 	cout << "Generating angle histograms\n";
 	vector<Hist> angleHistograms;
-	Calculator::calculateAngleHistograms(bands, angleHistograms);
+	Calculator::calculateAngleHistograms(bands, angleHistograms, params.useProjection);
 	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, 18, 0, M_PI);
 
 	// Write

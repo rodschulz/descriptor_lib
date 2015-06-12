@@ -67,9 +67,12 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 		switch (_params.smoothingType)
 		{
 			case SMOOTHING_GAUSSIAN:
+				cout << "Applying gaussian smoothing\n";
 				cloudXYZ = gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
 				break;
+
 			case SMOOTHING_MLS:
+				cout << "Applying MLS smoothing\n";
 				cloudXYZ = MLSSmoothing(cloudXYZ, _params.mlsRadius);
 				break;
 		}

@@ -131,7 +131,7 @@ void Calculator::calculateCurvatureHistograms(const vector<BandPtr> &_bands, vec
 	}
 }
 
-void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms)
+void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms, const bool _useProjection)
 {
 	_histograms.clear();
 	_histograms.reserve(_bands.size());
@@ -141,13 +141,15 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
+		BandPtr band = _bands[i];
 		_histograms.push_back(Hist(ANGLE));
-		for (size_t j = 0; j < _bands[i]->data->size(); j++)
-		{
-			Vector3f point = _bands[i]->data->points[j].getVector3fMap();
-			Vector3f normal = _bands[i]->data->points[j].getNormalVector3fMap();
 
-			if (_bands[i]->isRadialBand)
+		for (size_t j = 0; j < band->data->size(); j++)
+		{
+			Vector3f point = band->data->points[j].getVector3fMap();
+			Vector3f normal = band->data->points[j].getNormalVector3fMap();
+
+			if (band->isRadialBand)
 			{
 				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = point - targetPoint;
@@ -167,15 +169,14 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 			else
 			{
 				// TODO I think this angle should be against the original normal, not the projected one
-				Vector3f projectedNormal = _bands[i]->plane.projection(normal).normalized();
-				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
+				double theta = calculateAngle(targetNormal, normal, band, _useProjection);
 				_histograms.back().add(theta);
 			}
 		}
 	}
 }
 
-void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep)
+void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep, const bool _useProjection)
 {
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
@@ -186,23 +187,24 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 		Vector3f n = planeNormal.cross(pointNormal).normalized();
 		Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, band->point.getVector3fMap());
 
-		map<int, accumulator_set<double, features<tag::mean, tag::variance> > > dataMap;
+		map<int, accumulator_set<double, features<tag::mean, tag::median> > > dataMap;
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
 			PointNormal p = band->data->at(j);
-			Vector3f projectedNormal = band->plane.projection((Vector3f) p.getNormalVector3fMap()).normalized();
-
-			double theta = angleBetween<Vector3f>(pointNormal, projectedNormal);
+			double theta = calculateAngle(pointNormal, (Vector3f) p.getNormalVector3fMap(), band, _useProjection);
 			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / _binSize;
 
 			if (dataMap.find(index) == dataMap.end())
-				dataMap[index] = accumulator_set<double, features<tag::mean, tag::variance> >();
+				dataMap[index] = accumulator_set<double, features<tag::mean, tag::median> >();
 
 			dataMap[index](theta);
 		}
 
-		band->sequence = "";
-		for (map<int, accumulator_set<double, features<tag::mean, tag::variance> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
-			band->sequence += getSequenceChar((double) mean(it->second), _sequenceStep);
+		band->sequenceMean = band->sequenceMedian = "";
+		for (map<int, accumulator_set<double, features<tag::mean, tag::median> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
+		{
+			band->sequenceMean += getSequenceChar((double) mean(it->second), _sequenceStep);
+			band->sequenceMedian += getSequenceChar((double) median(it->second), _sequenceStep);
+		}
 	}
 }

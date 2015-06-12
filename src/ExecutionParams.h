@@ -34,6 +34,7 @@ public:
 		sequenceBin = 0.01;
 		bidirectional = true;
 		radialBands = false;
+		useProjection = true;
 
 		useSynthetic = false;
 		synCloudType = CLOUD_NONE;
@@ -78,6 +79,7 @@ public:
 	double sequenceBin;		// Size of the bins used in the sequence construction
 	bool bidirectional;		// Flag indicating if each band has to be analyzed bidirectional or not
 	bool radialBands;		// Flag indicating if the bands are radial or longitudinal
+	bool useProjection;		// Flag indicating if angle calculation must be done by projecting the angles over the band's plane
 
 	bool useSynthetic;		// Flag indicating if a synthetic has to be used
 	SynCloudType synCloudType;	// Desired synthetic cloud

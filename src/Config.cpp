@@ -87,6 +87,9 @@ void Config::parse(const string _key, const string _value)
 	else if (boost::iequals(_key, "radialBands"))
 		getInstance()->params.radialBands = boost::iequals(_value, "true");
 
+	else if (boost::iequals(_key, "useProjection"))
+		getInstance()->params.useProjection = boost::iequals(_value, "true");
+
 	// Use of synthetic clouds
 	else if (boost::iequals(_key, "useSynthetic"))
 		getInstance()->params.useSynthetic = boost::iequals(_value, "true");

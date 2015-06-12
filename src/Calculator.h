@@ -17,9 +17,9 @@ public:
 	static void calculateMeanCurvature(const vector<BandPtr> &_bands, vector<double> &_curvatures);
 
 	static void calculateCurvatureHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms);
-	static void calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms);
+	static void calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms, const bool _useProjection);
 
-	static void calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep);
+	static void calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep, const bool _useProjection);
 
 	template<class T>
 	static inline double angleBetween(const T &_vector1, const T &_vector2)
@@ -31,6 +31,17 @@ public:
 	{
 		int index = _value / _step;
 		return 'a' + index;
+	}
+
+	static inline double calculateAngle(const Vector3f &_targetNormal, const Vector3f &_normal, const BandPtr &_band, const bool _useProjection)
+	{
+		Vector3f pointNormal;
+		if (_useProjection)
+			pointNormal = _band->plane.projection(_normal).normalized();
+		else
+			pointNormal = _normal;
+
+		return angleBetween<Vector3f>(_targetNormal, pointNormal);
 	}
 
 private:
