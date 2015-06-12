@@ -5,10 +5,12 @@
 #include "Helper.h"
 #include <pcl/filters/filter.h>
 #include <pcl/filters/convolution_3d.h>
+#include <pcl/surface/mls.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/features/normal_3d_omp.h>
+#include <pcl/common/io.h>
 #include <ctype.h>
 #include "Factory.h"
 #include "CloudFactory.h"
@@ -48,7 +50,6 @@ PointCloud<Normal>::Ptr Helper::getNormals(const PointCloud<PointXYZ>::Ptr &_clo
 	return normals;
 }
 
-#include <pcl/io/pcd_io.h>
 bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
 {
 	bool loadOk = true;
@@ -63,26 +64,29 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 			loadOk = false;
 		}
 
-//		PointCloud<PointXYZ>::Ptr smoothedCloud = smoothCloud(cloudXYZ);
-//		Helper::removeNANs(cloudXYZ);
-//		PointCloud<Normal>::Ptr normals = Helper::getNormals(cloudXYZ, _params.normalEstimationRadius);
-//		PointCloud<PointNormal>::Ptr cloud2(new PointCloud<PointNormal>());
-//		concatenateFields(*smoothedCloud, *normals, *cloud2);
-//		io::savePCDFileASCII("./output/smoothed.pcd", *cloud2);
+		switch (_params.smoothingType)
+		{
+			case SMOOTHING_GAUSSIAN:
+				cloudXYZ = gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
+				break;
+			case SMOOTHING_MLS:
+				cloudXYZ = MLSSmoothing(cloudXYZ, _params.mlsRadius);
+				break;
+		}
 	}
 	else
 	{
 		switch (_params.synCloudType)
 		{
-			case CUBE:
+			case CLOUD_CUBE:
 				CloudFactory::generateCube(0.3, Factory::makePointXYZ(0.3, 0.3, 0.3), cloudXYZ);
 				break;
 
-			case CYLINDER:
+			case CLOUD_CYLINDER:
 				CloudFactory::generateCylinder(0.2, 0.5, Factory::makePointXYZ(0.4, 0.4, 0.4), cloudXYZ);
 				break;
 
-			case SPHERE:
+			case CLOUD_SPHERE:
 				CloudFactory::generateSphere(0.2, Factory::makePointXYZ(0.2, 0.2, 0.2), cloudXYZ);
 				break;
 
@@ -106,27 +110,45 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 	return loadOk;
 }
 
-PointCloud<PointXYZ>::Ptr Helper::gaussianSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud)
+PointCloud<PointXYZ>::Ptr Helper::gaussianSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud, const double _sigma, const double _radius)
 {
 	PointCloud<PointXYZ>::Ptr smoothedCloud(new PointCloud<PointXYZ>());
 
 	//Set up the Gaussian Kernel
 	GaussianKernel<PointXYZ, PointXYZ>::Ptr kernel(new GaussianKernel<PointXYZ, PointXYZ>());
-	kernel->setSigma(2);
+	kernel->setSigma(_sigma);
 	kernel->setThresholdRelativeToSigma(3);
 
 	//Set up the KDTree
-	search::KdTree<pcl::PointXYZ>::Ptr kdtree(new search::KdTree<pcl::PointXYZ>);
-	kdtree->setInputCloud(_cloud);
+	search::KdTree<PointXYZ>::Ptr kdTree(new search::KdTree<PointXYZ>);
+	kdTree->setInputCloud(_cloud);
 
 	//Set up the Convolution Filter
 	Convolution3D<PointXYZ, PointXYZ, GaussianKernel<PointXYZ, PointXYZ> > convolution;
 	convolution.setKernel(*kernel);
 	convolution.setInputCloud(_cloud);
-	convolution.setSearchMethod(kdtree);
-	convolution.setRadiusSearch(0.02);
+	convolution.setSearchMethod(kdTree);
+	convolution.setRadiusSearch(_radius);
 	convolution.convolve(*smoothedCloud);
 
+	return smoothedCloud;
+}
+
+PointCloud<PointXYZ>::Ptr Helper::MLSSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud, const double _radius)
+{
+	PointCloud<PointXYZ>::Ptr smoothedCloud(new PointCloud<PointXYZ>());
+	PointCloud<PointNormal>::Ptr MLSPoints(new PointCloud<PointNormal>());
+
+	search::KdTree<PointXYZ>::Ptr kdTree(new search::KdTree<PointXYZ>);
+	MovingLeastSquares<PointXYZ, PointNormal> mls;
+	mls.setComputeNormals(false);
+	mls.setInputCloud(_cloud);
+	mls.setPolynomialFit(true);
+	mls.setSearchMethod(kdTree);
+	mls.setSearchRadius(_radius);
+	mls.process(*MLSPoints);
+
+	copyPointCloud<PointNormal, PointXYZ>(*MLSPoints, *smoothedCloud);
 	return smoothedCloud;
 }
 

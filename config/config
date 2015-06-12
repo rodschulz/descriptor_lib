@@ -8,11 +8,17 @@ sequenceBin	0.005
 bidirectional	false
 radialBands	false
 
-# Use of synthetic clouds
+# Use of synthetic clouds (cube, cylinder or sphere)
 useSynthetic	false
-synCloudType	1
+synCloudType	cube
 
-# Filter parameters
-smoothCloud	true
-sigma		2
-searchRadius	0.02
+
+# Filter parameters (gaussian, mls or none)
+smoothingType	mls
+
+# Gaussian smoothing params
+gaussianSigma	4
+gaussianRadius	0.03
+
+# MLS smoothing params
+mlsRadius	0.05

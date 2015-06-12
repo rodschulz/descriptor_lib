@@ -6,12 +6,18 @@
 
 #include <string>
 #include <stdlib.h>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
 enum SynCloudType
 {
-	NONE, CUBE, CYLINDER, SPHERE,
+	CLOUD_NONE, CLOUD_CUBE, CLOUD_CYLINDER, CLOUD_SPHERE,
+};
+
+enum SmoothingType
+{
+	SMOOTHING_NONE, SMOOTHING_GAUSSIAN, SMOOTHING_MLS,
 };
 
 class ExecutionParams
@@ -30,23 +36,36 @@ public:
 		radialBands = false;
 
 		useSynthetic = false;
-		synCloudType = NONE;
+		synCloudType = CLOUD_NONE;
 
-		smoothCloud = false;
+		smoothingType = SMOOTHING_NONE;
+		gaussianSigma = 2;
+		gaussianRadius = 0.02;
+		mlsRadius = 0.02;
 	}
 
 	~ExecutionParams()
 	{
 	}
 
-	static SynCloudType getType(const string &_type)
+	static SynCloudType getSynCloudType(const string &_type)
 	{
-		int type = atoi(_type.c_str());
+		if (boost::iequals(_type, "cube"))
+			return CLOUD_CUBE;
+		else if (boost::iequals(_type, "cylinder"))
+			return CLOUD_CYLINDER;
+		else if (boost::iequals(_type, "sphere"))
+			return CLOUD_SPHERE;
+		return CLOUD_NONE;
+	}
 
-		if (0 < type || type < 3)
-			return (SynCloudType) type;
-		else
-			return NONE;
+	static SmoothingType getSmoothingType(const string &_type)
+	{
+		if (boost::iequals(_type, "gaussian"))
+			return SMOOTHING_GAUSSIAN;
+		else if (boost::iequals(_type, "mls"))
+			return SMOOTHING_MLS;
+		return SMOOTHING_NONE;
 	}
 
 	string inputLocation;		// Location of the input file
@@ -63,5 +82,8 @@ public:
 	bool useSynthetic;		// Flag indicating if a synthetic has to be used
 	SynCloudType synCloudType;	// Desired synthetic cloud
 
-	bool smoothCloud;		// Flag indicating if smoothing has to be done
+	SmoothingType smoothingType;	// Type of smoothing algorithm to use
+	double gaussianSigma;		// Sigma used for the gaussian smoothning
+	double gaussianRadius;		// Search radius used for the gaussian smoothing
+	double mlsRadius;		// Search radius used for the mls smoothing
 };

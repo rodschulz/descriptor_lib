@@ -50,7 +50,7 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 			{
 				// Using a synthetic cloud
 				params.useSynthetic = true;
-				params.synCloudType = ExecutionParams::getType(_argv[2]);
+				params.synCloudType = ExecutionParams::getSynCloudType(_argv[2]);
 				params.targetPoint = atoi(_argv[3]);
 				i = 4;
 			}

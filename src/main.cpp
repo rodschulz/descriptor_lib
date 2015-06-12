@@ -76,6 +76,8 @@ int main(int _argn, char **_argv)
 	}
 	cout << "Loaded " << cloud->size() << " points in cloud\n";
 
+	cout << "Calcutating descriptor for point " << params.targetPoint << "\n";
+
 	// Get target point and surface patch
 	PointNormal point = cloud->points[index];
 	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.patchSize);

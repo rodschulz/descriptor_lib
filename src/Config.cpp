@@ -92,5 +92,18 @@ void Config::parse(const string _key, const string _value)
 		getInstance()->params.useSynthetic = boost::iequals(_value, "true");
 
 	else if (boost::iequals(_key, "synCloudType"))
-		getInstance()->params.synCloudType = ExecutionParams::getType(_value);
+		getInstance()->params.synCloudType = ExecutionParams::getSynCloudType(_value);
+
+	// Smoothing params
+	else if (boost::iequals(_key, "smoothingType"))
+		getInstance()->params.smoothingType = ExecutionParams::getSmoothingType(_value);
+
+	else if (boost::iequals(_key, "gaussianSigma"))
+		getInstance()->params.gaussianSigma = atof(_value.c_str());
+
+	else if (boost::iequals(_key, "gaussianRadius"))
+		getInstance()->params.gaussianRadius = atof(_value.c_str());
+
+	else if (boost::iequals(_key, "mlsRadius"))
+		getInstance()->params.mlsRadius = atof(_value.c_str());
 }
