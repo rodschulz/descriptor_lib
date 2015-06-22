@@ -54,15 +54,10 @@ public:
 		return 'a' + index;
 	}
 
-	static inline double calculateAngle(const Vector3f &_targetNormal, const Vector3f &_normal, const BandPtr &_band, const bool _useProjection)
+	static inline double calculateAngle(const Vector3f &_vector1, const Vector3f &_vector2, const Hyperplane<float, 3> &_plane, const bool _useProjection)
 	{
-		Vector3f pointNormal;
-		if (_useProjection)
-			pointNormal = _band->plane.projection(_normal).normalized();
-		else
-			pointNormal = _normal;
-
-		return angle<Vector3f>(_targetNormal, pointNormal);
+		Vector3f v2 = _useProjection ? _plane.projection(_vector2).normalized() : _vector2;
+		return signedAngle<Vector3f>(_vector1, v2, (Vector3f)_plane.normal());
 	}
 
 private:

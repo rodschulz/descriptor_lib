@@ -5,8 +5,10 @@
 #include "Hist.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include  <cmath>
 
 #define RAD2DEG(x)	((x) * 57.29578)
+#define DEG2RAD(x)	((x) * 0.017453293)
 
 Hist::Hist(const Dimension _dimension)
 {
@@ -53,25 +55,27 @@ void Hist::add(const double _element)
 	maxData = maxData < _element ? _element : maxData;
 }
 
-void Hist::getBins(const int _binsNumber, const double _lowerBound, const double _upperBound, Bins &_bins) const
+void Hist::getBins(const double _binSize, const double _lowerBound, const double _upperBound, Bins &_bins)
 {
-	double step = (_upperBound - _lowerBound) / _binsNumber;
-	vector<double> binsVector(_binsNumber, 0);
+	int binNumber = ceil((_upperBound - _lowerBound) / _binSize) + 1;
+
+	_bins.bins.clear();
+	_bins.bins.resize(binNumber, 0);
+	_bins.step = _binSize;
+	_bins.dimension = dimension;
 
 	for (size_t i = 0; i < data.size(); i++)
 	{
-		int index = data[i] / step;
-		binsVector[index]++;
-	}
-	for (size_t i = 0; i < binsVector.size(); i++)
-		binsVector[i] /= data.size();
+		int index = round((data[i] - _lowerBound) / _binSize);
+		index = index >= binNumber ? binNumber - 1 : index;
 
-	_bins.bins = binsVector;
-	_bins.step = step;
-	_bins.dimension = dimension;
+		_bins.bins[index]++;
+	}
+	for (int i = 0; i < binNumber; i++)
+		_bins.bins[i] /= data.size();
 }
 
-void Hist::getBins(const int _binsNumber, Bins &_bins) const
+void Hist::getBins(const double _binSize, Bins &_bins)
 {
-	getBins(_binsNumber, minData, maxData, _bins);
+	getBins(_binSize, minData, maxData, _bins);
 }

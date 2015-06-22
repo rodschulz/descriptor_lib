@@ -15,12 +15,11 @@ using namespace std;
 class Writer
 {
 public:
-	static void writeData(const string &_filename, const vector<double> &_curvatures, const vector<Hist> &_curvatureHistograms, const vector<Hist> &_angleHistograms);
-	static void writeHistogram(const string &_filename, const string &_histogramTitle, const vector<Hist> &_histograms, const int _binsNumber, const double _lowerBound = -1, const double _upperBound = -1);
+	static void writeHistogram(const string &_filename, const string &_histogramTitle,  vector<Hist> &_histograms, const double _binSize, const double _lowerBound = -1, const double _upperBound = -1);
 
 private:
 	Writer();
 	~Writer();
 
-	static void generateScript(const string &_filename, const string &_histogramTitle, const int _bandsNumber);
+	static void generateScript(const string &_filename, const string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit);
 };

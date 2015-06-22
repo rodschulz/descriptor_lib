@@ -38,27 +38,18 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 
 			if (band->isRadialBand)
 			{
-				// Create a plane containing the target point, its normal and the current point
 				Vector3f targetToPoint = point - targetPoint;
-
-				// Skip if the point is equal to the target point
 				if (fabs(targetToPoint.norm()) < 1E-15)
 					continue;
 
+				// Create a plane containing the target point, its normal and the current point
 				Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
 				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
 
-				// Project current point's normal onto the plane and calculate normal's angle
-				Vector3f projectedNormal = plane.projection(normal).normalized();
-				double theta = angle<Vector3f>(targetNormal, projectedNormal);
-				_histograms.back().add(theta);
+				_histograms.back().add(calculateAngle(targetNormal, normal, plane, _useProjection));
 			}
 			else
-			{
-				// TODO I think this angle should be against the original normal, not the projected one
-				double theta = calculateAngle(targetNormal, normal, band, _useProjection);
-				_histograms.back().add(theta);
-			}
+				_histograms.back().add(calculateAngle(targetNormal, normal, band->plane, _useProjection));
 		}
 	}
 }
@@ -78,7 +69,7 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
 			PointNormal p = band->data->at(j);
-			double theta = calculateAngle(pointNormal, (Vector3f) p.getNormalVector3fMap(), band, _useProjection);
+			double theta = calculateAngle(pointNormal, (Vector3f) p.getNormalVector3fMap(), band->plane, _useProjection);
 			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / _binSize;
 
 			if (dataMap.find(index) == dataMap.end())

@@ -1,5 +1,5 @@
 # Descriptor calculation
-targetPoint	8480
+targetPoint	7302
 patchSize	0.03
 normalRadius	-1
 bandNumber	8
@@ -7,7 +7,7 @@ bandWidth	0.01
 sequenceBin	0.005
 bidirectional	false
 radialBands	false
-useProjection	true
+useProjection	false
 
 # Use of synthetic clouds (cube, cylinder or sphere)
 useSynthetic	false

@@ -23,66 +23,62 @@ Writer::~Writer()
 {
 }
 
-void Writer::writeData(const string &_filename, const vector<double> &_curvatures, const vector<Hist> &_curvatureHistograms, const vector<Hist> &_angleHistograms)
-{
-	string name = OUTPUT_FOLDER + _filename;
-
-	fstream output;
-	output.open(name.c_str(), fstream::out);
-	for (size_t i = 0; i < _curvatures.size(); i++)
-		output << "Curvature band " << i << ": " << _curvatures[i] << "\n";
-
-	output << "Curvature histograms\n";
-	for (size_t i = 0; i < _curvatureHistograms.size(); i++)
-	{
-		Bins bins;
-		_curvatureHistograms[i].getBins(8, bins);
-		output << "BAND" << i << ": " << bins;
-	}
-	output << "Angle Histograms\n";
-	for (size_t i = 0; i < _angleHistograms.size(); i++)
-	{
-		Bins bins;
-		_angleHistograms[i].getBins(18, 0, M_PI, bins);
-		output << "BAND" << i << ": " << bins;
-	}
-	output.close();
-}
-
-void Writer::writeHistogram(const string &_filename, const string &_histogramTitle, const vector<Hist> &_histograms, const int _binsNumber, const double _lowerBound, const double _upperBound)
+void Writer::writeHistogram(const string &_filename, const string &_histogramTitle, vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
 	if (!_histograms.empty())
 	{
-		// Generate the plotting script
-		generateScript(_filename, _histogramTitle, _histograms.size());
-
+		bool axesCreated = false;
+		vector<string> rows;
 		ostringstream stream;
-		vector<string> rows(_binsNumber, "");
+		Dimension dimension = ANGLE;
 
-		// Generate the data to plot
-		Bins aux;
-		(_lowerBound == -1 || _upperBound == -1) ? _histograms[0].getBins(_binsNumber, aux) : _histograms[0].getBins(_binsNumber, _lowerBound, _upperBound, aux);
-
-		double step = aux.dimension == ANGLE ? RAD2DEG(aux.step) : aux.step;
-		for (int j = 0; j < _binsNumber; j++)
-		{
-			stream.str(string());
-			stream << step * j;
-			rows[j] = stream.str();
-		}
-
+		// Generate data to plot
 		for (size_t i = 0; i < _histograms.size(); i++)
 		{
 			Bins bins;
-			(_lowerBound == -1 || _upperBound == -1) ? _histograms[i].getBins(_binsNumber, bins) : _histograms[i].getBins(_binsNumber, _lowerBound, _upperBound, bins);
+			if (_lowerBound == -1 || _upperBound == -1)
+				_histograms[i].getBins(_binSize, bins);
+			else
+				_histograms[i].getBins(_binSize, _lowerBound, _upperBound, bins);
 
-			for (int j = 0; j < _binsNumber; j++)
+			int binsNumber = bins.bins.size();
+
+			// Create axes if not already done
+			if (!axesCreated)
+			{
+				rows.resize(binsNumber);
+				dimension = bins.dimension;
+
+				bool isOdd = binsNumber % 2 > 0;
+
+				double step = dimension == ANGLE ? RAD2DEG(bins.step) : bins.step;
+				double boundary = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
+				for (int j = 0; j < binsNumber; j++)
+				{
+					stream.str(string());
+					if (isOdd)
+						stream << (step * j + boundary);
+					else
+						stream << (step * j - step * 0.5 + boundary);
+
+					rows[j] = stream.str();
+				}
+				axesCreated = true;
+			}
+
+			for (int j = 0; j < binsNumber; j++)
 			{
 				stream.str(string());
 				stream << "\t" << bins.bins[j];
 				rows[j] += stream.str();
 			}
 		}
+
+		// Generate the plotting script
+		double step = dimension == ANGLE ? RAD2DEG(_binSize) : _binSize;
+		double lower = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
+		double upper = dimension == ANGLE ? RAD2DEG(_upperBound) : _upperBound;
+		generateScript(_filename, _histogramTitle, _histograms.size(), step, lower, upper);
 
 		// Generate data file
 		ofstream output;
@@ -110,7 +106,7 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 	}
 }
 
-void Writer::generateScript(const string &_filename, const string &_histogramTitle, const int _bandsNumber)
+void Writer::generateScript(const string &_filename, const string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
 {
 	ofstream output;
 	output.open(PLOT_SCRIPT_NAME, fstream::out);
@@ -119,7 +115,9 @@ void Writer::generateScript(const string &_filename, const string &_histogramTit
 	output << "set ylabel 'Percentage'\n";
 	output << "set xlabel 'Degrees'\n";
 
-	output << "set auto x\n";
+	output << "set xrange [" << _lowerLimit << ":" << _upperLimit << "]\n";
+	output << "set xtics " << _binSize << "\n";
+	output << "set xtics font 'Verdana,9'\n";
 	output << "set yrange [0:1]\n";
 	output << "set style data linespoints\n";
 

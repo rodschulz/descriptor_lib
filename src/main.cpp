@@ -18,7 +18,7 @@
 using namespace std;
 using namespace pcl;
 
-void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, const vector<Hist> &_angleHistograms, const ExecutionParams &_params, const int _targetIndex)
+void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, vector<Hist> &_angleHistograms, const ExecutionParams &_params, const int _targetIndex)
 {
 	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
 
@@ -55,7 +55,8 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 	sequences.close();
 
 	// Write histogram data
-	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, 18, 0, M_PI);
+	double limit = M_PI;
+	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, DEG2RAD(20), -limit, limit);
 }
 
 int main(int _argn, char **_argv)
