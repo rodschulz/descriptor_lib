@@ -59,5 +59,17 @@ bool Test::Check()
 	if (!(status = angleSignedTest<Vector3f>(v4, v1, normal, angle14)))
 		cout << "Failed test " << testId++ << endl;
 
+	Vector3f v5(-1, -1, 0);
+	double angle15 = M_PI;
+
+	if (!(status = angleSignedTest<Vector3f>(v1, v5, normal, angle15)))
+		cout << "Failed test " << testId++ << endl;
+
+	Vector3f v6(1, 1, 0);
+	double angle16 = 0;
+
+	if (!(status = angleSignedTest<Vector3f>(v1, v6, normal, angle16)))
+		cout << "Failed test " << testId++ << endl;
+
 	return status;
 }

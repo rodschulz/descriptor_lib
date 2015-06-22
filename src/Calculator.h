@@ -28,10 +28,24 @@ public:
 	template<class T>
 	static inline double signedAngle(const T &_vector1, const T &_vector2, const T &_normal)
 	{
-		if (_normal.dot(_vector1.cross(_vector2)) < 0)
-			return -atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+		double direction = _normal.dot(_vector1.cross(_vector2));
+
+		// Check if the cross product is not zero
+		if (fabs(direction) > 1E-7)
+		{
+			if (_normal.dot(_vector1.cross(_vector2)) < 0)
+				return -atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+			else
+				return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+		}
 		else
-			return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+		{
+			if (_vector1.dot(_vector2) >= 0)
+				return 0;
+			else
+				return M_PI;
+
+		}
 	}
 
 	static inline char getSequenceChar(const double _value, const double _step)

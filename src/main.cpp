@@ -58,7 +58,6 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, 18, 0, M_PI);
 }
 
-#include "Test.h"
 int main(int _argn, char **_argv)
 {
 	if (system("rm -rf ./output/*") != 0)

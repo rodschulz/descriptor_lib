@@ -13,7 +13,7 @@ using namespace std;
 using namespace pcl;
 
 // Sign function
-template<typename T> int sign(T val)
+template<typename T> inline int sign(T val)
 {
 	return (T(0) < val) - (val < T(0));
 }
