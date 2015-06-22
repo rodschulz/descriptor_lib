@@ -18,119 +18,6 @@ Calculator::~Calculator()
 {
 }
 
-void Calculator::calculateMeanCurvature(const vector<BandPtr> &_bands, vector<double> &_curvatures)
-{
-	_curvatures.clear();
-	_curvatures.reserve(_bands.size());
-
-	Vector3f targetPoint = _bands[0]->point.getVector3fMap();
-	Vector3f targetNormal = _bands[0]->point.getNormalVector3fMap();
-
-	for (size_t i = 0; i < _bands.size(); i++)
-	{
-		double curvature = 0;
-		for (size_t j = 0; j < _bands[i]->data->size(); j++)
-		{
-			Vector3f point = _bands[i]->data->points[j].getVector3fMap();
-			Vector3f normal = _bands[i]->data->points[j].getNormalVector3fMap();
-
-			if (_bands[i]->isRadialBand)
-			{
-				// Create a plane containing the target point, its normal and the current point
-				Vector3f targetToPoint = point - targetPoint;
-				Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
-				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
-
-				// Project current point's normal onto the plane and get the point's curvature
-				Vector3f projectedNormal = plane.projection(normal);
-
-				Vector3f pointDiff = targetPoint - point;
-				double pointDistance = pointDiff.norm();
-				Vector3f normalDiff = targetNormal - projectedNormal;
-				double normalDistance = normalDiff.norm();
-
-				if (pointDistance > 0)
-					curvature += (normalDistance / pointDistance);
-			}
-			else
-			{
-				Vector3f projectedPoint = _bands[i]->plane.projection(point);
-				Vector3f projectedNormal = _bands[i]->plane.projection(normal);
-
-				Vector3f pointDiff = targetPoint - projectedPoint;
-				double pointDistance = pointDiff.norm();
-				Vector3f normalDiff = targetNormal - projectedNormal;
-				double normalDistance = normalDiff.norm();
-
-				if (pointDistance > 0)
-					curvature += (normalDistance / pointDistance);
-			}
-		}
-		curvature /= _bands[i]->data->size();
-		_curvatures.push_back(curvature);
-	}
-}
-
-void Calculator::calculateCurvatureHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms)
-{
-	_histograms.clear();
-	_histograms.reserve(_bands.size());
-
-	Vector3f targetPoint = _bands[0]->point.getVector3fMap();
-	Vector3f targetNormal = _bands[0]->point.getNormalVector3fMap();
-
-	for (size_t i = 0; i < _bands.size(); i++)
-	{
-		Hist histogram;
-
-		for (size_t j = 0; j < _bands[i]->data->size(); j++)
-		{
-			Vector3f point = _bands[i]->data->points[j].getVector3fMap();
-			Vector3f normal = _bands[i]->data->points[j].getNormalVector3fMap();
-
-			if (_bands[i]->isRadialBand)
-			{
-				// Create a plane containing the target point, its normal and the current point
-				Vector3f targetToPoint = targetPoint - point;
-
-				// Skip if the point is equal to the target point
-				if (fabs(targetToPoint.norm()) < 1E-15)
-					continue;
-
-				Vector3f planeNormal = targetNormal.cross(targetToPoint);
-				planeNormal.normalize();
-				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
-
-				// Project current point's normal onto the plane and get the point's curvature
-				Vector3f projectedNormal = plane.projection(normal);
-
-				Vector3f pointDiff = targetPoint - point;
-				double pointDistance = pointDiff.norm();
-				Vector3f normalDiff = targetNormal - projectedNormal;
-				double normalDistance = normalDiff.norm();
-
-				if (pointDistance > 0)
-					histogram.add(normalDistance / pointDistance);
-			}
-			else
-			{
-				Vector3f projectedPoint = _bands[i]->plane.projection(point);
-				Vector3f projectedNormal = _bands[i]->plane.projection(normal);
-
-				Vector3f pointDiff = targetPoint - projectedPoint;
-				double pointDistance = pointDiff.norm();
-				Vector3f normalDiff = targetNormal - projectedNormal;
-				double normalDistance = normalDiff.norm();
-
-				if (pointDistance > 0)
-					histogram.add(normalDistance / pointDistance);
-			}
-		}
-
-		_histograms.push_back(histogram);
-	}
-}
-
 void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms, const bool _useProjection)
 {
 	_histograms.clear();
@@ -163,7 +50,7 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 
 				// Project current point's normal onto the plane and calculate normal's angle
 				Vector3f projectedNormal = plane.projection(normal).normalized();
-				double theta = angleBetween<Vector3f>(targetNormal, projectedNormal);
+				double theta = angle<Vector3f>(targetNormal, projectedNormal);
 				_histograms.back().add(theta);
 			}
 			else
