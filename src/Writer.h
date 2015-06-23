@@ -15,7 +15,7 @@ using namespace std;
 class Writer
 {
 public:
-	static void writeHistogram(const string &_filename, const string &_histogramTitle,  vector<Hist> &_histograms, const double _binSize, const double _lowerBound = -1, const double _upperBound = -1);
+	static void writeHistogram(const string &_filename, const string &_histogramTitle, const vector<Hist> &_histograms, const double _binSize, const double _lowerBound = -1, const double _upperBound = -1);
 
 private:
 	Writer();

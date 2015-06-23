@@ -36,8 +36,8 @@ public:
 	~Hist();
 
 	void add(const double _element);
-	void getBins(const double _binSize, const double _lowerBound, const double _upperBound, Bins &_bins);
-	void getBins(const double _binSize, Bins &_bins);
+	void getBins(const double _binSize, const double _lowerBound, const double _upperBound, Bins &_bins) const;
+	void getBins(const double _binSize, Bins &_bins) const;
 
 private:
 	vector<double> data;

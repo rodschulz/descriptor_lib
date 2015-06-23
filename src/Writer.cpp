@@ -23,7 +23,7 @@ Writer::~Writer()
 {
 }
 
-void Writer::writeHistogram(const string &_filename, const string &_histogramTitle, vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
+void Writer::writeHistogram(const string &_filename, const string &_histogramTitle, const vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
 	if (!_histograms.empty())
 	{
@@ -49,18 +49,12 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 				rows.resize(binsNumber);
 				dimension = bins.dimension;
 
-				bool isOdd = binsNumber % 2 > 0;
-
 				double step = dimension == ANGLE ? RAD2DEG(bins.step) : bins.step;
 				double boundary = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
 				for (int j = 0; j < binsNumber; j++)
 				{
 					stream.str(string());
-					if (isOdd)
-						stream << (step * j + boundary);
-					else
-						stream << (step * j - step * 0.5 + boundary);
-
+					stream << (step * j + boundary);
 					rows[j] = stream.str();
 				}
 				axesCreated = true;
@@ -113,16 +107,28 @@ void Writer::generateScript(const string &_filename, const string &_histogramTit
 
 	output << "set title '" << _histogramTitle << "'\n";
 	output << "set ylabel 'Percentage'\n";
-	output << "set xlabel 'Degrees'\n";
+	output << "set xlabel 'Degrees'\n\n";
 
 	output << "set xrange [" << _lowerLimit << ":" << _upperLimit << "]\n";
+	output << "set yrange [0:1]\n";
+	output << "set grid ytics xtics\n\n";
+
 	output << "set xtics " << _binSize << "\n";
 	output << "set xtics font 'Verdana,9'\n";
-	output << "set yrange [0:1]\n";
-	output << "set style data linespoints\n";
+	output << "set xtics rotate by -50\n";
+	output << "set xtics (";
+
+	int binNumber = ceil((_upperLimit - _lowerLimit) / _binSize);
+	double offset = binNumber % 2 > 0 ? 0 : -0.5 * _binSize;
+
+	for (double pos = _lowerLimit + offset; pos < _upperLimit; pos += _binSize)
+		output << "'[" << round(pos) << ", " << round(pos + _binSize) << ")' " << pos - offset << (pos + _binSize <= _upperLimit ? ", " : "");
+	output << ")\n\n";
+
+	output << "set style data linespoints\n\n";
 
 	output << "set term png\n";
-	output << "set output '" << OUTPUT_FOLDER << _filename << ".png'\n";
+	output << "set output '" << OUTPUT_FOLDER << _filename << ".png'\n\n";
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)

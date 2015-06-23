@@ -18,7 +18,7 @@
 using namespace std;
 using namespace pcl;
 
-void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, vector<Hist> &_angleHistograms, const ExecutionParams &_params, const int _targetIndex)
+void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, const vector<Hist> &_angleHistograms, const ExecutionParams &_params, const int _targetIndex)
 {
 	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
 
