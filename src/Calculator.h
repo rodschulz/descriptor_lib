@@ -51,13 +51,15 @@ public:
 	static inline char getSequenceChar(const double _value, const double _step)
 	{
 		int index = _value / _step;
-		return 'a' + index;
+		if (index == 0)
+			return '0';
+		return index > 0 ? 'A' + index : 'a' - index;
 	}
 
 	static inline double calculateAngle(const Vector3f &_vector1, const Vector3f &_vector2, const Hyperplane<float, 3> &_plane, const bool _useProjection)
 	{
 		Vector3f v2 = _useProjection ? _plane.projection(_vector2).normalized() : _vector2;
-		return signedAngle<Vector3f>(_vector1, v2, (Vector3f)_plane.normal());
+		return signedAngle<Vector3f>(_vector1, v2, (Vector3f) _plane.normal());
 	}
 
 private:

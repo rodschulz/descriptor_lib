@@ -1,11 +1,11 @@
 # Descriptor calculation
-targetPoint	7302
+targetPoint	4402
 patchSize	0.03
 normalRadius	-1
-bandNumber	8
+bandNumber	4
 bandWidth	0.01
 sequenceBin	0.005
-bidirectional	false
+bidirectional	true
 radialBands	false
 useProjection	false
 
@@ -19,7 +19,7 @@ smoothingType	gaussian
 
 # Gaussian smoothing params
 gaussianSigma	4
-gaussianRadius	0.03
+gaussianRadius	0.005
 
 # MLS smoothing params
 mlsRadius	0.05

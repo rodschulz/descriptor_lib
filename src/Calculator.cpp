@@ -4,8 +4,8 @@
  */
 #include "Calculator.h"
 #include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
+#include <boost/accumulators/statistics/count.hpp>
 #include <map>
 
 using namespace boost::accumulators;
@@ -65,7 +65,7 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 		Vector3f n = planeNormal.cross(pointNormal).normalized();
 		Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, band->point.getVector3fMap());
 
-		map<int, accumulator_set<double, features<tag::mean, tag::median> > > dataMap;
+		map<int, accumulator_set<double, features<tag::mean, tag::median, tag::min> > > dataMap;
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
 			PointNormal p = band->data->at(j);
@@ -73,13 +73,13 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / _binSize;
 
 			if (dataMap.find(index) == dataMap.end())
-				dataMap[index] = accumulator_set<double, features<tag::mean, tag::median> >();
+				dataMap[index] = accumulator_set<double, features<tag::mean, tag::median, tag::min> >();
 
 			dataMap[index](theta);
 		}
 
 		band->sequenceMean = band->sequenceMedian = "";
-		for (map<int, accumulator_set<double, features<tag::mean, tag::median> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
+		for (map<int, accumulator_set<double, features<tag::mean, tag::median, tag::min> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
 		{
 			band->sequenceMean += getSequenceChar((double) mean(it->second), _sequenceStep);
 			band->sequenceMedian += getSequenceChar((double) median(it->second), _sequenceStep);
