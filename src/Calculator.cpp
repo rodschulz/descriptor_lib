@@ -54,8 +54,11 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 	}
 }
 
-void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep, const bool _useProjection)
+void Calculator::calculateSequences(const vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection)
 {
+	double binSize = _params.sequenceBin;
+	int binsNumber = (_params.bidirectional ? _params.patchSize * 2.0 : _params.patchSize) / binSize;
+
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
 		BandPtr band = _bands[i];
@@ -70,7 +73,7 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 		{
 			PointNormal p = band->data->at(j);
 			double theta = calculateAngle(pointNormal, (Vector3f) p.getNormalVector3fMap(), band->plane, _useProjection);
-			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / _binSize;
+			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / binSize;
 
 			if (dataMap.find(index) == dataMap.end())
 				dataMap[index] = accumulator_set<double, features<tag::mean, tag::median, tag::min> >();
@@ -79,10 +82,18 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const double 
 		}
 
 		band->sequenceMean = band->sequenceMedian = "";
-		for (map<int, accumulator_set<double, features<tag::mean, tag::median, tag::min> > >::iterator it = dataMap.begin(); it != dataMap.end(); it++)
+		for (int j = 0; j < binsNumber; j++)
 		{
-			band->sequenceMean += getSequenceChar((double) mean(it->second), _sequenceStep);
-			band->sequenceMedian += getSequenceChar((double) median(it->second), _sequenceStep);
+			if (dataMap.find(j) != dataMap.end())
+			{
+				band->sequenceMean += getSequenceChar((double) mean(dataMap[j]), _sequenceStep);
+				band->sequenceMedian += getSequenceChar((double) median(dataMap[j]), _sequenceStep);
+			}
+			else
+			{
+				band->sequenceMean += '-';
+				band->sequenceMedian += '-';
+			}
 		}
 	}
 }

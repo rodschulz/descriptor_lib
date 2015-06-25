@@ -88,7 +88,7 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 			cout << "WARNING, bad return for command: " << cmd << "\n";
 
 		// Remove script and data
-		cmd = "rm -rf ";
+		/*cmd = "rm -rf ";
 		cmd += PLOT_SCRIPT_NAME;
 		if (system(cmd.c_str()))
 			cout << "WARNING, bad return for command: " << cmd << "\n";
@@ -96,7 +96,7 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 		cmd = "rm -rf ";
 		cmd += PLOT_DATA_NAME;
 		if (system(cmd.c_str()))
-			cout << "WARNING, bad return for command: " << cmd << "\n";
+			cout << "WARNING, bad return for command: " << cmd << "\n";*/
 	}
 }
 

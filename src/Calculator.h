@@ -7,6 +7,7 @@
 #include "Extractor.h"
 #include "Hist.h"
 #include "Helper.h"
+#include "ExecutionParams.h"
 #include <vector>
 
 using namespace std;
@@ -17,7 +18,7 @@ class Calculator
 public:
 	static void calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms, const bool _useProjection);
 
-	static void calculateSequences(const vector<BandPtr> &_bands, const double _binSize, const double _sequenceStep, const bool _useProjection);
+	static void calculateSequences(const vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection);
 
 	template<class T>
 	static inline double angle(const T &_vector1, const T &_vector2)

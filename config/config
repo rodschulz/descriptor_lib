@@ -1,11 +1,11 @@
 # Descriptor calculation
-targetPoint	4402
-patchSize	0.03
+targetPoint	2089
+patchSize	0.02
 normalRadius	-1
-bandNumber	4
+bandNumber	8
 bandWidth	0.01
-sequenceBin	0.005
-bidirectional	true
+sequenceBin	0.002
+bidirectional	false
 radialBands	false
 useProjection	false
 

@@ -92,7 +92,7 @@ int main(int _argn, char **_argv)
 	// Extract bands
 	vector<BandPtr> bands = Extractor::getBands(patch, point, params);
 	if (!params.radialBands)
-		Calculator::calculateSequences(bands, params.sequenceBin, M_PI / 18, params.useProjection);
+		Calculator::calculateSequences(bands, params, M_PI / 18, params.useProjection);
 
 	// Calculate histograms
 	cout << "Generating angle histograms\n";

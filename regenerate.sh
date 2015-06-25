@@ -2,8 +2,12 @@
 
 type=$1
 
+if [ -d "./build" ]; then
+	rm -rf ./build
+	mkdir ./build/
+fi
+
 cd ./build/
-rm -rf *
 
 if [ "$type" == "-r" ] ; then
 	echo "Generating project for release"
