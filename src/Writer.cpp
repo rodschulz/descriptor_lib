@@ -23,13 +23,13 @@ Writer::~Writer()
 {
 }
 
-void Writer::writeHistogram(const string &_filename, const string &_histogramTitle, const vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
+void Writer::writeHistogram(const std::string &_filename, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
 	if (!_histograms.empty())
 	{
 		bool axesCreated = false;
-		vector<string> rows;
-		ostringstream stream;
+		std::vector<std::string> rows;
+		std::ostringstream stream;
 		Dimension dimension = ANGLE;
 
 		// Generate data to plot
@@ -53,7 +53,7 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 				double boundary = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
 				for (int j = 0; j < binsNumber; j++)
 				{
-					stream.str(string());
+					stream.str(std::string());
 					stream << (step * j + boundary);
 					rows[j] = stream.str();
 				}
@@ -62,7 +62,7 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 
 			for (int j = 0; j < binsNumber; j++)
 			{
-				stream.str(string());
+				stream.str(std::string());
 				stream << "\t" << bins.bins[j];
 				rows[j] += stream.str();
 			}
@@ -75,17 +75,17 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 		generateScript(_filename, _histogramTitle, _histograms.size(), step, lower, upper);
 
 		// Generate data file
-		ofstream output;
-		output.open(PLOT_DATA_NAME, fstream::out);
+		std::ofstream output;
+		output.open(PLOT_DATA_NAME, std::fstream::out);
 		for (size_t i = 0; i < rows.size(); i++)
 			output << rows[i] << "\n";
 		output.close();
 
 		// Execute script to generate plot
-		string cmd = "gnuplot ";
+		std::string cmd = "gnuplot ";
 		cmd += PLOT_SCRIPT_NAME;
 		if (system(cmd.c_str()) != 0)
-			cout << "WARNING, bad return for command: " << cmd << "\n";
+			std::cout << "WARNING, bad return for command: " << cmd << "\n";
 
 		// Remove script and data
 		/*cmd = "rm -rf ";
@@ -100,10 +100,10 @@ void Writer::writeHistogram(const string &_filename, const string &_histogramTit
 	}
 }
 
-void Writer::generateScript(const string &_filename, const string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
+void Writer::generateScript(const std::string &_filename, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
 {
-	ofstream output;
-	output.open(PLOT_SCRIPT_NAME, fstream::out);
+	std::ofstream output;
+	output.open(PLOT_SCRIPT_NAME, std::fstream::out);
 
 	output << "set title '" << _histogramTitle << "'\n";
 	output << "set ylabel 'Percentage'\n";

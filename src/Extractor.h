@@ -12,42 +12,38 @@
 #include "Parser.h"
 #include "PointFactory.h"
 
-using namespace std;
-using namespace pcl;
-using namespace Eigen;
-
 struct Band
 {
-	PointCloud<PointNormal>::Ptr data;
-	PointNormal point;
-	Hyperplane<float, 3> plane;
+	pcl::PointCloud<pcl::PointNormal>::Ptr data;
+	pcl::PointNormal point;
+	Eigen::Hyperplane<float, 3> plane;
 	bool isRadialBand;
-	string sequenceMean;
-	string sequenceMedian;
+	std::string sequenceMean;
+	std::string sequenceMedian;
 
-	Band(const PointNormal &_point, const Hyperplane<float, 3> &_plane)
+	Band(const pcl::PointNormal &_point, const Eigen::Hyperplane<float, 3> &_plane)
 	{
-		data = PointCloud<PointNormal>::Ptr(new PointCloud<PointNormal>());
+		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 		point = _point;
 		plane = _plane;
 		isRadialBand = false;
 		sequenceMean = sequenceMedian = "";
 	}
 
-	Band(const PointNormal &_point, const bool &_radialBand)
+	Band(const pcl::PointNormal &_point, const bool &_radialBand)
 	{
-		data = PointCloud<PointNormal>::Ptr(new PointCloud<PointNormal>());
+		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 		point = _point;
-		plane = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
+		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		isRadialBand = _radialBand;
 		sequenceMean = sequenceMedian = "";
 	}
 
 	Band()
 	{
-		data = PointCloud<PointNormal>::Ptr(new PointCloud<PointNormal>());
+		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 		point = PointFactory::makePointNormal(1, 0, 0, 1, 0, 0);
-		plane = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
+		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		isRadialBand = false;
 		sequenceMean = sequenceMedian = "";
 	}
@@ -57,15 +53,15 @@ typedef boost::shared_ptr<Band> BandPtr;
 class Extractor
 {
 public:
-	static PointCloud<PointNormal>::Ptr getNeighbors(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_searchPoint, const double _searchRadius);
-	static vector<BandPtr> getBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
-	static PointCloud<PointXYZRGB>::Ptr getTangentPlane(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point);
-	static vector<PointCloud<PointNormal>::Ptr> getBandPlanes(const vector<BandPtr> &_bands, const ExecutionParams &_params);
+	static pcl::PointCloud<pcl::PointNormal>::Ptr getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius);
+	static std::vector<BandPtr> getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params);
+	static pcl::PointCloud<pcl::PointXYZRGB>::Ptr getTangentPlane(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point);
+	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> getBandPlanes(const std::vector<BandPtr> &_bands, const ExecutionParams &_params);
 
 private:
 	Extractor();
 	~Extractor();
 
-	static vector<BandPtr> getRadialBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
-	static vector<BandPtr> getLongitudinalBands(const PointCloud<PointNormal>::Ptr &_cloud, const PointNormal &_point, const ExecutionParams &_params);
+	static std::vector<BandPtr> getRadialBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params);
+	static std::vector<BandPtr> getLongitudinalBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params);
 };

@@ -7,8 +7,6 @@
 #include <vector>
 #include <ostream>
 
-using namespace std;
-
 enum Dimension
 {
 	ANGLE, OTHER
@@ -16,7 +14,7 @@ enum Dimension
 
 struct Bins
 {
-	vector<double> bins;
+	std::vector<double> bins;
 	double step;
 	Dimension dimension;
 
@@ -32,7 +30,7 @@ class Hist
 {
 public:
 	Hist(const Dimension _dimension = OTHER);
-	Hist(const vector<double> &_data);
+	Hist(const std::vector<double> &_data);
 	~Hist();
 
 	void add(const double _element);
@@ -40,11 +38,11 @@ public:
 	void getBins(const double _binSize, Bins &_bins) const;
 
 private:
-	vector<double> data;
+	std::vector<double> data;
 	double minData;
 	double maxData;
 	Dimension dimension;
 };
 
-ostream& operator<<(ostream &_stream, const Bins &_bins);
+std::ostream& operator<<(std::ostream &_stream, const Bins &_bins);
 void printBins(const Bins &_data);

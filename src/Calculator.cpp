@@ -18,13 +18,13 @@ Calculator::~Calculator()
 {
 }
 
-void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms, const bool _useProjection)
+void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, std::vector<Hist> &_histograms, const bool _useProjection)
 {
 	_histograms.clear();
 	_histograms.reserve(_bands.size());
 
-	Vector3f targetPoint = _bands[0]->point.getVector3fMap();
-	Vector3f targetNormal = _bands[0]->point.getNormalVector3fMap();
+	Eigen::Vector3f targetPoint = _bands[0]->point.getVector3fMap();
+	Eigen::Vector3f targetNormal = _bands[0]->point.getNormalVector3fMap();
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
@@ -33,18 +33,18 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
-			Vector3f point = band->data->points[j].getVector3fMap();
-			Vector3f normal = band->data->points[j].getNormalVector3fMap();
+			Eigen::Vector3f point = band->data->points[j].getVector3fMap();
+			Eigen::Vector3f normal = band->data->points[j].getNormalVector3fMap();
 
 			if (band->isRadialBand)
 			{
-				Vector3f targetToPoint = point - targetPoint;
+				Eigen::Vector3f targetToPoint = point - targetPoint;
 				if (fabs(targetToPoint.norm()) < 1E-15)
 					continue;
 
 				// Create a plane containing the target point, its normal and the current point
-				Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
-				Hyperplane<float, 3> plane = Hyperplane<float, 3>(planeNormal, targetPoint);
+				Eigen::Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
+				Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(planeNormal, targetPoint);
 
 				_histograms.back().add(calculateAngle(targetNormal, normal, plane, _useProjection));
 			}
@@ -54,7 +54,7 @@ void Calculator::calculateAngleHistograms(const vector<BandPtr> &_bands, vector<
 	}
 }
 
-void Calculator::calculateSequences(const vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection)
+void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection)
 {
 	double binSize = _params.sequenceBin;
 	int binsNumber = (_params.bidirectional ? _params.patchSize * 2.0 : _params.patchSize) / binSize;
@@ -63,17 +63,17 @@ void Calculator::calculateSequences(const vector<BandPtr> &_bands, const Executi
 	{
 		BandPtr band = _bands[i];
 
-		Vector3f pointNormal = band->point.getNormalVector3fMap();
-		Vector3f planeNormal = band->plane.normal();
-		Vector3f n = planeNormal.cross(pointNormal).normalized();
-		Hyperplane<float, 3> plane = Hyperplane<float, 3>(n, band->point.getVector3fMap());
+		Eigen::Vector3f pointNormal = band->point.getNormalVector3fMap();
+		Eigen::Vector3f planeNormal = band->plane.normal();
+		Eigen::Vector3f n = planeNormal.cross(pointNormal).normalized();
+		Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, band->point.getVector3fMap());
 
-		map<int, accumulator_set<double, features<tag::mean, tag::median, tag::min> > > dataMap;
+		std::map<int, accumulator_set<double, features<tag::mean, tag::median, tag::min> > > dataMap;
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
-			PointNormal p = band->data->at(j);
-			double theta = calculateAngle(pointNormal, (Vector3f) p.getNormalVector3fMap(), band->plane, _useProjection);
-			int index = plane.signedDistance((Vector3f) p.getVector3fMap()) / binSize;
+			pcl::PointNormal p = band->data->at(j);
+			double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, _useProjection);
+			int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / binSize;
 
 			if (dataMap.find(index) == dataMap.end())
 				dataMap[index] = accumulator_set<double, features<tag::mean, tag::median, tag::min> >();

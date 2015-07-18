@@ -20,13 +20,13 @@ Config::~Config()
 {
 }
 
-bool Config::load(const string &_filename, int _argn, char **_argv)
+bool Config::load(const std::string &_filename, int _argn, char **_argv)
 {
 	bool loadOk = true;
 
-	string line;
-	ifstream inputFile;
-	inputFile.open(_filename.c_str(), fstream::in);
+	std::string line;
+	std::ifstream inputFile;
+	inputFile.open(_filename.c_str(), std::fstream::in);
 	if (inputFile.is_open())
 	{
 		while (getline(inputFile, line))
@@ -34,9 +34,9 @@ bool Config::load(const string &_filename, int _argn, char **_argv)
 			if (line.empty() || line[0] == '#')
 				continue;
 
-			vector<string> tokens;
-			istringstream iss(line);
-			copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(tokens));
+			std::vector<std::string> tokens;
+			std::istringstream iss(line);
+			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
 			parse(tokens[0], tokens[1]);
 		}
@@ -45,7 +45,7 @@ bool Config::load(const string &_filename, int _argn, char **_argv)
 		if (_argn < 2 && !getInstance()->params.useSynthetic)
 		{
 			loadOk = false;
-			cout << "Not enough parameters\n";
+			std::cout << "Not enough parameters\n";
 		}
 		else if (_argn >= 2)
 			getInstance()->params.inputLocation = _argv[1];
@@ -54,13 +54,13 @@ bool Config::load(const string &_filename, int _argn, char **_argv)
 	else
 	{
 		loadOk = false;
-		cout << "Unable to open input: " << _filename;
+		std::cout << "Unable to open input: " << _filename;
 	}
 
 	return loadOk;
 }
 
-void Config::parse(const string _key, const string _value)
+void Config::parse(const std::string _key, const std::string _value)
 {
 	// Descriptor calculation
 	if (boost::iequals(_key, "targetPoint"))

@@ -7,8 +7,6 @@
 #include <string>
 #include "ExecutionParams.h"
 
-using namespace std;
-
 class Config
 {
 public:
@@ -22,7 +20,7 @@ public:
 	}
 
 	// Loads the configuration file
-	static bool load(const string &_filename, int _argn, char **_argv);
+	static bool load(const std::string &_filename, int _argn, char **_argv);
 
 	static inline ExecutionParams getExecutionParams()
 	{
@@ -31,7 +29,7 @@ public:
 
 private:
 	Config();
-	static void parse(const string _key, const string _value);
+	static void parse(const std::string _key, const std::string _value);
 
 	ExecutionParams params;
 };

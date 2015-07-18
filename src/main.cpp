@@ -15,40 +15,37 @@
 
 #define CONFIG_LOCATION "./config/config"
 
-using namespace std;
-using namespace pcl;
-
-void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<PointNormal>::Ptr &_patch, const vector<BandPtr> &_bands, const vector<Hist> &_angleHistograms, const ExecutionParams &_params, const int _targetIndex)
+void writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointCloud<pcl::PointNormal>::Ptr &_patch, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params, const int _targetIndex)
 {
-	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
 
-	cout << "Writing clouds to disk\n";
-	io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
-	io::savePCDFileASCII("./output/patch.pcd", *Helper::createColorCloud(_patch, Helper::getColor(11)));
+	std::cout << "Writing clouds to disk\n";
+	pcl::io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
+	pcl::io::savePCDFileASCII("./output/patch.pcd", *Helper::createColorCloud(_patch, Helper::getColor(11)));
 
 	(*coloredCloud)[_targetIndex].rgb = Helper::getColor(255, 0, 0);
-	io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
+	pcl::io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
 
-	vector<PointCloud<PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
 
-	ofstream sequences;
-	sequences.open("./output/sequences", fstream::out);
+	std::ofstream sequences;
+	sequences.open("./output/sequences", std::fstream::out);
 
-	io::savePCDFileASCII("./output/plane.pcd", *Extractor::getTangentPlane(_cloud, _cloud->at(_targetIndex)));
+	pcl::io::savePCDFileASCII("./output/plane.pcd", *Extractor::getTangentPlane(_cloud, _cloud->at(_targetIndex)));
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
 		if (!_bands[i]->data->empty())
 		{
 			char name[100];
 			sprintf(name, "./output/band%d.pcd", (int) i);
-			io::savePCDFileASCII(name, *Helper::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
+			pcl::io::savePCDFileASCII(name, *Helper::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
 
 			sequences << "band " << i << "\n";
 			sequences << "\tmean  : " << _bands[i]->sequenceMean << "\n";
 			sequences << "\tmedian: " << _bands[i]->sequenceMedian << "\n";
 
 			sprintf(name, "./output/planeBand%d.pcd", (int) i);
-			io::savePCDFileASCII(name, *planes[i]);
+			pcl::io::savePCDFileASCII(name, *planes[i]);
 		}
 	}
 
@@ -62,47 +59,47 @@ void writeOuput(const PointCloud<PointNormal>::Ptr &_cloud, const PointCloud<Poi
 int main(int _argn, char **_argv)
 {
 	if (system("rm -rf ./output/*") != 0)
-		cout << "ERROR, wrong command\n";
+		std::cout << "ERROR, wrong command\n";
 
-	cout << "Loading configuration file\n";
+	std::cout << "Loading configuration file\n";
 	if (!Config::load(CONFIG_LOCATION, _argn, _argv))
 	{
-		cout << "Can't read configuration file at " << CONFIG_LOCATION << "\n";
+		std::cout << "Can't read configuration file at " << CONFIG_LOCATION << "\n";
 		return EXIT_FAILURE;
 	}
 
 	ExecutionParams params = Config::getExecutionParams();
 	int index = params.targetPoint;
-	cout << "Calcutating descriptor for point " << index << "\n";
+	std::cout << "Calcutating descriptor for point " << index << "\n";
 
 	// Load cloud
-	PointCloud<PointNormal>::Ptr cloud(new PointCloud<PointNormal>());
+	pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
 	if (!Helper::getCloud(cloud, params))
 	{
-		cout << "ERROR: loading failed\n";
+		std::cout << "ERROR: loading failed\n";
 		return EXIT_FAILURE;
 	}
-	cout << "Loaded " << cloud->size() << " points in cloud\n";
+	std::cout << "Loaded " << cloud->size() << " points in cloud\n";
 
 	// Get target point and surface patch
-	PointNormal point = cloud->points[index];
-	PointCloud<PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.patchSize);
-	cout << "Patch size: " << patch->size() << "\n";
+	pcl::PointNormal point = cloud->points[index];
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud, point, params.patchSize);
+	std::cout << "Patch size: " << patch->size() << "\n";
 
 	// Extract bands
-	vector<BandPtr> bands = Extractor::getBands(patch, point, params);
+	std::vector<BandPtr> bands = Extractor::getBands(patch, point, params);
 	if (!params.radialBands)
 		Calculator::calculateSequences(bands, params, M_PI / 18, params.useProjection);
 
 	// Calculate histograms
-	cout << "Generating angle histograms\n";
-	vector<Hist> histograms;
+	std::cout << "Generating angle histograms\n";
+	std::vector<Hist> histograms;
 	Calculator::calculateAngleHistograms(bands, histograms, params.useProjection);
 
 	// Write output
-	cout << "Writing output\n";
+	std::cout << "Writing output\n";
 	writeOuput(cloud, patch, bands, histograms, params, index);
 
-	cout << "Finished\n";
+	std::cout << "Finished\n";
 	return EXIT_SUCCESS;
 }

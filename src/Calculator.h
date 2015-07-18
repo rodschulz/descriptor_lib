@@ -10,14 +10,11 @@
 #include "ExecutionParams.h"
 #include <vector>
 
-using namespace std;
-using namespace pcl;
-
 class Calculator
 {
 public:
-	static void calculateAngleHistograms(const vector<BandPtr> &_bands, vector<Hist> &_histograms, const bool _useProjection);
-	static void calculateSequences(const vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection);
+	static void calculateAngleHistograms(const std::vector<BandPtr> &_bands, std::vector<Hist> &_histograms, const bool _useProjection);
+	static void calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection);
 
 	template<class T>
 	static inline double angle(const T &_vector1, const T &_vector2)
@@ -56,10 +53,10 @@ public:
 		return index > 0 ? 'A' + index : 'a' - index;
 	}
 
-	static inline double calculateAngle(const Vector3f &_vector1, const Vector3f &_vector2, const Hyperplane<float, 3> &_plane, const bool _useProjection)
+	static inline double calculateAngle(const Eigen::Vector3f &_vector1, const Eigen::Vector3f &_vector2, const Eigen::Hyperplane<float, 3> &_plane, const bool _useProjection)
 	{
-		Vector3f v2 = _useProjection ? _plane.projection(_vector2).normalized() : _vector2;
-		return signedAngle<Vector3f>(_vector1, v2, (Vector3f) _plane.normal());
+		Eigen::Vector3f v2 = _useProjection ? _plane.projection(_vector2).normalized() : _vector2;
+		return signedAngle<Eigen::Vector3f>(_vector1, v2, (Eigen::Vector3f) _plane.normal());
 	}
 
 private:

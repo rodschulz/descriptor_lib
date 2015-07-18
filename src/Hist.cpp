@@ -20,14 +20,14 @@ Hist::~Hist()
 {
 }
 
-ostream& operator<<(ostream &_stream, const Bins &_bins)
+std::ostream& operator<<(std::ostream &_stream, const Bins &_bins)
 {
 	_stream.precision(2);
 
 	double step = _bins.dimension == ANGLE ? RAD2DEG(_bins.step) : _bins.step;
 	for (size_t i = 0; i < _bins.bins.size(); i++)
 	{
-		_stream << fixed << "[" << step * i << "]:";
+		_stream << std::fixed << "[" << step * i << "]:";
 		_stream << _bins.bins[i];
 		if (i != _bins.bins.size() - 1)
 			_stream << "\t";
