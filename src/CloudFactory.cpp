@@ -3,7 +3,7 @@
  * 2015
  */
 #include "CloudFactory.h"
-#include "Factory.h"
+#include "PointFactory.h"
 
 CloudFactory::CloudFactory()
 {
@@ -13,7 +13,7 @@ CloudFactory::~CloudFactory()
 {
 }
 
-void CloudFactory::generateCube(const double _size, const PointXYZ &_center, PointCloud<PointXYZ>::Ptr &_cloud)
+void CloudFactory::generateCube(const double _size, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	_cloud->clear();
 
@@ -32,8 +32,8 @@ void CloudFactory::generateCube(const double _size, const PointXYZ &_center, Poi
 	{
 		for (double z = minZ; z <= maxZ; z += step)
 		{
-			_cloud->push_back(Factory::makePointXYZ(minX, y, z));
-			_cloud->push_back(Factory::makePointXYZ(maxX, y, z));
+			_cloud->push_back(PointFactory::makePointXYZ(minX, y, z));
+			_cloud->push_back(PointFactory::makePointXYZ(maxX, y, z));
 		}
 	}
 
@@ -42,8 +42,8 @@ void CloudFactory::generateCube(const double _size, const PointXYZ &_center, Poi
 	{
 		for (double z = minZ; z <= maxZ; z += step)
 		{
-			_cloud->push_back(Factory::makePointXYZ(x, minY, z));
-			_cloud->push_back(Factory::makePointXYZ(x, maxY, z));
+			_cloud->push_back(PointFactory::makePointXYZ(x, minY, z));
+			_cloud->push_back(PointFactory::makePointXYZ(x, maxY, z));
 		}
 	}
 
@@ -52,13 +52,13 @@ void CloudFactory::generateCube(const double _size, const PointXYZ &_center, Poi
 	{
 		for (double y = minY; y <= maxY; y += step)
 		{
-			_cloud->push_back(Factory::makePointXYZ(x, y, minZ));
-			_cloud->push_back(Factory::makePointXYZ(x, y, maxZ));
+			_cloud->push_back(PointFactory::makePointXYZ(x, y, minZ));
+			_cloud->push_back(PointFactory::makePointXYZ(x, y, maxZ));
 		}
 	}
 }
 
-void CloudFactory::generateCylinder(const double _radius, const double _height, const PointXYZ &_center, PointCloud<PointXYZ>::Ptr &_cloud)
+void CloudFactory::generateCylinder(const double _radius, const double _height, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	_cloud->clear();
 
@@ -74,8 +74,8 @@ void CloudFactory::generateCylinder(const double _radius, const double _height, 
 	{
 		for (double r = _radius; r > 0; r -= radialStep)
 		{
-			_cloud->push_back(Factory::makePointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, minZ));
-			_cloud->push_back(Factory::makePointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, maxZ));
+			_cloud->push_back(PointFactory::makePointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, minZ));
+			_cloud->push_back(PointFactory::makePointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, maxZ));
 		}
 	}
 
@@ -84,12 +84,12 @@ void CloudFactory::generateCylinder(const double _radius, const double _height, 
 	{
 		for (double angle = 0; angle < 2 * M_PI; angle += angularStep)
 		{
-			_cloud->push_back(Factory::makePointXYZ(_radius * cos(angle) + _center.x, _radius * sin(angle) + _center.y, z));
+			_cloud->push_back(PointFactory::makePointXYZ(_radius * cos(angle) + _center.x, _radius * sin(angle) + _center.y, z));
 		}
 	}
 }
 
-void CloudFactory::generateSphere(const double _radius, const PointXYZ &_center, PointCloud<PointXYZ>::Ptr &_cloud)
+void CloudFactory::generateSphere(const double _radius, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	_cloud->clear();
 
@@ -98,7 +98,7 @@ void CloudFactory::generateSphere(const double _radius, const PointXYZ &_center,
 	{
 		for (double phi = 0; phi < 2 * M_PI; phi += angularStep)
 		{
-			_cloud->push_back(Factory::makePointXYZ(_radius * sin(theta) * cos(phi) + _center.x, _radius * sin(theta) * sin(phi) + _center.y, _radius * cos(theta) + _center.z));
+			_cloud->push_back(PointFactory::makePointXYZ(_radius * sin(theta) * cos(phi) + _center.x, _radius * sin(theta) * sin(phi) + _center.y, _radius * cos(theta) + _center.z));
 		}
 	}
 }

@@ -12,10 +12,8 @@
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/common/io.h>
 #include <ctype.h>
-#include "Factory.h"
 #include "CloudFactory.h"
-
-using namespace pcl::filters;
+#include "PointFactory.h"
 
 Helper::Helper()
 {
@@ -25,18 +23,18 @@ Helper::~Helper()
 {
 }
 
-void Helper::removeNANs(PointCloud<PointXYZ>::Ptr &_cloud)
+void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	std::vector<int> mapping;
-	removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
+	pcl::removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
 }
 
-PointCloud<Normal>::Ptr Helper::getNormals(const PointCloud<PointXYZ>::Ptr &_cloud, const double _searchRadius)
+pcl::PointCloud<pcl::Normal>::Ptr Helper::getNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius)
 {
-	PointCloud<Normal>::Ptr normals(new PointCloud<Normal>());
+	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>());
 
-	search::KdTree<PointXYZ>::Ptr kdtree(new search::KdTree<PointXYZ>);
-	NormalEstimation<PointXYZ, Normal> normalEstimation;
+	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdtree(new pcl::search::KdTree<pcl::PointXYZ>);
+	pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normalEstimation;
 	normalEstimation.setInputCloud(_cloud);
 
 	if (_searchRadius > 0)
@@ -50,29 +48,29 @@ PointCloud<Normal>::Ptr Helper::getNormals(const PointCloud<PointXYZ>::Ptr &_clo
 	return normals;
 }
 
-bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+bool Helper::getCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
 {
 	bool loadOk = true;
 
 	// Get cartesian data
-	PointCloud<PointXYZ>::Ptr cloudXYZ(new PointCloud<PointXYZ>());
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ(new pcl::PointCloud<pcl::PointXYZ>());
 	if (!_params.useSynthetic)
 	{
-		if (io::loadPCDFile<PointXYZ>(_params.inputLocation, *cloudXYZ) != 0)
+		if (pcl::io::loadPCDFile<pcl::PointXYZ>(_params.inputLocation, *cloudXYZ) != 0)
 		{
-			cout << "ERROR: Can't read file from disk (" << _params.inputLocation << ")\n";
+			std::cout << "ERROR: Can't read file from disk (" << _params.inputLocation << ")\n";
 			loadOk = false;
 		}
 
 		switch (_params.smoothingType)
 		{
 			case SMOOTHING_GAUSSIAN:
-				cout << "Applying gaussian smoothing\n";
+				std::cout << "Applying gaussian smoothing\n";
 				cloudXYZ = gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
 				break;
 
 			case SMOOTHING_MLS:
-				cout << "Applying MLS smoothing\n";
+				std::cout << "Applying MLS smoothing\n";
 				cloudXYZ = MLSSmoothing(cloudXYZ, _params.mlsRadius);
 				break;
 		}
@@ -82,21 +80,21 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 		switch (_params.synCloudType)
 		{
 			case CLOUD_CUBE:
-				CloudFactory::generateCube(0.3, Factory::makePointXYZ(0.3, 0.3, 0.3), cloudXYZ);
+				CloudFactory::generateCube(0.3, PointFactory::makePointXYZ(0.3, 0.3, 0.3), cloudXYZ);
 				break;
 
 			case CLOUD_CYLINDER:
-				CloudFactory::generateCylinder(0.2, 0.5, Factory::makePointXYZ(0.4, 0.4, 0.4), cloudXYZ);
+				CloudFactory::generateCylinder(0.2, 0.5, PointFactory::makePointXYZ(0.4, 0.4, 0.4), cloudXYZ);
 				break;
 
 			case CLOUD_SPHERE:
-				CloudFactory::generateSphere(0.2, Factory::makePointXYZ(0.2, 0.2, 0.2), cloudXYZ);
+				CloudFactory::generateSphere(0.2, PointFactory::makePointXYZ(0.2, 0.2, 0.2), cloudXYZ);
 				break;
 
 			default:
 				cloudXYZ->clear();
 				loadOk = false;
-				cout << "WARNING, wrong cloud generation parameters\n";
+				std::cout << "WARNING, wrong cloud generation parameters\n";
 		}
 	}
 
@@ -104,7 +102,7 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 	if (loadOk)
 	{
 		Helper::removeNANs(cloudXYZ);
-		PointCloud<Normal>::Ptr normals = Helper::getNormals(cloudXYZ, _params.normalEstimationRadius);
+		pcl::PointCloud<pcl::Normal>::Ptr normals = Helper::getNormals(cloudXYZ, _params.normalEstimationRadius);
 
 		_cloud->clear();
 		concatenateFields(*cloudXYZ, *normals, *_cloud);
@@ -113,21 +111,21 @@ bool Helper::getCloud(PointCloud<PointNormal>::Ptr &_cloud, const ExecutionParam
 	return loadOk;
 }
 
-PointCloud<PointXYZ>::Ptr Helper::gaussianSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud, const double _sigma, const double _radius)
+pcl::PointCloud<pcl::PointXYZ>::Ptr Helper::gaussianSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _sigma, const double _radius)
 {
-	PointCloud<PointXYZ>::Ptr smoothedCloud(new PointCloud<PointXYZ>());
+	pcl::PointCloud<pcl::PointXYZ>::Ptr smoothedCloud(new pcl::PointCloud<pcl::PointXYZ>());
 
 	//Set up the Gaussian Kernel
-	GaussianKernel<PointXYZ, PointXYZ>::Ptr kernel(new GaussianKernel<PointXYZ, PointXYZ>());
+	pcl::filters::GaussianKernel<pcl::PointXYZ, pcl::PointXYZ>::Ptr kernel(new pcl::filters::GaussianKernel<pcl::PointXYZ, pcl::PointXYZ>());
 	kernel->setSigma(_sigma);
 	kernel->setThresholdRelativeToSigma(3);
 
 	//Set up the KDTree
-	search::KdTree<PointXYZ>::Ptr kdTree(new search::KdTree<PointXYZ>);
+	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdTree(new pcl::search::KdTree<pcl::PointXYZ>);
 	kdTree->setInputCloud(_cloud);
 
 	//Set up the Convolution Filter
-	Convolution3D<PointXYZ, PointXYZ, GaussianKernel<PointXYZ, PointXYZ> > convolution;
+	pcl::filters::Convolution3D<pcl::PointXYZ, pcl::PointXYZ, pcl::filters::GaussianKernel<pcl::PointXYZ, pcl::PointXYZ> > convolution;
 	convolution.setKernel(*kernel);
 	convolution.setInputCloud(_cloud);
 	convolution.setSearchMethod(kdTree);
@@ -137,13 +135,13 @@ PointCloud<PointXYZ>::Ptr Helper::gaussianSmoothing(const PointCloud<PointXYZ>::
 	return smoothedCloud;
 }
 
-PointCloud<PointXYZ>::Ptr Helper::MLSSmoothing(const PointCloud<PointXYZ>::Ptr &_cloud, const double _radius)
+pcl::PointCloud<pcl::PointXYZ>::Ptr Helper::MLSSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _radius)
 {
-	PointCloud<PointXYZ>::Ptr smoothedCloud(new PointCloud<PointXYZ>());
-	PointCloud<PointNormal>::Ptr MLSPoints(new PointCloud<PointNormal>());
+	pcl::PointCloud<pcl::PointXYZ>::Ptr smoothedCloud(new pcl::PointCloud<pcl::PointXYZ>());
+	pcl::PointCloud<pcl::PointNormal>::Ptr MLSPoints(new pcl::PointCloud<pcl::PointNormal>());
 
-	search::KdTree<PointXYZ>::Ptr kdTree(new search::KdTree<PointXYZ>);
-	MovingLeastSquares<PointXYZ, PointNormal> mls;
+	pcl::search::KdTree<pcl::PointXYZ>::Ptr kdTree(new pcl::search::KdTree<pcl::PointXYZ>);
+	pcl::MovingLeastSquares<pcl::PointXYZ, pcl::PointNormal> mls;
 	mls.setComputeNormals(false);
 	mls.setInputCloud(_cloud);
 	mls.setPolynomialFit(true);
@@ -151,34 +149,34 @@ PointCloud<PointXYZ>::Ptr Helper::MLSSmoothing(const PointCloud<PointXYZ>::Ptr &
 	mls.setSearchRadius(_radius);
 	mls.process(*MLSPoints);
 
-	copyPointCloud<PointNormal, PointXYZ>(*MLSPoints, *smoothedCloud);
+	pcl::copyPointCloud<pcl::PointNormal, pcl::PointXYZ>(*MLSPoints, *smoothedCloud);
 	return smoothedCloud;
 }
 
-PointCloud<PointXYZRGBNormal>::Ptr Helper::createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, uint32_t _color)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint32_t _color)
 {
-	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud(new PointCloud<PointXYZRGBNormal>());
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	coloredCloud->reserve(_cloud->size());
 
 	float color = *reinterpret_cast<float*>(&_color);
 	for (int i = 0; i < _cloud->width; i++)
 	{
-		PointNormal p = _cloud->points[i];
-		coloredCloud->push_back(Factory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, color));
+		pcl::PointNormal p = _cloud->points[i];
+		coloredCloud->push_back(PointFactory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, color));
 	}
 
 	return coloredCloud;
 }
 
-PointCloud<PointXYZRGBNormal>::Ptr Helper::createColorCloud(const PointCloud<PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b)
 {
-	PointCloud<PointXYZRGBNormal>::Ptr coloredCloud(new PointCloud<PointXYZRGBNormal>());
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	coloredCloud->reserve(_cloud->size());
 
 	for (int i = 0; i < _cloud->width; i++)
 	{
-		PointNormal p = _cloud->points[i];
-		coloredCloud->push_back(Factory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
+		pcl::PointNormal p = _cloud->points[i];
+		coloredCloud->push_back(PointFactory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
 	}
 
 	return coloredCloud;
@@ -199,7 +197,7 @@ unsigned int Helper::getColor(const int _index)
 	return palette[_index % 12];
 }
 
-bool Helper::isNumber(const string &_str)
+bool Helper::isNumber(const std::string &_str)
 {
 	bool number = true;
 	for (size_t i = 0; i < _str.size(); i++)

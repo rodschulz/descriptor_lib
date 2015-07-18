@@ -10,7 +10,7 @@
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <eigen3/Eigen/src/Geometry/Hyperplane.h>
 #include "Parser.h"
-#include "Factory.h"
+#include "PointFactory.h"
 
 using namespace std;
 using namespace pcl;
@@ -46,7 +46,7 @@ struct Band
 	Band()
 	{
 		data = PointCloud<PointNormal>::Ptr(new PointCloud<PointNormal>());
-		point = Factory::makePointNormal(1, 0, 0, 1, 0, 0);
+		point = PointFactory::makePointNormal(1, 0, 0, 1, 0, 0);
 		plane = Hyperplane<float, 3>(Vector3f(0, 1, 0), Vector3f(0, 0, 0));
 		isRadialBand = false;
 		sequenceMean = sequenceMedian = "";

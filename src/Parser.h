@@ -4,10 +4,7 @@
  */
 #pragma once
 
-#include <string>
 #include "ExecutionParams.h"
-
-using namespace std;
 
 class Parser
 {

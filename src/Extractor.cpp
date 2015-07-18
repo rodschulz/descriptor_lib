@@ -3,11 +3,11 @@
  * 2015
  */
 #include "Extractor.h"
-#include "Factory.h"
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/features/normal_3d.h>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
+#include "PointFactory.h"
 
 Extractor::Extractor()
 {
@@ -57,7 +57,7 @@ PointCloud<PointXYZRGB>::Ptr Extractor::getTangentPlane(const PointCloud<PointNo
 	{
 		Vector3f p = _cloud->points[i].getVector3fMap();
 		Vector3f projection = plane.projection(p);
-		tangentPlane->push_back(Factory::makePointXYZRGB((float) projection[0], (float) projection[1], (float) projection[2], 0, 0, 255));
+		tangentPlane->push_back(PointFactory::makePointXYZRGB((float) projection[0], (float) projection[1], (float) projection[2], 0, 0, 255));
 	}
 
 	return tangentPlane;
@@ -182,7 +182,7 @@ vector<PointCloud<PointNormal>::Ptr> Extractor::getBandPlanes(const vector<BandP
 				for (float z = begin; z <= delta; z += step)
 				{
 					Vector3f p = _bands[i]->plane.projection(point + Vector3f(x, y, z));
-					planes.back()->push_back((PointNormal)Factory::makePointNormal(p.x(), p.y(), p.z(), normal[0], normal[1], normal[2]));
+					planes.back()->push_back((PointNormal)PointFactory::makePointNormal(p.x(), p.y(), p.z(), normal[0], normal[1], normal[2]));
 				}
 			}
 		}

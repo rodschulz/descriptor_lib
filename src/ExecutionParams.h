@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <boost/algorithm/string.hpp>
 
-using namespace std;
-
 enum SynCloudType
 {
 	CLOUD_NONE, CLOUD_CUBE, CLOUD_CYLINDER, CLOUD_SPHERE,
@@ -49,7 +47,7 @@ public:
 	{
 	}
 
-	static SynCloudType getSynCloudType(const string &_type)
+	static SynCloudType getSynCloudType(const std::string &_type)
 	{
 		if (boost::iequals(_type, "cube"))
 			return CLOUD_CUBE;
@@ -60,7 +58,7 @@ public:
 		return CLOUD_NONE;
 	}
 
-	static SmoothingType getSmoothingType(const string &_type)
+	static SmoothingType getSmoothingType(const std::string &_type)
 	{
 		if (boost::iequals(_type, "gaussian"))
 			return SMOOTHING_GAUSSIAN;
@@ -69,7 +67,7 @@ public:
 		return SMOOTHING_NONE;
 	}
 
-	string inputLocation;		// Location of the input file
+	std::string inputLocation;		// Location of the input file
 	int targetPoint;		// Target point
 
 	double patchSize;		// Search radius used with the SEARCH_RADIUS method

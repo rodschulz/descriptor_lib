@@ -18,15 +18,15 @@ Parser::~Parser()
 
 void Parser::printUsage()
 {
-	cout << "Usage:\n";
-	cout << "   TestDescriptores <input_file or synthetic cloud> <target_point_index> [OPTIONS]\n\n";
-	cout << "   -sc INT\tRuns the application using a synthetic cloud. Options are 1=cube, 2=cylinder and 3=sphere\n";
-	cout << "   -r FLOAT\tSets the search radius used to extract the surface patch\n";
-	cout << "   -n FLOAT\tSets the radius used to perform the normal estimation. If none is given, then the search radius is used\n";
-	cout << "   -b INT\tSets the number of bands to create for analysis (by default 4)\n";
-	cout << "   -w FLOAT\tSets the band's width (by default 0.05)\n";
-	cout << "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n";
-	cout << "   -R\t\tWhen present bands are defined as radial zones and the width of each\n\t\twill be defined by the patch's size the number of bands\n\n";
+	std::cout << "Usage:\n";
+	std::cout << "   TestDescriptores <input_file or synthetic cloud> <target_point_index> [OPTIONS]\n\n";
+	std::cout << "   -sc INT\tRuns the application using a synthetic cloud. Options are 1=cube, 2=cylinder and 3=sphere\n";
+	std::cout << "   -r FLOAT\tSets the search radius used to extract the surface patch\n";
+	std::cout << "   -n FLOAT\tSets the radius used to perform the normal estimation. If none is given, then the search radius is used\n";
+	std::cout << "   -b INT\tSets the number of bands to create for analysis (by default 4)\n";
+	std::cout << "   -w FLOAT\tSets the band's width (by default 0.05)\n";
+	std::cout << "   -u\t\tWhen present each band is defined from the target point to the \n\t\tpatch's border and not across the point\n";
+	std::cout << "   -R\t\tWhen present bands are defined as radial zones and the width of each\n\t\twill be defined by the patch's size the number of bands\n\n";
 }
 
 void parseSection()
@@ -41,7 +41,7 @@ ExecutionParams Parser::parseExecutionParams(int _argn, char **_argv)
 	{
 		if (!Helper::isNumber(_argv[2]))
 		{
-			cout << "ERROR: wrong execution params. Target point invalid (" << _argv[2] << ")\n";
+			std::cout << "ERROR: wrong execution params. Target point invalid (" << _argv[2] << ")\n";
 		}
 		else
 		{
