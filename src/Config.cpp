@@ -89,9 +89,6 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "bandWidth"))
 		getInstance()->params.bandWidth = atof(_value.c_str());
 
-	else if (boost::iequals(_key, "sequenceBin"))
-		getInstance()->params.sequenceBin = atof(_value.c_str());
-
 	else if (boost::iequals(_key, "bidirectional"))
 		getInstance()->params.bidirectional = boost::iequals(_value, "true");
 
@@ -100,6 +97,13 @@ void Config::parse(const std::string _key, const std::string _value)
 
 	else if (boost::iequals(_key, "useProjection"))
 		getInstance()->params.useProjection = boost::iequals(_value, "true");
+
+	// Sequence calculation
+	else if (boost::iequals(_key, "sequenceBin"))
+		getInstance()->params.sequenceBin = atof(_value.c_str());
+
+	else if (boost::iequals(_key, "sequenceStat"))
+		getInstance()->params.sequenceStat = ExecutionParams::getStatType(_value);
 
 	// Use of synthetic clouds
 	else if (boost::iequals(_key, "useSynthetic"))

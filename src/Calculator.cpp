@@ -18,16 +18,16 @@ Calculator::~Calculator()
 {
 }
 
-std::vector<BandPtr> Calculator::calculateDescriptor(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_target, const ExecutionParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr _patch)
+std::vector<BandPtr> Calculator::calculateDescriptor(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_target, const ExecutionParams &_params)
 {
 	// Get target point and surface patch
-	_patch = Extractor::getNeighbors(_cloud, _target, _params.patchSize);
-	std::cout << "Patch size: " << _patch->size() << "\n";
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _target, _params.patchSize);
+	std::cout << "Patch size: " << patch->size() << "\n";
 
 	// Extract bands
-	std::vector<BandPtr> bands = Extractor::getBands(_patch, _target, _params);
+	std::vector<BandPtr> bands = Extractor::getBands(patch, _target, _params);
 	if (!_params.radialBands)
-		Calculator::calculateSequences(bands, _params, M_PI / 18, _params.useProjection);
+		Calculator::calculateSequences(bands, _params, M_PI / 18);
 
 	return bands;
 }
@@ -68,7 +68,7 @@ void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, st
 	}
 }
 
-void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection)
+void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep)
 {
 	double binSize = _params.sequenceBin;
 	int binsNumber = (_params.bidirectional ? _params.patchSize * 2.0 : _params.patchSize) / binSize;
@@ -86,7 +86,7 @@ void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const Ex
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
 			pcl::PointNormal p = band->data->at(j);
-			double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, _useProjection);
+			double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, _params.useProjection);
 			int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / binSize;
 
 			if (dataMap.find(index) == dataMap.end())
@@ -95,18 +95,19 @@ void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const Ex
 			dataMap[index](theta);
 		}
 
-		band->sequenceMean = band->sequenceMedian = "";
+		band->sequenceString = "";
 		for (int j = 0; j < binsNumber; j++)
 		{
 			if (dataMap.find(j) != dataMap.end())
 			{
-				band->sequenceMean += getSequenceChar((double) mean(dataMap[j]), _sequenceStep);
-				band->sequenceMedian += getSequenceChar((double) median(dataMap[j]), _sequenceStep);
+				double value = _params.sequenceStat == STAT_MEAN ? (double) mean(dataMap[j]) : (double) median(dataMap[j]);
+				band->sequenceString += getSequenceChar(value, _sequenceStep);
+				band->sequenceVector.push_back(value);
 			}
 			else
 			{
-				band->sequenceMean += '-';
-				band->sequenceMedian += '-';
+				band->sequenceString += '-';
+				band->sequenceVector.push_back(-M_PI);
 			}
 		}
 	}

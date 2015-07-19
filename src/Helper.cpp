@@ -29,7 +29,7 @@ void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 	pcl::removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
 }
 
-pcl::PointCloud<pcl::Normal>::Ptr Helper::getNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius)
+pcl::PointCloud<pcl::Normal>::Ptr Helper::estimateNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius)
 {
 	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>());
 
@@ -48,7 +48,7 @@ pcl::PointCloud<pcl::Normal>::Ptr Helper::getNormals(const pcl::PointCloud<pcl::
 	return normals;
 }
 
-bool Helper::getCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+bool Helper::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
 {
 	bool loadOk = true;
 
@@ -102,7 +102,7 @@ bool Helper::getCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Exec
 	if (loadOk)
 	{
 		Helper::removeNANs(cloudXYZ);
-		pcl::PointCloud<pcl::Normal>::Ptr normals = Helper::getNormals(cloudXYZ, _params.normalEstimationRadius);
+		pcl::PointCloud<pcl::Normal>::Ptr normals = Helper::estimateNormals(cloudXYZ, _params.normalEstimationRadius);
 
 		_cloud->clear();
 		concatenateFields(*cloudXYZ, *normals, *_cloud);

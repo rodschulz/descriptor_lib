@@ -18,6 +18,11 @@ enum SmoothingType
 	SMOOTHING_NONE, SMOOTHING_GAUSSIAN, SMOOTHING_MLS,
 };
 
+enum SequenceStat
+{
+	STAT_NONE, STAT_MEAN, STAT_MEDIAN
+};
+
 class ExecutionParams
 {
 public:
@@ -31,10 +36,12 @@ public:
 		normalEstimationRadius = -1;
 		bandNumber = 4;
 		bandWidth = 0.01;
-		sequenceBin = 0.01;
 		bidirectional = true;
 		radialBands = false;
 		useProjection = true;
+
+		sequenceBin = 0.01;
+		sequenceStat = STAT_NONE;
 
 		useSynthetic = false;
 		synCloudType = CLOUD_NONE;
@@ -72,6 +79,15 @@ public:
 		return SMOOTHING_NONE;
 	}
 
+	static SequenceStat getStatType(const std::string &_type)
+	{
+		if (boost::iequals(_type, "mean"))
+			return STAT_MEAN;
+		else if (boost::iequals(_type, "median"))
+			return STAT_MEDIAN;
+		return STAT_NONE;
+	}
+
 	bool normalExecution;		// Flag indicating if the execution has to be normal or a clustering evaluation
 
 	std::string inputLocation;	// Location of the input file
@@ -81,10 +97,12 @@ public:
 	double normalEstimationRadius;	// Radius used to calculate normals
 	int bandNumber;			// Number of bands to sample
 	double bandWidth;		// Width of each band
-	double sequenceBin;		// Size of the bins used in the sequence construction
 	bool bidirectional;		// Flag indicating if each band has to be analyzed bidirectional or not
 	bool radialBands;		// Flag indicating if the bands are radial or longitudinal
 	bool useProjection;		// Flag indicating if angle calculation must be done by projecting the angles over the band's plane
+
+	double sequenceBin;		// Size of the bins used in the sequence construction
+	SequenceStat sequenceStat;	// Statistic to use in the sequence calculation
 
 	bool useSynthetic;		// Flag indicating if a synthetic has to be used
 	SynCloudType synCloudType;	// Desired synthetic cloud
@@ -96,4 +114,5 @@ public:
 
 	int maxIterations;		// Clustering max iterations
 	double stopThreshold;		// Clustering stop threshold
+	std::string cacheLocation;	// Location of the cachefiles
 };

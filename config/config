@@ -1,5 +1,5 @@
 # Selector between normal calculation and clustering evaluation
-normalExec	false	
+normalExec	true	
 
 ##############################
 # Filter parameters (gaussian, mls or none)
@@ -16,18 +16,22 @@ mlsRadius	0.05
 # Clustering options
 maxIter		10000
 stopThres	0.01
+cacheLocation	./cache/
 
 ##############################
 # Descriptor calculation
-targetPoint	2089
+targetPoint	8000
 patchSize	0.02
 normalRadius	-1
 bandNumber	8
 bandWidth	0.01
-sequenceBin	0.002
 bidirectional	false
 radialBands	false
 useProjection	false
+
+# Sequence calculation (stat can be mean or median)
+sequenceBin	0.002
+sequenceStat	mean
 
 # Use of synthetic clouds (cube, cylinder or sphere)
 useSynthetic	false

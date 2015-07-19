@@ -18,8 +18,8 @@ struct Band
 	pcl::PointNormal point;
 	Eigen::Hyperplane<float, 3> plane;
 	bool isRadialBand;
-	std::string sequenceMean;
-	std::string sequenceMedian;
+	std::string sequenceString;
+	std::vector<double> sequenceVector;
 
 	Band(const pcl::PointNormal &_point, const Eigen::Hyperplane<float, 3> &_plane)
 	{
@@ -27,7 +27,7 @@ struct Band
 		point = _point;
 		plane = _plane;
 		isRadialBand = false;
-		sequenceMean = sequenceMedian = "";
+		sequenceString = "";
 	}
 
 	Band(const pcl::PointNormal &_point, const bool &_radialBand)
@@ -36,7 +36,7 @@ struct Band
 		point = _point;
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		isRadialBand = _radialBand;
-		sequenceMean = sequenceMedian = "";
+		sequenceString = "";
 	}
 
 	Band()
@@ -45,9 +45,10 @@ struct Band
 		point = PointFactory::makePointNormal(1, 0, 0, 1, 0, 0);
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		isRadialBand = false;
-		sequenceMean = sequenceMedian = "";
+		sequenceString = "";
 	}
 };
+
 typedef boost::shared_ptr<Band> BandPtr;
 
 class Extractor
