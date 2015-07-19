@@ -23,10 +23,12 @@ class ExecutionParams
 public:
 	ExecutionParams()
 	{
-		inputLocation = "";
+		normalExecution = true;
+
+		targetPoint = 1000;
+
 		patchSize = 0.05;
 		normalEstimationRadius = -1;
-		targetPoint = 1000;
 		bandNumber = 4;
 		bandWidth = 0.01;
 		sequenceBin = 0.01;
@@ -41,6 +43,9 @@ public:
 		gaussianSigma = 2;
 		gaussianRadius = 0.02;
 		mlsRadius = 0.02;
+
+		maxIterations = 10000;
+		stopThreshold = 0.001;
 	}
 
 	~ExecutionParams()
@@ -67,7 +72,9 @@ public:
 		return SMOOTHING_NONE;
 	}
 
-	std::string inputLocation;		// Location of the input file
+	bool normalExecution;		// Flag indicating if the execution has to be normal or a clustering evaluation
+
+	std::string inputLocation;	// Location of the input file
 	int targetPoint;		// Target point
 
 	double patchSize;		// Search radius used with the SEARCH_RADIUS method
@@ -86,4 +93,7 @@ public:
 	double gaussianSigma;		// Sigma used for the gaussian smoothning
 	double gaussianRadius;		// Search radius used for the gaussian smoothing
 	double mlsRadius;		// Search radius used for the mls smoothing
+
+	int maxIterations;		// Clustering max iterations
+	double stopThreshold;		// Clustering stop threshold
 };

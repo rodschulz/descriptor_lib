@@ -18,6 +18,20 @@ Calculator::~Calculator()
 {
 }
 
+std::vector<BandPtr> Calculator::calculateDescriptor(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_target, const ExecutionParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr _patch)
+{
+	// Get target point and surface patch
+	_patch = Extractor::getNeighbors(_cloud, _target, _params.patchSize);
+	std::cout << "Patch size: " << _patch->size() << "\n";
+
+	// Extract bands
+	std::vector<BandPtr> bands = Extractor::getBands(_patch, _target, _params);
+	if (!_params.radialBands)
+		Calculator::calculateSequences(bands, _params, M_PI / 18, _params.useProjection);
+
+	return bands;
+}
+
 void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, std::vector<Hist> &_histograms, const bool _useProjection)
 {
 	_histograms.clear();

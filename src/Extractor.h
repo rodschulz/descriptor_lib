@@ -9,8 +9,8 @@
 #include <pcl/point_types.h>
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <eigen3/Eigen/src/Geometry/Hyperplane.h>
-#include "Parser.h"
 #include "PointFactory.h"
+#include "ExecutionParams.h"
 
 struct Band
 {

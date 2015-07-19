@@ -1,3 +1,23 @@
+# Selector between normal calculation and clustering evaluation
+normalExec	false	
+
+##############################
+# Filter parameters (gaussian, mls or none)
+smoothingType	gaussian
+
+# Gaussian smoothing params
+gaussianSigma	4
+gaussianRadius	0.005
+
+# MLS smoothing params
+mlsRadius	0.05
+
+##############################
+# Clustering options
+maxIter		10000
+stopThres	0.01
+
+##############################
 # Descriptor calculation
 targetPoint	2089
 patchSize	0.02
@@ -12,14 +32,3 @@ useProjection	false
 # Use of synthetic clouds (cube, cylinder or sphere)
 useSynthetic	false
 synCloudType	cube
-
-
-# Filter parameters (gaussian, mls or none)
-smoothingType	gaussian
-
-# Gaussian smoothing params
-gaussianSigma	4
-gaussianRadius	0.005
-
-# MLS smoothing params
-mlsRadius	0.05

@@ -62,8 +62,19 @@ bool Config::load(const std::string &_filename, int _argn, char **_argv)
 
 void Config::parse(const std::string _key, const std::string _value)
 {
+	// Execution type selection
+	if (boost::iequals(_key, "normalExec"))
+		getInstance()->params.normalExecution = boost::iequals(_value, "true");
+
+	// Clustering parameters
+	else if (boost::iequals(_key, "maxIter"))
+		getInstance()->params.maxIterations = atoi(_value.c_str());
+
+	else if (boost::iequals(_key, "stopThres"))
+		getInstance()->params.stopThreshold = atof(_value.c_str());
+
 	// Descriptor calculation
-	if (boost::iequals(_key, "targetPoint"))
+	else if (boost::iequals(_key, "targetPoint"))
 		getInstance()->params.targetPoint = atoi(_value.c_str());
 
 	else if (boost::iequals(_key, "patchSize"))

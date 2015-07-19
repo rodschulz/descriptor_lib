@@ -182,7 +182,7 @@ std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::getBandPlanes(con
 				for (float z = begin; z <= delta; z += step)
 				{
 					Eigen::Vector3f p = _bands[i]->plane.projection(point + Eigen::Vector3f(x, y, z));
-					planes.back()->push_back((pcl::PointNormal)PointFactory::makePointNormal(p.x(), p.y(), p.z(), normal[0], normal[1], normal[2]));
+					planes.back()->push_back((pcl::PointNormal) PointFactory::makePointNormal(p.x(), p.y(), p.z(), normal[0], normal[1], normal[2]));
 				}
 			}
 		}

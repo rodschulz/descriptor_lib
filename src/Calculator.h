@@ -13,6 +13,8 @@
 class Calculator
 {
 public:
+	static std::vector<BandPtr> calculateDescriptor(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr _patch = pcl::PointCloud<pcl::PointNormal>::Ptr());
+
 	static void calculateAngleHistograms(const std::vector<BandPtr> &_bands, std::vector<Hist> &_histograms, const bool _useProjection);
 	static void calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep, const bool _useProjection);
 
