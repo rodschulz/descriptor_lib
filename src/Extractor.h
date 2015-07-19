@@ -19,7 +19,7 @@ struct Band
 	Eigen::Hyperplane<float, 3> plane;
 	bool isRadialBand;
 	std::string sequenceString;
-	std::vector<double> sequenceVector;
+	std::vector<float> sequenceVector;
 
 	Band(const pcl::PointNormal &_point, const Eigen::Hyperplane<float, 3> &_plane)
 	{

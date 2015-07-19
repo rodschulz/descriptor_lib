@@ -61,6 +61,13 @@ public:
 		return signedAngle<Eigen::Vector3f>(_vector1, v2, (Eigen::Vector3f) _plane.normal());
 	}
 
+	static inline int calculateSequenceLength(const ExecutionParams &_params)
+	{
+		double binSize = _params.sequenceBin;
+		int binsNumber = (_params.bidirectional ? _params.patchSize * 2.0 : _params.patchSize) / binSize;
+		return binsNumber;
+	}
+
 private:
 	Calculator();
 	~Calculator();

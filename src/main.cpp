@@ -88,13 +88,56 @@ int main(int _argn, char **_argv)
 		else
 		{
 			std::cout << "Clustering\n";
-			for (size_t i = 0; i < cloud->size(); i++)
+
+			size_t cloudSize = cloud->size();
+			size_t sequenceSize = Calculator::calculateSequenceLength(params);
+			cv::Mat descriptors = cv::Mat::zeros(cloudSize, sequenceSize * params.bandNumber, CV_32FC1);
+
+			if (!Helper::loadClusteringCache(descriptors, params))
 			{
-				pcl::PointNormal target = cloud->points[i];
-				std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
+				std::cout << "Cache not found, calculating descriptors\n";
 
+				// Extract the descriptors
+				for (size_t i = 0; i < cloudSize; i++)
+				{
+					pcl::PointNormal target = cloud->points[i];
+					std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
 
+					for (size_t j = 0; j < bands.size(); j++)
+						memcpy(&descriptors.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
+				}
+
+				// Save cache to file
+				Helper::writeClusteringCache(descriptors, params);
 			}
+
+			cv::Mat labels, centers;
+			int attempts = 5;
+			int clusterNumber = 2;
+			double minError = std::numeric_limits<double>::max();
+
+			// Find the number of clusters minimizing SSE
+			for (int i = clusterNumber; i < 10; i++)
+			{
+
+				cv::kmeans(descriptors, i, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+				double sse = Helper::calculateSSE(descriptors, centers, labels);
+
+				if (sse < minError)
+				{
+					minError = sse;
+					clusterNumber = i;
+				}
+			}
+
+			std::cout << "Minimizing cluster number is " << clusterNumber << "\n";
+			cv::kmeans(descriptors, clusterNumber, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+
+			// Color the data according to the clusters
+			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = Helper::createColorCloud(cloud, Helper::getColor(0));
+			for (int i = 0; i < labels.rows; i++)
+				(*colored)[i].rgb = Helper::getColor(labels.at<int>(i) + 1);
+			pcl::io::savePCDFileASCII("./output/clusters.pcd", *colored);
 		}
 	}
 	catch (std::exception &e)

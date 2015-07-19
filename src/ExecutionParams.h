@@ -7,6 +7,9 @@
 #include <string>
 #include <stdlib.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/lexical_cast.hpp>
+#include "Helper.h"
 
 enum SynCloudType
 {
@@ -86,6 +89,31 @@ public:
 		else if (boost::iequals(_type, "median"))
 			return STAT_MEDIAN;
 		return STAT_NONE;
+	}
+
+	std::string getHash() const
+	{
+		std::string str = "";
+		str += "input=" + inputLocation;
+		str += "-patchSize=" + boost::lexical_cast<std::string>(patchSize);
+		str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius);
+		str += "-bandNumber=" + boost::lexical_cast<std::string>(bandNumber);
+		str += "-bandWidth=" + boost::lexical_cast<std::string>(bandWidth);
+		str += "-bidirectional=" + boost::lexical_cast<std::string>(bidirectional);
+		str += "-useProjection=" + boost::lexical_cast<std::string>(useProjection);
+		str += "-sequenceBin=" + boost::lexical_cast<std::string>(sequenceBin);
+		str += "-sequenceStat=" + boost::lexical_cast<std::string>(sequenceStat);
+		str += "-smoothingType=" + boost::lexical_cast<std::string>(smoothingType);
+		if (smoothingType == SMOOTHING_GAUSSIAN)
+		{
+			str += "-gaussianSigma=" + boost::lexical_cast<std::string>(gaussianSigma);
+			str += "-gaussianRadius=" + boost::lexical_cast<std::string>(gaussianRadius);
+		}
+		else if (smoothingType == SMOOTHING_MLS)
+			str += "-mlsRadius=" + boost::lexical_cast<std::string>(mlsRadius);
+
+		boost::hash<std::string> strHash;
+		return Helper::toHexString(strHash(str));
 	}
 
 	bool normalExecution;		// Flag indicating if the execution has to be normal or a clustering evaluation

@@ -1,5 +1,5 @@
 # Selector between normal calculation and clustering evaluation
-normalExec	true	
+normalExec	false	
 
 ##############################
 # Filter parameters (gaussian, mls or none)
@@ -14,8 +14,8 @@ mlsRadius	0.05
 
 ##############################
 # Clustering options
-maxIter		10000
-stopThres	0.01
+maxIter		1000
+stopThres	0.0001
 cacheLocation	./cache/
 
 ##############################

@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include "CloudFactory.h"
 #include "PointFactory.h"
+#include "ExecutionParams.h"
 
 Helper::Helper()
 {
@@ -27,6 +28,23 @@ void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	std::vector<int> mapping;
 	pcl::removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
+}
+
+bool Helper::isNumber(const std::string &_str)
+{
+	bool number = true;
+	for (size_t i = 0; i < _str.size(); i++)
+	{
+		number = number && isdigit(_str[i]);
+	}
+	return number;
+}
+
+std::string Helper::toHexString(const size_t _number)
+{
+	std::stringstream stream;
+	stream << std::hex << _number;
+	return stream.str();
 }
 
 pcl::PointCloud<pcl::Normal>::Ptr Helper::estimateNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius)
@@ -197,12 +215,72 @@ unsigned int Helper::getColor(const int _index)
 	return palette[_index % 12];
 }
 
-bool Helper::isNumber(const std::string &_str)
+bool Helper::loadClusteringCache(cv::Mat &_descriptors, const ExecutionParams &_params)
 {
-	bool number = true;
-	for (size_t i = 0; i < _str.size(); i++)
+	bool loadOK = true;
+	std::string filename = _params.cacheLocation + _params.getHash();
+	size_t row = 0;
+
+	std::string line;
+	std::ifstream cacheFile;
+	cacheFile.open(filename.c_str(), std::fstream::in);
+	if (cacheFile.is_open())
 	{
-		number = number && isdigit(_str[i]);
+		while (getline(cacheFile, line))
+		{
+			if (line.empty())
+				continue;
+
+			std::vector<std::string> tokens;
+			std::istringstream iss(line);
+			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
+
+			if (tokens.size() != _descriptors.cols)
+			{
+				loadOK = false;
+				break;
+			}
+
+			for (size_t col = 0; col < tokens.size(); col++)
+				_descriptors.at<float>(row, col) = (float) atof(tokens[col].c_str());
+			row++;
+		}
+		cacheFile.close();
 	}
-	return number;
+	else
+		loadOK = false;
+
+	return loadOK;
+}
+
+void Helper::writeClusteringCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
+{
+	std::string destination = _params.cacheLocation + _params.getHash();
+
+	if (!boost::filesystem::exists(_params.cacheLocation))
+		system(("mkdir " + _params.cacheLocation).c_str());
+
+	std::ofstream cacheFile;
+	cacheFile.open(destination.c_str(), std::fstream::out);
+
+	for (int i = 0; i < _descriptors.rows; i++)
+	{
+		for (int j = 0; j < _descriptors.cols; j++)
+			cacheFile << std::setprecision(15) << _descriptors.at<float>(i, j) << " ";
+		cacheFile << "\n";
+	}
+
+	cacheFile.close();
+}
+
+double Helper::calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_centers, const cv::Mat &_labels)
+{
+	double sse = 0;
+	for (int i = 0; i < _descriptors.rows; i++)
+	{
+		float norm = cv::norm(_descriptors.row(i), _centers.row(_labels.at<int>(i)));
+		sse += (norm * norm);
+	}
+
+	return sse;
 }

@@ -22,7 +22,7 @@ std::vector<BandPtr> Calculator::calculateDescriptor(pcl::PointCloud<pcl::PointN
 {
 	// Get target point and surface patch
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _target, _params.patchSize);
-	std::cout << "Patch size: " << patch->size() << "\n";
+	//std::cout << "Patch size: " << patch->size() << "\n";
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(patch, _target, _params);
@@ -71,7 +71,7 @@ void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, st
 void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep)
 {
 	double binSize = _params.sequenceBin;
-	int binsNumber = (_params.bidirectional ? _params.patchSize * 2.0 : _params.patchSize) / binSize;
+	int binsNumber = calculateSequenceLength(_params);
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
@@ -100,7 +100,7 @@ void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const Ex
 		{
 			if (dataMap.find(j) != dataMap.end())
 			{
-				double value = _params.sequenceStat == STAT_MEAN ? (double) mean(dataMap[j]) : (double) median(dataMap[j]);
+				float value = _params.sequenceStat == STAT_MEAN ? (float) mean(dataMap[j]) : (float) median(dataMap[j]);
 				band->sequenceString += getSequenceChar(value, _sequenceStep);
 				band->sequenceVector.push_back(value);
 			}
