@@ -62,11 +62,16 @@ bool Config::load(const std::string &_filename, int _argn, char **_argv)
 
 void Config::parse(const std::string _key, const std::string _value)
 {
+	/*****************************/
 	// Execution type selection
 	if (boost::iequals(_key, "normalExec"))
 		getInstance()->params.normalExecution = boost::iequals(_value, "true");
 
+	/*****************************/
 	// Clustering parameters
+	else if (boost::iequals(_key, "clusters"))
+		getInstance()->params.clusters = atoi(_value.c_str());
+
 	else if (boost::iequals(_key, "maxIter"))
 		getInstance()->params.maxIterations = atoi(_value.c_str());
 
@@ -76,6 +81,10 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "cacheLocation"))
 		getInstance()->params.cacheLocation = _value.c_str();
 
+	else if (boost::iequals(_key, "showElbow"))
+		getInstance()->params.showElbow = boost::iequals(_value, "true");
+
+	/*****************************/
 	// Descriptor calculation
 	else if (boost::iequals(_key, "targetPoint"))
 		getInstance()->params.targetPoint = atoi(_value.c_str());
@@ -101,6 +110,7 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "useProjection"))
 		getInstance()->params.useProjection = boost::iequals(_value, "true");
 
+	/*****************************/
 	// Sequence calculation
 	else if (boost::iequals(_key, "sequenceBin"))
 		getInstance()->params.sequenceBin = atof(_value.c_str());
@@ -108,6 +118,7 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "sequenceStat"))
 		getInstance()->params.sequenceStat = ExecutionParams::getStatType(_value);
 
+	/*****************************/
 	// Use of synthetic clouds
 	else if (boost::iequals(_key, "useSynthetic"))
 		getInstance()->params.useSynthetic = boost::iequals(_value, "true");
@@ -115,6 +126,7 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "synCloudType"))
 		getInstance()->params.synCloudType = ExecutionParams::getSynCloudType(_value);
 
+	/*****************************/
 	// Smoothing params
 	else if (boost::iequals(_key, "smoothingType"))
 		getInstance()->params.smoothingType = ExecutionParams::getSmoothingType(_value);

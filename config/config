@@ -14,7 +14,9 @@ mlsRadius	0.05
 
 ##############################
 # Clustering options
-maxIter		1000
+showElbow	false
+clusters	6
+maxIter		50000
 stopThres	0.0001
 cacheLocation	./cache/
 

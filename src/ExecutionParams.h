@@ -54,8 +54,10 @@ public:
 		gaussianRadius = 0.02;
 		mlsRadius = 0.02;
 
+		clusters = 5;
 		maxIterations = 10000;
 		stopThreshold = 0.001;
+		showElbow = false;
 	}
 
 	~ExecutionParams()
@@ -140,7 +142,9 @@ public:
 	double gaussianRadius;		// Search radius used for the gaussian smoothing
 	double mlsRadius;		// Search radius used for the mls smoothing
 
+	int clusters;			// Number of clusters used in the clustering test
 	int maxIterations;		// Clustering max iterations
 	double stopThreshold;		// Clustering stop threshold
 	std::string cacheLocation;	// Location of the cachefiles
+	bool showElbow;			// Flag indicating if an elbow graph has to be done
 };

@@ -111,27 +111,14 @@ int main(int _argn, char **_argv)
 				Helper::writeClusteringCache(descriptors, params);
 			}
 
-			cv::Mat labels, centers;
+			// Create an 'elbow criterion' graph
+			if (params.showElbow)
+				Helper::generateElbowGraph(descriptors, params);
+
+			// Make clusters of data
 			int attempts = 5;
-			int clusterNumber = 2;
-			double minError = std::numeric_limits<double>::max();
-
-			// Find the number of clusters minimizing SSE
-			for (int i = clusterNumber; i < 10; i++)
-			{
-
-				cv::kmeans(descriptors, i, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
-				double sse = Helper::calculateSSE(descriptors, centers, labels);
-
-				if (sse < minError)
-				{
-					minError = sse;
-					clusterNumber = i;
-				}
-			}
-
-			std::cout << "Minimizing cluster number is " << clusterNumber << "\n";
-			cv::kmeans(descriptors, clusterNumber, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+			cv::Mat labels, centers;
+			cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
 
 			// Color the data according to the clusters
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = Helper::createColorCloud(cloud, Helper::getColor(0));

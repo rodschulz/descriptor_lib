@@ -38,6 +38,7 @@ public:
 	static void writeClusteringCache(const cv::Mat &_descriptors, const ExecutionParams &_params);
 
 	static double calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_centers, const cv::Mat &_labels);
+	static void generateElbowGraph(const cv::Mat &_descriptors, const ExecutionParams &_params);
 
 private:
 	Helper();
