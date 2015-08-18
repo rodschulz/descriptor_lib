@@ -15,7 +15,7 @@ mlsRadius	0.05
 ##############################
 # Clustering options
 showElbow	false
-implementation	custom
+implementation	opencv
 clusters	6
 maxIter		50000
 stopThres	0.0001
