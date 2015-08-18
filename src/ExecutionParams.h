@@ -26,6 +26,11 @@ enum SequenceStat
 	STAT_NONE, STAT_MEAN, STAT_MEDIAN
 };
 
+enum ClusteringImplementation
+{
+	CLUSTERING_NONE, CLUSTERING_OPENCV, CLUSTERING_CUSTOM
+};
+
 class ExecutionParams
 {
 public:
@@ -58,6 +63,7 @@ public:
 		maxIterations = 10000;
 		stopThreshold = 0.001;
 		showElbow = false;
+		implementation = CLUSTERING_NONE;
 	}
 
 	~ExecutionParams()
@@ -93,6 +99,15 @@ public:
 		return STAT_NONE;
 	}
 
+	static ClusteringImplementation getClusteringImplementation(const std::string &_type)
+	{
+		if (boost::iequals(_type, "opencv"))
+			return CLUSTERING_OPENCV;
+		else if (boost::iequals(_type, "custom"))
+			return CLUSTERING_CUSTOM;
+		return CLUSTERING_NONE;
+	}
+
 	std::string getHash() const
 	{
 		std::string str = "";
@@ -118,33 +133,34 @@ public:
 		return Helper::toHexString(strHash(str));
 	}
 
-	bool normalExecution;		// Flag indicating if the execution has to be normal or a clustering evaluation
+	bool normalExecution;				// Flag indicating if the execution has to be normal or a clustering evaluation
 
-	std::string inputLocation;	// Location of the input file
-	int targetPoint;		// Target point
+	std::string inputLocation;			// Location of the input file
+	int targetPoint;				// Target point
 
-	double patchSize;		// Search radius used with the SEARCH_RADIUS method
-	double normalEstimationRadius;	// Radius used to calculate normals
-	int bandNumber;			// Number of bands to sample
-	double bandWidth;		// Width of each band
-	bool bidirectional;		// Flag indicating if each band has to be analyzed bidirectional or not
-	bool radialBands;		// Flag indicating if the bands are radial or longitudinal
-	bool useProjection;		// Flag indicating if angle calculation must be done by projecting the angles over the band's plane
+	double patchSize;				// Search radius used with the SEARCH_RADIUS method
+	double normalEstimationRadius;			// Radius used to calculate normals
+	int bandNumber;					// Number of bands to sample
+	double bandWidth;				// Width of each band
+	bool bidirectional;				// Flag indicating if each band has to be analyzed bidirectional or not
+	bool radialBands;				// Flag indicating if the bands are radial or longitudinal
+	bool useProjection;				// Flag indicating if angle calculation must be done by projecting the angles over the band's plane
 
-	double sequenceBin;		// Size of the bins used in the sequence construction
-	SequenceStat sequenceStat;	// Statistic to use in the sequence calculation
+	double sequenceBin;				// Size of the bins used in the sequence construction
+	SequenceStat sequenceStat;			// Statistic to use in the sequence calculation
 
-	bool useSynthetic;		// Flag indicating if a synthetic has to be used
-	SynCloudType synCloudType;	// Desired synthetic cloud
+	bool useSynthetic;				// Flag indicating if a synthetic has to be used
+	SynCloudType synCloudType;			// Desired synthetic cloud
 
-	SmoothingType smoothingType;	// Type of smoothing algorithm to use
-	double gaussianSigma;		// Sigma used for the gaussian smoothning
-	double gaussianRadius;		// Search radius used for the gaussian smoothing
-	double mlsRadius;		// Search radius used for the mls smoothing
+	SmoothingType smoothingType;			// Type of smoothing algorithm to use
+	double gaussianSigma;				// Sigma used for the gaussian smoothning
+	double gaussianRadius;				// Search radius used for the gaussian smoothing
+	double mlsRadius;				// Search radius used for the mls smoothing
 
-	int clusters;			// Number of clusters used in the clustering test
-	int maxIterations;		// Clustering max iterations
-	double stopThreshold;		// Clustering stop threshold
-	std::string cacheLocation;	// Location of the cachefiles
-	bool showElbow;			// Flag indicating if an elbow graph has to be done
+	bool showElbow;					// Flag indicating if an elbow graph has to be done
+	ClusteringImplementation implementation;	// Implementation of clustering to be used
+	int clusters;					// Number of clusters used in the clustering test
+	int maxIterations;				// Clustering max iterations
+	double stopThreshold;				// Clustering stop threshold
+	std::string cacheLocation;			// Location of the cachefiles
 };

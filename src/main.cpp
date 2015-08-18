@@ -116,9 +116,20 @@ int main(int _argn, char **_argv)
 				Helper::generateElbowGraph(descriptors, params);
 
 			// Make clusters of data
-			int attempts = 5;
 			cv::Mat labels, centers;
-			cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+			switch (params.implementation)
+			{
+				case CLUSTERING_OPENCV:
+				{
+					int attempts = 5;
+					cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+					break;
+				}
+				case CLUSTERING_CUSTOM:
+				{
+					break;
+				}
+			}
 
 			// Color the data according to the clusters
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = Helper::createColorCloud(cloud, Helper::getColor(0));

@@ -69,6 +69,12 @@ void Config::parse(const std::string _key, const std::string _value)
 
 	/*****************************/
 	// Clustering parameters
+	else if (boost::iequals(_key, "showElbow"))
+		getInstance()->params.showElbow = boost::iequals(_value, "true");
+
+	else if (boost::iequals(_key, "implementation"))
+		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(_value);
+
 	else if (boost::iequals(_key, "clusters"))
 		getInstance()->params.clusters = atoi(_value.c_str());
 
@@ -80,9 +86,6 @@ void Config::parse(const std::string _key, const std::string _value)
 
 	else if (boost::iequals(_key, "cacheLocation"))
 		getInstance()->params.cacheLocation = _value.c_str();
-
-	else if (boost::iequals(_key, "showElbow"))
-		getInstance()->params.showElbow = boost::iequals(_value, "true");
 
 	/*****************************/
 	// Descriptor calculation
