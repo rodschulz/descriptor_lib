@@ -20,6 +20,7 @@ template<typename T> inline int sign(T val)
 class Helper
 {
 public:
+	static int getRandomNumber(const int _min, const int _max);
 	static void removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud);
 	static bool isNumber(const std::string &_str);
 	static std::string toHexString(const size_t _number);

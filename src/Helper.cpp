@@ -16,12 +16,21 @@
 #include "PointFactory.h"
 #include "ExecutionParams.h"
 
+boost::random::mt19937 randomGenerator;
+
 Helper::Helper()
 {
 }
 
 Helper::~Helper()
 {
+}
+
+int Helper::getRandomNumber(const int _min, const int _max)
+{
+	randomGenerator.seed(std::time(0));
+	boost::random::uniform_int_distribution<> dist(_min, _max);
+	return dist(randomGenerator);
 }
 
 void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
@@ -258,7 +267,7 @@ void Helper::writeClusteringCache(const cv::Mat &_descriptors, const ExecutionPa
 	std::string destination = _params.cacheLocation + _params.getHash();
 
 	if (!boost::filesystem::exists(_params.cacheLocation))
-		system(("mkdir " + _params.cacheLocation).c_str());
+		int out = system(("mkdir " + _params.cacheLocation).c_str());
 
 	std::ofstream cacheFile;
 	cacheFile.open(destination.c_str(), std::fstream::out);
@@ -318,5 +327,5 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 
 	graph.close();
 
-	system("gnuplot ./output/graph.plot");
+	int out = system("gnuplot ./output/graph.plot");
 }

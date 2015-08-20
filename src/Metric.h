@@ -16,6 +16,6 @@ public:
 	{
 	}
 
-	virtual double distance(const cv::Mat _vector1, const cv::Mat _vector2) = 0;
-	virtual cv::Mat average(const cv::Mat &_vectors) = 0;
+	virtual double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const = 0;
+	virtual cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_descriptors, const cv::Mat &_labels) const = 0;
 };

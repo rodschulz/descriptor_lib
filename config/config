@@ -15,10 +15,10 @@ mlsRadius	0.05
 ##############################
 # Clustering options
 showElbow	false
-implementation	opencv
+implementation	custom
 clusters	6
-maxIter		50000
-stopThres	0.0001
+maxIter		10000
+stopThres	0.001
 cacheLocation	./cache/
 
 ##############################

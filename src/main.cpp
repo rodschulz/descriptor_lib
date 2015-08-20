@@ -12,6 +12,8 @@
 #include "Hist.h"
 #include "Writer.h"
 #include "Calculator.h"
+#include "ClosestPermutation.h"
+#include "KMeans.h"
 
 #define CONFIG_LOCATION "./config/config"
 
@@ -117,16 +119,18 @@ int main(int _argn, char **_argv)
 
 			// Make clusters of data
 			cv::Mat labels, centers;
+			int attempts = 3;
 			switch (params.implementation)
 			{
 				case CLUSTERING_OPENCV:
 				{
-					int attempts = 5;
 					cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
 					break;
 				}
 				case CLUSTERING_CUSTOM:
 				{
+					ClosestPermutation metric(params.bandNumber);
+					KMeans::findClusters(descriptors, params.clusters, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
 					break;
 				}
 			}

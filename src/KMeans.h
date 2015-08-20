@@ -16,5 +16,7 @@ private:
 	KMeans();
 	~KMeans();
 
+	static void selectStartCenters(const cv::Mat &_descriptors, cv::Mat &_centers);
 	static double calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_labels, const cv::Mat &_centers, const Metric &_metric);
+	static int findClosestCenter(const cv::Mat &_descriptor, cv::Mat &_centers, const Metric &_metric);
 };
