@@ -27,6 +27,9 @@ void writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std:
 
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
 
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_params.targetPoint), _params.patchSize);
+	pcl::io::savePCDFileASCII("./output/patch.pcd", *patch);
+
 	std::ofstream sequences;
 	sequences.open("./output/sequences", std::fstream::out);
 
