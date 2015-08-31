@@ -14,7 +14,7 @@ KMeans::~KMeans()
 {
 }
 
-void KMeans::findClusters(const cv::Mat &_descriptors, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
+void KMeans::findClusters(const cv::Mat &_descriptors, const int _clusterNumber, Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _descriptors.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_descriptors.rows, 1, CV_32FC1);
@@ -73,7 +73,7 @@ void KMeans::selectStartCenters(const cv::Mat &_descriptors, cv::Mat &_centers)
 	}
 }
 
-double KMeans::calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_labels, const cv::Mat &_centers, const Metric &_metric)
+double KMeans::calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_labels, const cv::Mat &_centers, Metric &_metric)
 {
 	double sse = 0;
 	for (int i = 0; i < _descriptors.rows; i++)
@@ -85,7 +85,7 @@ double KMeans::calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_labels,
 	return sse;
 }
 
-int KMeans::findClosestCenter(const cv::Mat &_descriptor, cv::Mat &_centers, const Metric &_metric)
+int KMeans::findClosestCenter(const cv::Mat &_descriptor, cv::Mat &_centers, Metric &_metric)
 {
 	int closestCenter = -1;
 

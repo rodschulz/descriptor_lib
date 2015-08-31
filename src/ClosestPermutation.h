@@ -12,11 +12,24 @@ public:
 	ClosestPermutation(const int _permutationSize);
 	~ClosestPermutation();
 
-	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
-	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_descriptors, const cv::Mat &_labels) const;
+	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2);
+	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_descriptors, const cv::Mat &_labels);
 
 private:
 	int permutationSize;
+	cv::Mat cachedVector;
+	cv::Mat cachedPermutation;
 
-	cv::Mat getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
+	cv::Mat getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2);
+
+	inline double squaredDistance(const cv::Mat &_vector1, const cv::Mat &_vector2)
+	{
+		double dist = 0;
+		for (int i = 0; i < _vector1.cols; i++)
+		{
+			double delta = _vector1.at<float>(i) - _vector2.at<float>(i);
+			dist += (delta * delta);
+		}
+		return dist;
+	}
 };

@@ -14,23 +14,27 @@ ClosestPermutation::~ClosestPermutation()
 {
 }
 
-double ClosestPermutation::distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+double ClosestPermutation::distance(const cv::Mat &_vector1, const cv::Mat &_vector2)
 {
-	cv::Mat vector2 = _vector2.clone();
+	if (cachedVector.empty() || cachedVector.cols != _vector2.cols)
+		cachedVector = _vector2.clone();
+	else
+		_vector2.copyTo(cachedVector);
+
 	int permutationNumber = std::floor(_vector2.cols / permutationSize);
 
-	double minDist = cv::norm(_vector1, vector2);
+	double minDist = cv::norm(_vector1, cachedVector);
 	for (int i = 1; i < permutationNumber; i++)
 	{
 		// Copy the piece of data from the current permutation to the end of the vector
 		int begin = permutationSize * i * sizeof(float);
 		int size = (_vector2.cols - (permutationSize * i)) * sizeof(float);
-		memcpy(vector2.datastart, _vector2.datastart + begin, size);
+		memcpy(cachedVector.datastart, _vector2.datastart + begin, size);
 
 		// Copy the piece of data from the begin till the permutation begin
-		memcpy(vector2.datastart + size, _vector2.datastart, begin);
+		memcpy(cachedVector.datastart + size, _vector2.datastart, begin);
 
-		double dist = cv::norm(_vector1, vector2);
+		double dist = cv::norm(_vector1, cachedVector);
 		if (minDist > dist)
 			minDist = dist;
 	}
@@ -38,7 +42,7 @@ double ClosestPermutation::distance(const cv::Mat &_vector1, const cv::Mat &_vec
 	return minDist;
 }
 
-cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_descriptors, const cv::Mat &_labels) const
+cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_descriptors, const cv::Mat &_labels)
 {
 	cv::Mat first = cv::Mat::zeros(_clusterNumber, _descriptors.cols, CV_32FC1);
 	cv::Mat newCenters = cv::Mat::zeros(_clusterNumber, _descriptors.cols, CV_32FC1);
@@ -63,31 +67,37 @@ cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv:
 	return newCenters;
 }
 
-cv::Mat ClosestPermutation::getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+cv::Mat ClosestPermutation::getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2)
 {
-	cv::Mat vector2 = _vector2.clone();
+	if (cachedVector.empty() || cachedVector.cols != _vector2.cols)
+		cachedVector = _vector2.clone();
+	else
+		_vector2.copyTo(cachedVector);
+
+	if (cachedPermutation.empty() || cachedPermutation.cols != _vector2.cols)
+		cachedPermutation = _vector2.clone();
+	else
+		_vector2.copyTo(cachedPermutation);
+
+	double minDist = cv::norm(_vector1, cachedVector);
 	int permutationNumber = std::floor(_vector2.cols / permutationSize);
-
-	double minDist = cv::norm(_vector1, vector2);
-	cv::Mat minPermutation = vector2.clone();
-
 	for (int i = 1; i < permutationNumber; i++)
 	{
 		// Copy the piece of data from the current permutation to the end of the vector
 		int begin = permutationSize * i * sizeof(float);
 		int size = (_vector2.cols - (permutationSize * i)) * sizeof(float);
-		memcpy(vector2.datastart, _vector2.datastart + begin, size);
+		memcpy(cachedVector.datastart, _vector2.datastart + begin, size);
 
 		// Copy the piece of data from the begin till the permutation begin
-		memcpy(vector2.datastart + size, _vector2.datastart, begin);
+		memcpy(cachedVector.datastart + size, _vector2.datastart, begin);
 
-		double dist = cv::norm(_vector1, vector2);
+		double dist = cv::norm(_vector1, cachedVector);
 		if (minDist > dist)
 		{
 			minDist = dist;
-			vector2.copyTo(minPermutation);
+			cachedVector.copyTo(cachedPermutation);
 		}
 	}
 
-	return minPermutation;
+	return cachedPermutation;
 }

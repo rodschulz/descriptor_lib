@@ -57,6 +57,8 @@ void writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std:
 
 int main(int _argn, char **_argv)
 {
+	clock_t begin = clock();
+
 	try
 	{
 		if (system("rm -rf ./output/*") != 0)
@@ -78,7 +80,7 @@ int main(int _argn, char **_argv)
 		{
 			std::cout << "Target point: " << params.targetPoint << "\n";
 
-			pcl::PointNormal target = cloud->points[params.targetPoint];
+			pcl::PointNormal target = cloud->at(params.targetPoint);
 			std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
 
 			// Calculate histograms
@@ -120,6 +122,8 @@ int main(int _argn, char **_argv)
 			if (params.showElbow)
 				Helper::generateElbowGraph(descriptors, params);
 
+			std::cout << "Calculating clusters\n";
+
 			// Make clusters of data
 			cv::Mat labels, centers;
 			int attempts = 3;
@@ -150,6 +154,9 @@ int main(int _argn, char **_argv)
 		std::cout << "ERROR: " << e.what() << std::endl;
 	}
 
-	std::cout << "Finished\n";
+	clock_t end = clock();
+	double elapsedTime = double(end - begin) / CLOCKS_PER_SEC;
+
+	std::cout << std::fixed << std::setprecision(3) << "Finished in " << elapsedTime << " [s]\n";
 	return EXIT_SUCCESS;
 }
