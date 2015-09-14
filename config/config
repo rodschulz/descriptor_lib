@@ -15,7 +15,7 @@ mlsRadius	0.05
 ##############################
 # Clustering options
 showElbow	false
-implementation	custom
+implementation	opencv
 clusters	6
 maxIter		10000
 stopThres	0.001
@@ -24,16 +24,16 @@ cacheLocation	./cache/
 ##############################
 # Descriptor calculation
 targetPoint	8000
-patchSize	0.02
+patchSize	0.01
 normalRadius	-1
 bandNumber	8
-bandWidth	0.01
+bandWidth	0.005
 bidirectional	false
 radialBands	false
 useProjection	false
 
 # Sequence calculation (stat can be mean or median)
-sequenceBin	0.002
+sequenceBin	0.0025
 sequenceStat	mean
 
 # Use of synthetic clouds (cube, cylinder or sphere)
