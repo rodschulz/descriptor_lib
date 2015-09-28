@@ -11,6 +11,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/common/io.h>
+#include <Eigen/Geometry>
 #include <ctype.h>
 #include "CloudFactory.h"
 #include "PointFactory.h"
@@ -328,4 +329,89 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 	graph.close();
 
 	int out = system("gnuplot ./output/graph.plot");
+}
+
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params, const int _sequenceLength)
+{
+	std::vector<pcl::PointNormal> locations(_centers.rows);
+	std::vector<int> pointsPerCluster(_centers.rows, 0);
+
+	// Calculate the location for each cluster representation
+	for (int i = 0; i < _labels.rows; i++)
+	{
+		locations[_labels.at<int>(i)].x += _cloud->at(i).x;
+		locations[_labels.at<int>(i)].y += _cloud->at(i).y;
+		locations[_labels.at<int>(i)].z += _cloud->at(i).z;
+
+		pointsPerCluster[_labels.at<int>(i)]++;
+	}
+	for (size_t i = 0; i < locations.size(); i++)
+	{
+		locations[i].x /= pointsPerCluster[i];
+		locations[i].y /= pointsPerCluster[i];
+		locations[i].z /= pointsPerCluster[i];
+	}
+
+	// Angular step between bands
+	double bandAngle = 2 * M_PI / _params.bandNumber;
+
+	// Define reference vectors
+	Eigen::Vector3f referenceNormal = Eigen::Vector3f(1, 0, 0).normalized();
+	Eigen::Vector3f rotationAxis = Eigen::Vector3f(0, 1, 0).normalized();
+
+	// Create the vectors placed according to the cluster centroid info
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr output(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+	for (int i = 0; i < _centers.rows; i++)
+	{
+		for (int j = 0; j < _params.bandNumber; j++)
+		{
+			Eigen::Vector3f baseLocation = locations[i].getVector3fMap();
+
+			// Update the rotation axis according to the current band's angle
+			rotationAxis = Eigen::AngleAxis<float>(bandAngle * j, referenceNormal).matrix() * rotationAxis;
+			rotationAxis.normalize();
+
+			for (int k = 0; k < _sequenceLength; k++)
+			{
+				// Calculate the rotated normal according to the angle of the current bin in the current band
+				float angle = _centers.at<float>(i, j * _sequenceLength + k);
+				Eigen::Vector3f rotatedNormal = Eigen::AngleAxis<float>(angle, rotationAxis).matrix() * referenceNormal;
+				rotatedNormal.normalize();
+
+				// Create a plane oriented according to the rotated normal vector
+				Eigen::Hyperplane<float, 3> plane;
+				if (output->empty())
+					plane = Eigen::Hyperplane<float, 3>(rotatedNormal, baseLocation);
+				else
+					plane = Eigen::Hyperplane<float, 3>(rotatedNormal, output->back().getVector3fMap());
+
+				// Add 9 points to represent the bin
+				for (double sideStep = -_params.bandWidth / 2; sideStep < _params.bandWidth; sideStep += _params.bandWidth / 2)
+				{
+					for (double forwardStep = 0; forwardStep < _params.sequenceBin; forwardStep += _params.sequenceBin / 3)
+					{
+						float x = 0;
+						float y = sideStep;
+						float z = forwardStep + k * _params.sequenceBin;
+						Eigen::Vector3f displaced = Eigen::Vector3f(x, y, z);
+						Eigen::Vector3f point = Eigen::AngleAxis<float>(bandAngle * j, referenceNormal) * displaced;
+						point = point + Eigen::Vector3f(baseLocation.x(), baseLocation.y(), baseLocation.z());
+
+						// Project the point over a plane oriented according the normal of the band's bin
+						Eigen::Vector3f p = plane.projection(point);
+
+						float nx = rotatedNormal.x();
+						float ny = rotatedNormal.y();
+						float nz = rotatedNormal.z();
+
+						output->push_back(PointFactory::makePointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Helper::getColor(j)));
+					}
+				}
+			}
+		}
+
+		break;
+	}
+
+	return output;
 }

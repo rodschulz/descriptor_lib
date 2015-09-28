@@ -23,8 +23,8 @@ cacheLocation	./cache/
 
 ##############################
 # Descriptor calculation
-targetPoint	8000
-patchSize	0.01
+targetPoint	4185
+patchSize	0.02
 normalRadius	-1
 bandNumber	8
 bandWidth	0.005

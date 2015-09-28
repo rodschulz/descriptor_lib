@@ -136,11 +136,14 @@ int main(int _argn, char **_argv)
 				}
 				case CLUSTERING_CUSTOM:
 				{
-					ClosestPermutation metric(params.bandNumber);
+					ClosestPermutation metric = ClosestPermutation(sequenceSize);
 					KMeans::findClusters(descriptors, params.clusters, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
 					break;
 				}
 			}
+
+			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr clusteredCloud = Helper::generateClusterRepresentation(cloud, labels, centers, params, sequenceSize);
+			pcl::io::savePCDFileASCII("./output/visualization.pcd", *clusteredCloud);
 
 			// Color the data according to the clusters
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = Helper::createColorCloud(cloud, Helper::getColor(0));
@@ -149,9 +152,9 @@ int main(int _argn, char **_argv)
 			pcl::io::savePCDFileASCII("./output/clusters.pcd", *colored);
 		}
 	}
-	catch (std::exception &e)
+	catch (std::exception &_ex)
 	{
-		std::cout << "ERROR: " << e.what() << std::endl;
+		std::cout << "ERROR: " << _ex.what() << std::endl;
 	}
 
 	clock_t end = clock();
