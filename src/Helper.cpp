@@ -353,7 +353,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 	}
 
 	// Angular step between bands
-	double bandAngle = 2 * M_PI / _params.bandNumber;
+	double bandAngularStep = _params.getBandsAngularStep();
 
 	// Define reference vectors
 	Eigen::Vector3f referenceNormal = Eigen::Vector3f(1, 0, 0).normalized();
@@ -368,7 +368,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 			Eigen::Vector3f baseLocation = locations[i].getVector3fMap();
 
 			// Update the rotation axis according to the current band's angle
-			rotationAxis = Eigen::AngleAxis<float>(bandAngle * j, referenceNormal).matrix() * rotationAxis;
+			rotationAxis = Eigen::AngleAxis<float>(bandAngularStep * j, referenceNormal).matrix() * rotationAxis;
 			rotationAxis.normalize();
 
 			for (int k = 0; k < _sequenceLength; k++)
@@ -394,7 +394,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 						float y = sideStep;
 						float z = forwardStep + k * _params.sequenceBin;
 						Eigen::Vector3f displaced = Eigen::Vector3f(x, y, z);
-						Eigen::Vector3f point = Eigen::AngleAxis<float>(bandAngle * j, referenceNormal) * displaced;
+						Eigen::Vector3f point = Eigen::AngleAxis<float>(bandAngularStep * j, referenceNormal) * displaced;
 						point = point + Eigen::Vector3f(baseLocation.x(), baseLocation.y(), baseLocation.z());
 
 						// Project the point over a plane oriented according the normal of the band's bin

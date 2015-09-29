@@ -75,8 +75,7 @@ std::vector<BandPtr> Extractor::getLongitudinalBands(const pcl::PointCloud<pcl::
 	Eigen::Vector3f v2 = n.cross(v1).normalized();
 
 	// Angular step for bands definitions
-	double angleRange = _params.bidirectional ? M_PI : 2 * M_PI;
-	double angleStep = angleRange / _params.bandNumber;
+	double angleStep = _params.getBandsAngularStep();
 
 	// Create the lines defining each band and also each band's longitudinal plane
 	std::vector<Eigen::ParametrizedLine<float, 3> > lines;

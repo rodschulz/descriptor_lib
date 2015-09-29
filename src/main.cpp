@@ -97,7 +97,7 @@ int main(int _argn, char **_argv)
 			std::cout << "Clustering\n";
 
 			size_t cloudSize = cloud->size();
-			size_t sequenceSize = Calculator::calculateSequenceLength(params);
+			size_t sequenceSize = params.getSequenceLength();
 			cv::Mat descriptors = cv::Mat::zeros(cloudSize, sequenceSize * params.bandNumber, CV_32FC1);
 
 			if (!Helper::loadClusteringCache(descriptors, params))

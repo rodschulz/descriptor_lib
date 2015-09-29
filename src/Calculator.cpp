@@ -55,7 +55,7 @@ void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, st
 void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const ExecutionParams &_params, const double _sequenceStep)
 {
 	double binSize = _params.sequenceBin;
-	int binsNumber = calculateSequenceLength(_params);
+	int binsNumber = _params.getSequenceLength();
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
