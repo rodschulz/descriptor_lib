@@ -331,8 +331,9 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 	int out = system("gnuplot ./output/graph.plot");
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params, const int _sequenceLength)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
+	int sequenceLength = _params.getSequenceLength();
 	std::vector<pcl::PointNormal> locations(_centers.rows);
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
 
@@ -371,10 +372,10 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 			rotationAxis = Eigen::AngleAxis<float>(bandAngularStep * j, referenceNormal).matrix() * rotationAxis;
 			rotationAxis.normalize();
 
-			for (int k = 0; k < _sequenceLength; k++)
+			for (int k = 0; k < sequenceLength; k++)
 			{
 				// Calculate the rotated normal according to the angle of the current bin in the current band
-				float angle = _centers.at<float>(i, j * _sequenceLength + k);
+				float angle = _centers.at<float>(i, j * sequenceLength + k);
 				Eigen::Vector3f rotatedNormal = Eigen::AngleAxis<float>(angle, rotationAxis).matrix() * referenceNormal;
 				rotatedNormal.normalize();
 

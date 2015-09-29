@@ -142,7 +142,7 @@ int main(int _argn, char **_argv)
 				}
 			}
 
-			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr clusteredCloud = Helper::generateClusterRepresentation(cloud, labels, centers, params, sequenceSize);
+			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr clusteredCloud = Helper::generateClusterRepresentation(cloud, labels, centers, params);
 			pcl::io::savePCDFileASCII("./output/visualization.pcd", *clusteredCloud);
 
 			// Color the data according to the clusters

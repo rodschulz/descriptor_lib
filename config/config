@@ -1,5 +1,5 @@
 # Selector between normal calculation and clustering evaluation
-normalExec	false	
+normalExec	true	
 
 ##############################
 # Filter parameters (gaussian, mls or none)
