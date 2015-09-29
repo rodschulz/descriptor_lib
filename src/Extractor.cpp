@@ -37,10 +37,7 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 
 std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params)
 {
-	if (_params.radialBands)
-		return getRadialBands(_cloud, _point, _params);
-	else
-		return getLongitudinalBands(_cloud, _point, _params);
+	return getLongitudinalBands(_cloud, _point, _params);
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr Extractor::getTangentPlane(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point)
@@ -61,38 +58,6 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr Extractor::getTangentPlane(const pcl::Poi
 	}
 
 	return tangentPlane;
-}
-
-std::vector<BandPtr> Extractor::getRadialBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params)
-{
-	std::vector<BandPtr> bands;
-	bands.reserve(_params.bandNumber);
-
-	// Get the point, its normal and make a plane tangent to the point
-	Eigen::Vector3f p = _point.getVector3fMap();
-	Eigen::Vector3f n = _point.getNormalVector3fMap();
-	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, p);
-
-	double radialStep = _params.patchSize / _params.bandNumber;
-
-	// Create bands
-	for (int i = 0; i < _params.bandNumber; i++)
-		bands.push_back(BandPtr(new Band(_point, true)));
-
-	// Extract points
-	for (size_t i = 0; i < _cloud->size(); i++)
-	{
-		Eigen::Vector3f point = _cloud->points[i].getVector3fMap();
-		Eigen::Vector3f projection = plane.projection(point);
-
-		Eigen::Vector3f diff = p - projection;
-		double distance = diff.norm();
-		int index = (int) (distance / radialStep);
-
-		bands[index]->data->push_back(_cloud->points[i]);
-	}
-
-	return bands;
 }
 
 std::vector<BandPtr> Extractor::getLongitudinalBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params)

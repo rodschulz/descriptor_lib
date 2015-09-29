@@ -45,7 +45,6 @@ public:
 		bandNumber = 4;
 		bandWidth = 0.01;
 		bidirectional = true;
-		radialBands = false;
 		useProjection = true;
 
 		sequenceBin = 0.01;
@@ -143,7 +142,6 @@ public:
 	int bandNumber;					// Number of bands to sample
 	double bandWidth;				// Width of each band
 	bool bidirectional;				// Flag indicating if each band has to be analyzed bidirectional or not
-	bool radialBands;				// Flag indicating if the bands are radial or longitudinal
 	bool useProjection;				// Flag indicating if angle calculation must be done by projecting the angles over the band's plane
 
 	double sequenceBin;				// Size of the bins used in the sequence construction

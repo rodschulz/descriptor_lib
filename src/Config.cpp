@@ -107,9 +107,6 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "bidirectional"))
 		getInstance()->params.bidirectional = boost::iequals(_value, "true");
 
-	else if (boost::iequals(_key, "radialBands"))
-		getInstance()->params.radialBands = boost::iequals(_value, "true");
-
 	else if (boost::iequals(_key, "useProjection"))
 		getInstance()->params.useProjection = boost::iequals(_value, "true");
 

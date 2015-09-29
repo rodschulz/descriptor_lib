@@ -27,8 +27,6 @@ struct Band
 	std::string sequenceString;
 	// Vector corresponding to the numeric sequence representation
 	std::vector<float> sequenceVector;
-	// THIS HAS TO BE REMOVED (RADIAL NO LONGER SUPPORTED)
-	bool isRadialBand;
 
 	Band(const pcl::PointNormal &_point, const Eigen::Hyperplane<float, 3> &_plane)
 	{
@@ -36,16 +34,14 @@ struct Band
 		point = _point;
 		plane = _plane;
 		sequenceString = "";
-		isRadialBand = false;
 	}
 
-	Band(const pcl::PointNormal &_point, const bool &_radialBand)
+	Band(const pcl::PointNormal &_point)
 	{
 		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 		point = _point;
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		sequenceString = "";
-		isRadialBand = false;
 	}
 
 	Band()
@@ -54,7 +50,6 @@ struct Band
 		point = PointFactory::makePointNormal(1, 0, 0, 1, 0, 0);
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		sequenceString = "";
-		isRadialBand = false;
 	}
 };
 
@@ -72,6 +67,5 @@ private:
 	Extractor();
 	~Extractor();
 
-	static std::vector<BandPtr> getRadialBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params);
 	static std::vector<BandPtr> getLongitudinalBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params);
 };

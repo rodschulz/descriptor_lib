@@ -25,8 +25,7 @@ std::vector<BandPtr> Calculator::calculateDescriptor(pcl::PointCloud<pcl::PointN
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(patch, _target, _params);
-	if (!_params.radialBands)
-		Calculator::calculateSequences(bands, _params, M_PI / 18);
+	Calculator::calculateSequences(bands, _params, M_PI / 18);
 
 	return bands;
 }
@@ -48,21 +47,7 @@ void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, st
 		{
 			Eigen::Vector3f point = band->data->points[j].getVector3fMap();
 			Eigen::Vector3f normal = band->data->points[j].getNormalVector3fMap();
-
-			if (band->isRadialBand)
-			{
-				Eigen::Vector3f targetToPoint = point - targetPoint;
-				if (fabs(targetToPoint.norm()) < 1E-15)
-					continue;
-
-				// Create a plane containing the target point, its normal and the current point
-				Eigen::Vector3f planeNormal = targetNormal.cross(targetToPoint).normalized();
-				Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(planeNormal, targetPoint);
-
-				_histograms.back().add(calculateAngle(targetNormal, normal, plane, _useProjection));
-			}
-			else
-				_histograms.back().add(calculateAngle(targetNormal, normal, band->plane, _useProjection));
+			_histograms.back().add(calculateAngle(targetNormal, normal, band->plane, _useProjection));
 		}
 	}
 }
