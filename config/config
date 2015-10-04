@@ -1,5 +1,5 @@
 # Selector between normal calculation and clustering evaluation
-normalExec	true	
+normalExec	false	
 
 ##############################
 # Filter parameters (gaussian, mls or none)
@@ -13,12 +13,12 @@ gaussianRadius	0.005
 mlsRadius	0.05
 
 ##############################
-# Clustering options
+# Clustering options (implementation can be opencv, custom or stochastic)
 showElbow	false
-implementation	opencv
-clusters	6
+implementation	stochastic
+clusters	3
 maxIter		10000
-stopThres	0.001
+stopThres	0.00000001
 cacheLocation	./cache/
 
 ##############################

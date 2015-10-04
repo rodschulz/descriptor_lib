@@ -42,27 +42,33 @@ double ClosestPermutation::distance(const cv::Mat &_vector1, const cv::Mat &_vec
 	return minDist;
 }
 
-cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_descriptors, const cv::Mat &_labels)
+cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels)
 {
-	cv::Mat first = cv::Mat::zeros(_clusterNumber, _descriptors.cols, CV_32FC1);
-	cv::Mat newCenters = cv::Mat::zeros(_clusterNumber, _descriptors.cols, CV_32FC1);
-	cv::Mat count = cv::Mat::zeros(_clusterNumber, 1, CV_32SC1);
+	std::vector<int> itemCount;
+	return calculateCenters(_clusterNumber, _items, _labels, itemCount);
+}
+
+cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter)
+{
+	std::vector<bool> begin(_clusterNumber, true);
+	_itemsPerCenter = std::vector<int>(_clusterNumber, 0);
+
+	cv::Mat first = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
+	cv::Mat newCenters = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 
 	for (int i = 0; i < _labels.rows; i++)
 	{
 		int index = _labels.at<int>(i);
-		if (first.row(index).at<float>(1) == 0)
-			_descriptors.row(index).copyTo(first.row(index));
+		if (begin[index])
+			_items.row(index).copyTo(first.row(index));
+		begin[index];
 
-		newCenters.row(index) += getClosestPermutation(first.row(index), _descriptors.row(index));
-		count.row(index) += 1;
+		newCenters.row(index) += getClosestPermutation(first.row(index), _items.row(index));
+		_itemsPerCenter[index] += 1;
 	}
 
 	for (int i = 0; i < newCenters.rows; i++)
-	{
-		int index = _labels.at<int>(i);
-		newCenters.row(index) /= count.row(index).at<int>(0);
-	}
+		newCenters.row(i) /= _itemsPerCenter[i];
 
 	return newCenters;
 }

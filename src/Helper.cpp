@@ -34,6 +34,25 @@ int Helper::getRandomNumber(const int _min, const int _max)
 	return dist(randomGenerator);
 }
 
+std::vector<int> Helper::getRandomSet(const int _size, const int _min, const int _max)
+{
+	randomGenerator.seed(std::time(0));
+	boost::random::uniform_int_distribution<> dist(_min, _max);
+
+	std::vector<int> numbers;
+	numbers.reserve(_size);
+
+	std::map<int, bool> used;
+	while (numbers.size() < _size)
+	{
+		int number = dist(randomGenerator);
+		if (used.find(number) == used.end())
+			numbers.push_back(number);
+	}
+
+	return numbers;
+}
+
 void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	std::vector<int> mapping;
@@ -334,31 +353,37 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
 	int sequenceLength = _params.getSequenceLength();
-	std::vector<pcl::PointNormal> locations(_centers.rows);
+	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::makePointNormal(0, 0, 0, 0, 0, 0, 0));
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
 
-	// Calculate the location for each cluster representation
-	for (int i = 0; i < _labels.rows; i++)
-	{
-		locations[_labels.at<int>(i)].x += _cloud->at(i).x;
-		locations[_labels.at<int>(i)].y += _cloud->at(i).y;
-		locations[_labels.at<int>(i)].z += _cloud->at(i).z;
+//	// Calculate the location for each cluster representation
+//	for (int i = 0; i < _labels.rows; i++)
+//	{
+//		locations[_labels.at<int>(i)].x += _cloud->at(i).x;
+//		locations[_labels.at<int>(i)].y += _cloud->at(i).y;
+//		locations[_labels.at<int>(i)].z += _cloud->at(i).z;
+//
+//		pointsPerCluster[_labels.at<int>(i)]++;
+//	}
+//	for (size_t i = 0; i < locations.size(); i++)
+//	{
+//		locations[i].x /= pointsPerCluster[i];
+//		locations[i].y /= pointsPerCluster[i];
+//		locations[i].z /= pointsPerCluster[i];
+//	}
 
-		pointsPerCluster[_labels.at<int>(i)]++;
-	}
 	for (size_t i = 0; i < locations.size(); i++)
 	{
-		locations[i].x /= pointsPerCluster[i];
-		locations[i].y /= pointsPerCluster[i];
-		locations[i].z /= pointsPerCluster[i];
+		locations[i].x = _params.patchSize;
+		locations[i].z = _params.patchSize * 3 * i;
 	}
 
 	// Angular step between bands
 	double bandAngularStep = _params.getBandsAngularStep();
 
 	// Define reference vectors
-	Eigen::Vector3f referenceNormal = Eigen::Vector3f(1, 0, 0).normalized();
-	Eigen::Vector3f rotationAxis = Eigen::Vector3f(0, 1, 0).normalized();
+	Eigen::Vector3f referenceNormal = Eigen::Vector3f(1, 0, 0);
+	Eigen::Vector3f referenceRotationAxis = Eigen::Vector3f(0, 1, 0);
 
 	// Create the vectors placed according to the cluster centroid info
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr output(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
@@ -368,8 +393,9 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 		{
 			Eigen::Vector3f baseLocation = locations[i].getVector3fMap();
 
-			// Update the rotation axis according to the current band's angle
-			rotationAxis = Eigen::AngleAxis<float>(bandAngularStep * j, referenceNormal).matrix() * rotationAxis;
+			// Calculate the normal's rotation axis according to the current band's angle
+			double bandAngle = bandAngularStep * j;
+			Eigen::Vector3f rotationAxis = Eigen::AngleAxis<float>(bandAngle, referenceNormal).matrix() * referenceRotationAxis;
 			rotationAxis.normalize();
 
 			for (int k = 0; k < sequenceLength; k++)
@@ -395,23 +421,22 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 						float y = sideStep;
 						float z = forwardStep + k * _params.sequenceBin;
 						Eigen::Vector3f displaced = Eigen::Vector3f(x, y, z);
-						Eigen::Vector3f point = Eigen::AngleAxis<float>(bandAngularStep * j, referenceNormal) * displaced;
+						Eigen::Vector3f point = Eigen::AngleAxis<float>(bandAngle, referenceNormal) * displaced;
 						point = point + Eigen::Vector3f(baseLocation.x(), baseLocation.y(), baseLocation.z());
 
 						// Project the point over a plane oriented according the normal of the band's bin
-						Eigen::Vector3f p = plane.projection(point);
+						//Eigen::Vector3f p = plane.projection(point);
+						Eigen::Vector3f p = point;
 
 						float nx = rotatedNormal.x();
 						float ny = rotatedNormal.y();
 						float nz = rotatedNormal.z();
 
-						output->push_back(PointFactory::makePointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Helper::getColor(j)));
+						output->push_back(PointFactory::makePointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Helper::getColor(i)));
 					}
 				}
 			}
 		}
-
-		break;
 	}
 
 	return output;

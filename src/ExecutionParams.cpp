@@ -70,6 +70,8 @@ ClusteringImplementation ExecutionParams::getClusteringImplementation(const std:
 		return CLUSTERING_OPENCV;
 	else if (boost::iequals(_type, "custom"))
 		return CLUSTERING_CUSTOM;
+	else if (boost::iequals(_type, "stochastic"))
+		return CLUSTERING_STOCHASTIC;
 	return CLUSTERING_NONE;
 }
 

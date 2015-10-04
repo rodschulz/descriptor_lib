@@ -94,7 +94,7 @@ int main(int _argn, char **_argv)
 		}
 		else
 		{
-			std::cout << "Clustering\n";
+			std::cout << "Execution for clustering\n";
 
 			size_t cloudSize = cloud->size();
 			size_t sequenceSize = params.getSequenceLength();
@@ -118,7 +118,7 @@ int main(int _argn, char **_argv)
 				Helper::writeClusteringCache(descriptors, params);
 			}
 
-			// Create an 'elbow criterion' graph
+			// Create an 'elbow criterion' graph using kmeans
 			if (params.showElbow)
 				Helper::generateElbowGraph(descriptors, params);
 
@@ -127,18 +127,27 @@ int main(int _argn, char **_argv)
 			// Make clusters of data
 			cv::Mat labels, centers;
 			int attempts = 3;
-			switch (params.implementation)
+			//if (!Helper::loadClusters(centers, labels, params))
 			{
-				case CLUSTERING_OPENCV:
+				switch (params.implementation)
 				{
-					cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
-					break;
-				}
-				case CLUSTERING_CUSTOM:
-				{
-					ClosestPermutation metric = ClosestPermutation(sequenceSize);
-					KMeans::findClusters(descriptors, params.clusters, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
-					break;
+					case CLUSTERING_OPENCV:
+					{
+						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+						break;
+					}
+					case CLUSTERING_CUSTOM:
+					{
+						ClosestPermutation metric = ClosestPermutation(sequenceSize);
+						KMeans::searchClusters(descriptors, params.clusters, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						break;
+					}
+					case CLUSTERING_STOCHASTIC:
+					{
+						ClosestPermutation metric = ClosestPermutation(sequenceSize);
+						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						break;
+					}
 				}
 			}
 
@@ -148,7 +157,7 @@ int main(int _argn, char **_argv)
 			// Color the data according to the clusters
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = Helper::createColorCloud(cloud, Helper::getColor(0));
 			for (int i = 0; i < labels.rows; i++)
-				(*colored)[i].rgb = Helper::getColor(labels.at<int>(i) + 1);
+				(*colored)[i].rgb = Helper::getColor(labels.at<int>(i));
 			pcl::io::savePCDFileASCII("./output/clusters.pcd", *colored);
 		}
 	}
