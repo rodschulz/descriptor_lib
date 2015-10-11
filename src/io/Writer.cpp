@@ -9,6 +9,8 @@
 #include <sstream>
 #include <stdlib.h>
 #include <pcl/pcl_macros.h>
+#include <pcl/io/pcd_io.h>
+#include "../factories/CloudFactory.h"
 
 #define SCRIPT_NAME		"plot.script"
 #define DATA_NAME		"histogram.dat"
@@ -124,4 +126,42 @@ void Writer::generateScript(const std::string &_filename, const std::string &_hi
 		output << "'" << PLOT_DATA_NAME << "' using 1:" << i + 2 << " title 'Band " << i << "', \\\n";
 
 	output.close();
+}
+
+void Writer::writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
+{
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
+	pcl::io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
+
+	(*coloredCloud)[_params.targetPoint].rgb = Helper::getColor(255, 0, 0);
+	pcl::io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
+
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
+
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_params.targetPoint), _params.patchSize);
+	pcl::io::savePCDFileASCII("./output/patch.pcd", *patch);
+
+	std::ofstream sequences;
+	sequences.open("./output/sequences", std::fstream::out);
+
+	for (size_t i = 0; i < _bands.size(); i++)
+	{
+		if (!_bands[i]->data->empty())
+		{
+			char name[100];
+			sprintf(name, "./output/band%d.pcd", (int) i);
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
+
+			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
+
+			sprintf(name, "./output/planeBand%d.pcd", (int) i);
+			pcl::io::savePCDFileASCII(name, *planes[i]);
+		}
+	}
+
+	sequences.close();
+
+	// Write histogram data
+	double limit = M_PI;
+	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, DEG2RAD(20), -limit, limit);
 }

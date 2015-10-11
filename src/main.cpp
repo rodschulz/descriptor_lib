@@ -4,57 +4,20 @@
  */
 #include <stdlib.h>
 #include <iostream>
-#include <pcl/io/pcd_io.h>
 #include <string>
+#include <opencv2/core/core.hpp>
+#include <pcl/io/pcd_io.h>
 #include "clustering/ClosestPermutation.h"
 #include "clustering/KMeans.h"
 #include "descriptor/Calculator.h"
 #include "descriptor/Extractor.h"
 #include "descriptor/Hist.h"
-#include "io/Writer.h"
 #include "utils/Config.h"
 #include "utils/Helper.h"
 #include "factories/CloudFactory.h"
+#include "io/Writer.h"
 
 #define CONFIG_LOCATION "./config/config"
-
-void writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
-{
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
-	pcl::io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
-
-	(*coloredCloud)[_params.targetPoint].rgb = Helper::getColor(255, 0, 0);
-	pcl::io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
-
-	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
-
-	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_params.targetPoint), _params.patchSize);
-	pcl::io::savePCDFileASCII("./output/patch.pcd", *patch);
-
-	std::ofstream sequences;
-	sequences.open("./output/sequences", std::fstream::out);
-
-	for (size_t i = 0; i < _bands.size(); i++)
-	{
-		if (!_bands[i]->data->empty())
-		{
-			char name[100];
-			sprintf(name, "./output/band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
-
-			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
-
-			sprintf(name, "./output/planeBand%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *planes[i]);
-		}
-	}
-
-	sequences.close();
-
-	// Write histogram data
-	double limit = M_PI;
-	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, DEG2RAD(20), -limit, limit);
-}
 
 int main(int _argn, char **_argv)
 {
@@ -91,7 +54,7 @@ int main(int _argn, char **_argv)
 
 			// Write output
 			std::cout << "Writing output\n";
-			writeOuput(cloud, bands, histograms, params);
+			Writer::writeOuput(cloud, bands, histograms, params);
 		}
 		else
 		{
@@ -125,7 +88,26 @@ int main(int _argn, char **_argv)
 
 			std::cout << "Calculating clusters\n";
 
-			// Make clusters of data
+//			cv::Mat mm1 = cv::Mat::zeros(1, 9, CV_32FC1);
+//			cv::Mat mm2 = cv::Mat::zeros(1, 9, CV_32FC1);
+//
+//			mm1.at<float>(0, 0) = mm1.at<float>(0, 1) = mm1.at<float>(0, 2) = 7;
+//			mm1.at<float>(0, 3) = mm1.at<float>(0, 4) = mm1.at<float>(0, 5) = -1;
+//			mm1.at<float>(0, 6) = mm1.at<float>(0, 7) = mm1.at<float>(0, 8) = 3;
+//
+//			mm2.at<float>(0, 0) = mm2.at<float>(0, 1) = mm2.at<float>(0, 2) = -2;
+//			mm2.at<float>(0, 3) = mm2.at<float>(0, 4) = mm2.at<float>(0, 5) = 4;
+//			mm2.at<float>(0, 6) = mm2.at<float>(0, 7) = mm2.at<float>(0, 8) = 2;
+//			std::cout << "===\n" << mm1 << std::endl;
+//			std::cout << "===\n" << mm2 << std::endl;
+//
+//			cv::Mat tmp1 = mm1(cv::Range::all(), cv::Range(0, 3));
+//			cv::Mat tmp2 = mm2(cv::Range::all(), cv::Range(3, 6));
+//			std::cout << "===\n" << tmp1 << std::endl;
+//			std::cout << "===\n" << tmp2 << std::endl;
+//			double n2 = cv::norm(tmp1, tmp2);
+
+// Make clusters of data
 			cv::Mat labels, centers;
 			int attempts = 3;
 			//if (!Helper::loadClusters(centers, labels, params))
