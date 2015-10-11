@@ -8,8 +8,8 @@
 #include <math.h>
 #include <sstream>
 #include <stdlib.h>
+#include <pcl/pcl_macros.h>
 
-#define RAD2DEG(x)		((x) * 57.2957795131)
 #define SCRIPT_NAME		"plot.script"
 #define DATA_NAME		"histogram.dat"
 #define PLOT_SCRIPT_NAME	OUTPUT_FOLDER SCRIPT_NAME
@@ -86,17 +86,6 @@ void Writer::writeHistogram(const std::string &_filename, const std::string &_hi
 		cmd += PLOT_SCRIPT_NAME;
 		if (system(cmd.c_str()) != 0)
 			std::cout << "WARNING, bad return for command: " << cmd << "\n";
-
-		// Remove script and data
-		/*cmd = "rm -rf ";
-		cmd += PLOT_SCRIPT_NAME;
-		if (system(cmd.c_str()))
-			cout << "WARNING, bad return for command: " << cmd << "\n";
-
-		cmd = "rm -rf ";
-		cmd += PLOT_DATA_NAME;
-		if (system(cmd.c_str()))
-			cout << "WARNING, bad return for command: " << cmd << "\n";*/
 	}
 }
 

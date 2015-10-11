@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <string>
-#include "Hist.h"
+#include "../descriptor/Hist.h"
 
 #define OUTPUT_FOLDER		"./output/"
 

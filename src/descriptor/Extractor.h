@@ -9,8 +9,8 @@
 #include <pcl/point_types.h>
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <eigen3/Eigen/src/Geometry/Hyperplane.h>
-#include "PointFactory.h"
-#include "ExecutionParams.h"
+#include "../factories/PointFactory.h"
+#include "../utils/ExecutionParams.h"
 
 /**
  * Structure holding the band information

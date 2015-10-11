@@ -4,7 +4,8 @@
  */
 #include "KMeans.h"
 #include <limits>
-#include "Helper.h"
+
+#include "../utils/Helper.h"
 
 KMeans::KMeans()
 {

@@ -4,11 +4,10 @@
  */
 #pragma once
 
+#include <vector>
 #include "Extractor.h"
 #include "Hist.h"
-#include "Helper.h"
-#include "ExecutionParams.h"
-#include <vector>
+#include "../utils/ExecutionParams.h"
 
 class Calculator
 {

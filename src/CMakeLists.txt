@@ -16,6 +16,17 @@ file(GLOB PCL_DESCRIPTOR_SRC
     "*.cpp"
 )
 
+add_subdirectory(clustering)
+add_subdirectory(descriptor)
+add_subdirectory(factories)
+add_subdirectory(io)
+add_subdirectory(utils)
+
 add_executable(Descriptor ${PCL_DESCRIPTOR_SRC})
+target_link_libraries(Descriptor clustering)
+target_link_libraries(Descriptor descriptor)
+target_link_libraries(Descriptor factories)
+target_link_libraries(Descriptor io)
+target_link_libraries(Descriptor utils)
 target_link_libraries(Descriptor ${PCL_LIBRARIES})
 target_link_libraries(Descriptor ${OpenCV_LIBS})

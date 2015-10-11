@@ -5,10 +5,8 @@
 #include "Hist.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include  <cmath>
-
-#define RAD2DEG(x)	((x) * 57.29578)
-#define DEG2RAD(x)	((x) * 0.017453293)
+#include <cmath>
+#include <pcl/pcl_macros.h>
 
 Hist::Hist(const Dimension _dimension)
 {

@@ -6,14 +6,14 @@
 #include <iostream>
 #include <pcl/io/pcd_io.h>
 #include <string>
-#include "Config.h"
-#include "Helper.h"
-#include "Extractor.h"
-#include "Hist.h"
-#include "Writer.h"
-#include "Calculator.h"
-#include "ClosestPermutation.h"
-#include "KMeans.h"
+#include "clustering/ClosestPermutation.h"
+#include "clustering/KMeans.h"
+#include "descriptor/Calculator.h"
+#include "descriptor/Extractor.h"
+#include "descriptor/Hist.h"
+#include "io/Writer.h"
+#include "utils/Config.h"
+#include "utils/Helper.h"
 
 #define CONFIG_LOCATION "./config/config"
 

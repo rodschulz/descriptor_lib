@@ -7,7 +7,6 @@
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/features/normal_3d.h>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
-#include "PointFactory.h"
 
 Extractor::Extractor()
 {

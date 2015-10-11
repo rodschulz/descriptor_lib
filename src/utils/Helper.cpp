@@ -13,9 +13,9 @@
 #include <pcl/common/io.h>
 #include <Eigen/Geometry>
 #include <ctype.h>
-#include "CloudFactory.h"
-#include "PointFactory.h"
 #include "ExecutionParams.h"
+#include "../factories/CloudFactory.h"
+#include "../factories/PointFactory.h"
 
 boost::random::mt19937 randomGenerator;
 
