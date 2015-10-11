@@ -59,16 +59,6 @@ void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 	pcl::removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
 }
 
-bool Helper::isNumber(const std::string &_str)
-{
-	bool number = true;
-	for (size_t i = 0; i < _str.size(); i++)
-	{
-		number = number && isdigit(_str[i]);
-	}
-	return number;
-}
-
 std::string Helper::toHexString(const size_t _number)
 {
 	std::stringstream stream;
@@ -200,35 +190,6 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Helper::MLSSmoothing(const pcl::PointCloud<p
 	return smoothedCloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint32_t _color)
-{
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-	coloredCloud->reserve(_cloud->size());
-
-	float color = *reinterpret_cast<float*>(&_color);
-	for (int i = 0; i < _cloud->width; i++)
-	{
-		pcl::PointNormal p = _cloud->points[i];
-		coloredCloud->push_back(PointFactory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, color));
-	}
-
-	return coloredCloud;
-}
-
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b)
-{
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-	coloredCloud->reserve(_cloud->size());
-
-	for (int i = 0; i < _cloud->width; i++)
-	{
-		pcl::PointNormal p = _cloud->points[i];
-		coloredCloud->push_back(PointFactory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
-	}
-
-	return coloredCloud;
-}
-
 float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
 {
 	uint32_t color = ((uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
@@ -355,22 +316,6 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 	int sequenceLength = _params.getSequenceLength();
 	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::makePointNormal(0, 0, 0, 0, 0, 0, 0));
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
-
-//	// Calculate the location for each cluster representation
-//	for (int i = 0; i < _labels.rows; i++)
-//	{
-//		locations[_labels.at<int>(i)].x += _cloud->at(i).x;
-//		locations[_labels.at<int>(i)].y += _cloud->at(i).y;
-//		locations[_labels.at<int>(i)].z += _cloud->at(i).z;
-//
-//		pointsPerCluster[_labels.at<int>(i)]++;
-//	}
-//	for (size_t i = 0; i < locations.size(); i++)
-//	{
-//		locations[i].x /= pointsPerCluster[i];
-//		locations[i].y /= pointsPerCluster[i];
-//		locations[i].z /= pointsPerCluster[i];
-//	}
 
 	for (size_t i = 0; i < locations.size(); i++)
 	{

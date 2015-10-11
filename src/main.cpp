@@ -14,12 +14,13 @@
 #include "io/Writer.h"
 #include "utils/Config.h"
 #include "utils/Helper.h"
+#include "factories/CloudFactory.h"
 
 #define CONFIG_LOCATION "./config/config"
 
 void writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
 {
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = Helper::createColorCloud(_cloud, Helper::getColor(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
 	pcl::io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
 
 	(*coloredCloud)[_params.targetPoint].rgb = Helper::getColor(255, 0, 0);
@@ -39,7 +40,7 @@ void writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std:
 		{
 			char name[100];
 			sprintf(name, "./output/band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *Helper::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
@@ -155,7 +156,7 @@ int main(int _argn, char **_argv)
 			pcl::io::savePCDFileASCII("./output/visualization.pcd", *clusteredCloud);
 
 			// Color the data according to the clusters
-			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = Helper::createColorCloud(cloud, Helper::getColor(0));
+			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(cloud, Helper::getColor(0));
 			for (int i = 0; i < labels.rows; i++)
 				(*colored)[i].rgb = Helper::getColor(labels.at<int>(i));
 			pcl::io::savePCDFileASCII("./output/clusters.pcd", *colored);

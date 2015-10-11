@@ -102,3 +102,32 @@ void CloudFactory::generateSphere(const double _radius, const pcl::PointXYZ &_ce
 		}
 	}
 }
+
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint32_t _color)
+{
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+	coloredCloud->reserve(_cloud->size());
+
+	float color = *reinterpret_cast<float*>(&_color);
+	for (int i = 0; i < _cloud->width; i++)
+	{
+		pcl::PointNormal p = _cloud->points[i];
+		coloredCloud->push_back(PointFactory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, color));
+	}
+
+	return coloredCloud;
+}
+
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b)
+{
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+	coloredCloud->reserve(_cloud->size());
+
+	for (int i = 0; i < _cloud->width; i++)
+	{
+		pcl::PointNormal p = _cloud->points[i];
+		coloredCloud->push_back(PointFactory::makePointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
+	}
+
+	return coloredCloud;
+}
