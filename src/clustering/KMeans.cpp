@@ -15,7 +15,7 @@ KMeans::~KMeans()
 {
 }
 
-void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
+void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
@@ -34,6 +34,8 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, Met
 		// Iterate until the desired max iterations
 		for (int j = 0; j < _maxIterations; j++)
 		{
+			std::cout << "\t\tit:" << j << std::endl;
+
 			// Set labels
 			for (int k = 0; k < _items.rows; k++)
 				labels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
@@ -68,7 +70,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, Met
 	}
 }
 
-void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
+void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
@@ -132,7 +134,7 @@ void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterN
 	}
 }
 
-bool KMeans::evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, Metric &_metric)
+bool KMeans::evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, const Metric &_metric)
 {
 	bool thresholdReached = true;
 	for (int k = 0; k < _oldCenters.rows && thresholdReached; k++)
@@ -148,7 +150,7 @@ void KMeans::selectStartCenters(const cv::Mat &_items, cv::Mat &_centers)
 		_items.row(randomSet[j]).copyTo(_centers.row(j));
 }
 
-double KMeans::calculateSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, Metric &_metric)
+double KMeans::calculateSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, const Metric &_metric)
 {
 	double sse = 0;
 	for (int i = 0; i < _items.rows; i++)
@@ -160,7 +162,7 @@ double KMeans::calculateSSE(const cv::Mat &_items, const cv::Mat &_labels, const
 	return sse;
 }
 
-int KMeans::findClosestCenter(const cv::Mat &_items, cv::Mat &_centers, Metric &_metric)
+int KMeans::findClosestCenter(const cv::Mat &_items, cv::Mat &_centers, const Metric &_metric)
 {
 	int closestCenter = -1;
 

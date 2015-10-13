@@ -77,5 +77,6 @@ public:
 	int clusters;					// Number of clusters used in the clustering test
 	int maxIterations;				// Clustering max iterations
 	double stopThreshold;				// Clustering stop threshold
+	int attempts;				// Number of attemtps to try when clustering
 	std::string cacheLocation;			// Location of the cachefiles
 };

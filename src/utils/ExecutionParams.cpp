@@ -32,6 +32,7 @@ ExecutionParams::ExecutionParams()
 	maxIterations = 10000;
 	stopThreshold = 0.001;
 	showElbow = false;
+	attempts = 1;
 	implementation = CLUSTERING_NONE;
 }
 

@@ -228,7 +228,7 @@ bool Helper::loadClusteringCache(cv::Mat &_descriptors, const ExecutionParams &_
 			std::istringstream iss(line);
 			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
-			loadOK = (int) tokens.size() != _descriptors.cols;
+			loadOK = (int) tokens.size() == _descriptors.cols;
 			if (!loadOK)
 				break;
 

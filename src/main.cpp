@@ -90,28 +90,21 @@ int main(int _argn, char **_argv)
 
 			// Make clusters of data
 			cv::Mat labels, centers;
-			int attempts = 3;
 			//if (!Helper::loadClusters(centers, labels, params))
 			{
 				switch (params.implementation)
 				{
 					case CLUSTERING_OPENCV:
-					{
-						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
+						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
 						break;
-					}
+
 					case CLUSTERING_CUSTOM:
-					{
-						ClosestPermutation metric = ClosestPermutation(sequenceSize);
-						KMeans::searchClusters(descriptors, params.clusters, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::searchClusters(descriptors, params.clusters, ClosestPermutation(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 						break;
-					}
+
 					case CLUSTERING_STOCHASTIC:
-					{
-						ClosestPermutation metric = ClosestPermutation(sequenceSize);
-						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, metric, attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, ClosestPermutation(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 						break;
-					}
 
 					default:
 						break;

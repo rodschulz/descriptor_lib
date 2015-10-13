@@ -84,6 +84,9 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "stopThres"))
 		getInstance()->params.stopThreshold = atof(_value.c_str());
 
+	else if (boost::iequals(_key, "attempts"))
+		getInstance()->params.attempts = atoi(_value.c_str());
+
 	else if (boost::iequals(_key, "cacheLocation"))
 		getInstance()->params.cacheLocation = _value.c_str();
 
