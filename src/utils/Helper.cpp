@@ -34,7 +34,7 @@ int Helper::getRandomNumber(const int _min, const int _max)
 	return dist(randomGenerator);
 }
 
-std::vector<int> Helper::getRandomSet(const int _size, const int _min, const int _max)
+std::vector<int> Helper::getRandomSet(const unsigned int _size, const int _min, const int _max)
 {
 	randomGenerator.seed(std::time(0));
 	boost::random::uniform_int_distribution<> dist(_min, _max);
@@ -109,6 +109,9 @@ bool Helper::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Exe
 			case SMOOTHING_MLS:
 				std::cout << "Applying MLS smoothing\n";
 				cloudXYZ = MLSSmoothing(cloudXYZ, _params.mlsRadius);
+				break;
+
+			default:
 				break;
 		}
 	}
@@ -225,11 +228,9 @@ bool Helper::loadClusteringCache(cv::Mat &_descriptors, const ExecutionParams &_
 			std::istringstream iss(line);
 			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
-			if (tokens.size() != _descriptors.cols)
-			{
-				loadOK = false;
+			loadOK = (int) tokens.size() != _descriptors.cols;
+			if (!loadOK)
 				break;
-			}
 
 			for (size_t col = 0; col < tokens.size(); col++)
 				_descriptors.at<float>(row, col) = (float) atof(tokens[col].c_str());
@@ -248,7 +249,8 @@ void Helper::writeClusteringCache(const cv::Mat &_descriptors, const ExecutionPa
 	std::string destination = _params.cacheLocation + _params.getHash();
 
 	if (!boost::filesystem::exists(_params.cacheLocation))
-		int out = system(("mkdir " + _params.cacheLocation).c_str());
+		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
+			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
 
 	std::ofstream cacheFile;
 	cacheFile.open(destination.c_str(), std::fstream::out);
@@ -308,7 +310,8 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 
 	graph.close();
 
-	int out = system("gnuplot ./output/graph.plot");
+	if (system("gnuplot ./output/graph.plot") != 0)
+		std::cout << "WARNING: can't execute GNUPlot" << std::endl;
 }
 
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)

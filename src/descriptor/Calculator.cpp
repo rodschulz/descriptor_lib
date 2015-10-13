@@ -35,9 +35,7 @@ void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, st
 	_histograms.clear();
 	_histograms.reserve(_bands.size());
 
-	Eigen::Vector3f targetPoint = _bands[0]->point.getVector3fMap();
 	Eigen::Vector3f targetNormal = _bands[0]->point.getNormalVector3fMap();
-
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
 		BandPtr band = _bands[i];
@@ -45,7 +43,6 @@ void Calculator::calculateAngleHistograms(const std::vector<BandPtr> &_bands, st
 
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
-			Eigen::Vector3f point = band->data->points[j].getVector3fMap();
 			Eigen::Vector3f normal = band->data->points[j].getNormalVector3fMap();
 			_histograms.back().add(calculateAngle(targetNormal, normal, band->plane, _useProjection));
 		}
@@ -91,7 +88,7 @@ void Calculator::calculateSequences(const std::vector<BandPtr> &_bands, const Ex
 			else
 			{
 				band->sequenceString += '-';
-				band->sequenceVector.push_back(-M_PI);
+				band->sequenceVector.push_back(5);
 			}
 		}
 	}
