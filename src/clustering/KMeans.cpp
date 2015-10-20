@@ -4,8 +4,8 @@
  */
 #include "KMeans.h"
 #include <limits>
-
 #include "../utils/Helper.h"
+#include "../io/Writer.h"
 
 KMeans::KMeans()
 {
@@ -19,6 +19,9 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
+	std::vector<int> itemsPerCenter;
+
+	std::vector<double> sseEvolution;
 
 	double currentSSE = std::numeric_limits<double>::max();
 	for (int i = 0; i < _attempts; i++)
@@ -32,20 +35,24 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		selectStartCenters(_items, centers);
 
 		// Iterate until the desired max iterations
+		std::vector<int> itemCount;
 		for (int j = 0; j < _maxIterations; j++)
 		{
-			std::cout << "\t\tit:" << j << std::endl;
+			if (j % 50 == 0)
+				std::cout << "\t\tit:" << j << std::endl;
 
 			// Set labels
 			for (int k = 0; k < _items.rows; k++)
 				labels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
 			// Calculate updated centers
-			std::vector<int> itemCount;
 			cv::Mat newCenters = _metric.calculateCenters(_clusterNumber, _items, labels, itemCount);
 
 			// Evaluate the stop condition
 			bool thresholdReached = evaluateStopCondition(centers, newCenters, _threshold, _metric);
+
+			// Store SSE evolution
+			sseEvolution.push_back(calculateSSE(_items, labels, centers, _metric));
 
 			// Update centers
 			newCenters.copyTo(centers);
@@ -57,17 +64,24 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 			}
 		}
 
-		double sse = calculateSSE(_items, labels, centers, _metric);
-		std::cout << "\tSSE: " << std::fixed << sse << std::endl;
+		double finalSSE = calculateSSE(_items, labels, centers, _metric);
+		std::cout << "\tSSE: " << std::fixed << finalSSE << std::endl;
 
-		if (sse < currentSSE)
+		if (finalSSE < currentSSE)
 		{
 			labels.copyTo(_labels);
 			centers.copyTo(_centers);
-			currentSSE = sse;
+			currentSSE = finalSSE;
+			itemsPerCenter = itemCount;
 		}
-
 	}
+
+	std::cout << "KMeans finished\n";
+	for (size_t i = 0; i < itemsPerCenter.size(); i++)
+		std::cout << "\tcluster " << i << ": " << itemsPerCenter[i] << " points\n";
+
+	std::cout << "Generating SSE plot" << std::endl;
+	Writer::writePlotSSE("sse", "SSE Evolution", sseEvolution);
 }
 
 void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
@@ -90,6 +104,9 @@ void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterN
 		// Iterate until the desired max iterations
 		for (int j = 0; j < _maxIterations; j++)
 		{
+			if (j % 50 == 0)
+				std::cout << "\t\tit:" << j << std::endl;
+
 			// Select sample points
 			getSample(_items, sample);
 

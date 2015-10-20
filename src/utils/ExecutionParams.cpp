@@ -79,7 +79,13 @@ ClusteringImplementation ExecutionParams::getClusteringImplementation(const std:
 std::string ExecutionParams::getHash() const
 {
 	std::string str = "";
-	str += "input=" + inputLocation;
+
+	std::string inputFile = inputLocation;
+	std::string sdasd = inputLocation.substr(0, 2);
+	if (inputLocation.substr(0, 2).compare("./") == 0)
+		inputFile = inputLocation.substr(2);
+
+	str += "input=" + inputFile;
 	str += "-patchSize=" + boost::lexical_cast<std::string>(patchSize);
 	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius);
 	str += "-bandNumber=" + boost::lexical_cast<std::string>(bandNumber);

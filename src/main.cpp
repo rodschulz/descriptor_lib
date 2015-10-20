@@ -54,7 +54,7 @@ int main(int _argn, char **_argv)
 
 			// Write output
 			std::cout << "Writing output\n";
-			Writer::writeOuput(cloud, bands, histograms, params);
+			Writer::writeOuputData(cloud, bands, histograms, params);
 		}
 		else
 		{

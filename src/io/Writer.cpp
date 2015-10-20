@@ -12,10 +12,10 @@
 #include <pcl/io/pcd_io.h>
 #include "../factories/CloudFactory.h"
 
-#define SCRIPT_NAME		"plot.script"
-#define DATA_NAME		"histogram.dat"
-#define PLOT_SCRIPT_NAME	OUTPUT_FOLDER SCRIPT_NAME
-#define PLOT_DATA_NAME		OUTPUT_FOLDER DATA_NAME
+#define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"
+#define SCRIPT_SSE_NAME		OUTPUT_FOLDER "ssePlot.script"
+#define HISTOGRAM_DATA_FILE	OUTPUT_FOLDER "histogram.dat"
+#define SSE_DATA_FILE		OUTPUT_FOLDER "sse.dat"
 
 Writer::Writer()
 {
@@ -74,27 +74,27 @@ void Writer::writeHistogram(const std::string &_filename, const std::string &_hi
 		double step = dimension == ANGLE ? RAD2DEG(_binSize) : _binSize;
 		double lower = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
 		double upper = dimension == ANGLE ? RAD2DEG(_upperBound) : _upperBound;
-		generateScript(_filename, _histogramTitle, _histograms.size(), step, lower, upper);
+		generateHistogramScript(_filename, _histogramTitle, _histograms.size(), step, lower, upper);
 
 		// Generate data file
 		std::ofstream output;
-		output.open(PLOT_DATA_NAME, std::fstream::out);
+		output.open(HISTOGRAM_DATA_FILE, std::fstream::out);
 		for (size_t i = 0; i < rows.size(); i++)
 			output << rows[i] << "\n";
 		output.close();
 
 		// Execute script to generate plot
 		std::string cmd = "gnuplot ";
-		cmd += PLOT_SCRIPT_NAME;
+		cmd += SCRIPT_HISTOGRAM_NAME;
 		if (system(cmd.c_str()) != 0)
 			std::cout << "WARNING, bad return for command: " << cmd << "\n";
 	}
 }
 
-void Writer::generateScript(const std::string &_filename, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
+void Writer::generateHistogramScript(const std::string &_filename, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
 {
 	std::ofstream output;
-	output.open(PLOT_SCRIPT_NAME, std::fstream::out);
+	output.open(SCRIPT_HISTOGRAM_NAME, std::fstream::out);
 
 	output << "set title '" << _histogramTitle << "'\n";
 	output << "set ylabel 'Percentage'\n";
@@ -123,12 +123,12 @@ void Writer::generateScript(const std::string &_filename, const std::string &_hi
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)
-		output << "'" << PLOT_DATA_NAME << "' using 1:" << i + 2 << " title 'Band " << i << "', \\\n";
+		output << "'" << HISTOGRAM_DATA_FILE << "' using 1:" << i + 2 << " title 'Band " << i << "', \\\n";
 
 	output.close();
 }
 
-void Writer::writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
+void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
 	pcl::io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
@@ -164,4 +164,38 @@ void Writer::writeOuput(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, co
 	// Write histogram data
 	double limit = M_PI;
 	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, DEG2RAD(20), -limit, limit);
+}
+
+void Writer::writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse)
+{
+	// Generate data file
+	std::ofstream dataFile;
+	dataFile.open(SSE_DATA_FILE, std::fstream::out);
+	for (size_t i = 0; i < _sse.size(); i++)
+		dataFile << i << "\t" << _sse[i] << "\n";
+	dataFile.close();
+
+	// Generate plot script
+	std::ofstream plotScript;
+	plotScript.open(SCRIPT_SSE_NAME, std::fstream::out);
+
+	plotScript << "set title '" << _plotTitle << "'\n";
+	plotScript << "set ylabel 'SSE'\n";
+	plotScript << "set xlabel 'Iterations'\n\n";
+
+	plotScript << "set grid ytics xtics\n";
+	plotScript << "set style data linespoints\n\n";
+
+	plotScript << "set term png\n";
+	plotScript << "set output '" << OUTPUT_FOLDER << _filename << ".png'\n\n";
+
+	plotScript << "plot '" << SSE_DATA_FILE << "' using 1:2 title 'SSE'\n";
+
+	plotScript.close();
+
+	// Execute script to generate plot
+	std::string cmd = "gnuplot ";
+	cmd += SCRIPT_SSE_NAME;
+	if (system(cmd.c_str()) != 0)
+		std::cout << "WARNING, bad return for command: " << cmd << "\n";
 }
