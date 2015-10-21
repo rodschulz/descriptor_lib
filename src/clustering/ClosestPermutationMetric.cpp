@@ -2,30 +2,24 @@
  * Author: rodrigo
  * 2015
  */
-#include "ClosestPermutation.h"
+#include "ClosestPermutationMetric.h"
 #include <iostream>
 
-ClosestPermutation::ClosestPermutation(const int _permutationSize)
+ClosestPermutationMetric::ClosestPermutationMetric(const int _permutationSize)
 {
 	permutationSize = _permutationSize;
 }
 
-ClosestPermutation::~ClosestPermutation()
+ClosestPermutationMetric::~ClosestPermutationMetric()
 {
 }
 
-double ClosestPermutation::distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+double ClosestPermutationMetric::distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
 {
 	return getClosestPermutation(_vector1, _vector2).distance;
 }
 
-cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels) const
-{
-	std::vector<int> itemCount;
-	return calculateCenters(_clusterNumber, _items, _labels, itemCount);
-}
-
-cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const
+cv::Mat ClosestPermutationMetric::calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const
 {
 	_itemsPerCenter = std::vector<int>(_clusterNumber, 0);
 
@@ -64,7 +58,7 @@ cv::Mat ClosestPermutation::calculateCenters(const int _clusterNumber, const cv:
 	return newCenters;
 }
 
-ClosestPermutation::Permutation ClosestPermutation::getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+ClosestPermutationMetric::Permutation ClosestPermutationMetric::getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
 {
 	// Number of permutations to be evaluated
 	int permutationNumber = std::floor(_vector1.cols / permutationSize);

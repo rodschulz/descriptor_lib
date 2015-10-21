@@ -7,7 +7,8 @@
 #include <string>
 #include <opencv2/core/core.hpp>
 #include <pcl/io/pcd_io.h>
-#include "clustering/ClosestPermutation.h"
+#include "clustering/ClosestPermutationMetric.h"
+#include "clustering/EuclideanMetric.h"
 #include "clustering/KMeans.h"
 #include "descriptor/Calculator.h"
 #include "descriptor/Extractor.h"
@@ -99,11 +100,12 @@ int main(int _argn, char **_argv)
 						break;
 
 					case CLUSTERING_CUSTOM:
-						KMeans::searchClusters(descriptors, params.clusters, ClosestPermutation(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						//KMeans::searchClusters(descriptors, params.clusters, ClosestPermutationMetric(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::searchClusters(descriptors, params.clusters, EuclideanMetric(), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 						break;
 
 					case CLUSTERING_STOCHASTIC:
-						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, ClosestPermutation(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, ClosestPermutationMetric(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 						break;
 
 					default:

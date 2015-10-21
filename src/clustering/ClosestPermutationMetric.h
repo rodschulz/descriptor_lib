@@ -6,14 +6,13 @@
 
 #include "Metric.h"
 
-class ClosestPermutation: public Metric
+class ClosestPermutationMetric: public Metric
 {
 public:
-	ClosestPermutation(const int _permutationSize);
-	~ClosestPermutation();
+	ClosestPermutationMetric(const int _permutationSize);
+	~ClosestPermutationMetric();
 
 	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
-	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels) const;
 	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const;
 
 private:

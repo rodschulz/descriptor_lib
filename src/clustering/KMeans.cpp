@@ -17,6 +17,19 @@ KMeans::~KMeans()
 
 void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
+	/**
+	 * @TODO revisar que el new centers se este actualizando
+	 *
+	 * -hacer prueba de que el kmeans esta funcionado bien, para esto evaluar clusters de pocos puntos
+	 * 	que esten bien separados y usar metrica euclideana.
+	 * -hacer tests de funcionamiento de kmeans.
+	 * -hacer matriz de distancias cruzadas (como una matriz de confusión) con todos
+	 * 	los puntos => la matriz por bloques con las distancias que vimos en mineria
+	 * -hacer una matriz de distancias, pero esta vez de la distancia con respecto al
+	 * 	 promedio de los puntos dentro del cluster =>
+	 *
+	 */
+
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
 	std::vector<int> itemsPerCenter;
@@ -45,14 +58,14 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 			for (int k = 0; k < _items.rows; k++)
 				labels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
+			// Store SSE evolution
+			sseEvolution.push_back(calculateSSE(_items, labels, centers, _metric));
+
 			// Calculate updated centers
 			cv::Mat newCenters = _metric.calculateCenters(_clusterNumber, _items, labels, itemCount);
 
 			// Evaluate the stop condition
 			bool thresholdReached = evaluateStopCondition(centers, newCenters, _threshold, _metric);
-
-			// Store SSE evolution
-			sseEvolution.push_back(calculateSSE(_items, labels, centers, _metric));
 
 			// Update centers
 			newCenters.copyTo(centers);
