@@ -16,6 +16,7 @@
 #include "ExecutionParams.h"
 #include "../factories/CloudFactory.h"
 #include "../factories/PointFactory.h"
+#include "../descriptor/Calculator.h"
 
 boost::random::mt19937 randomGenerator;
 
