@@ -15,6 +15,7 @@
 #include "descriptor/Hist.h"
 #include "utils/Config.h"
 #include "utils/Helper.h"
+#include "utils/ExtractData.h"
 #include "factories/CloudFactory.h"
 #include "io/Writer.h"
 
@@ -41,6 +42,7 @@ int main(int _argn, char **_argv)
 			throw std::runtime_error("Can't load cloud");
 		std::cout << "Loaded " << cloud->size() << " points in cloud\n";
 
+		// Select execution type
 		if (params.normalExecution)
 		{
 			std::cout << "Target point: " << params.targetPoint << "\n";
@@ -61,30 +63,21 @@ int main(int _argn, char **_argv)
 		{
 			std::cout << "Execution for clustering\n";
 
-			size_t cloudSize = cloud->size();
-			size_t sequenceSize = params.getSequenceLength();
-			cv::Mat descriptors = cv::Mat::zeros(cloudSize, sequenceSize * params.bandNumber, CV_32FC1);
+			cv::Mat descriptors = cv::Mat::zeros(cloud->size(), params.getSequenceLength() * params.bandNumber, CV_32FC1);
+			if (!Helper::loadDescriptorsCache(descriptors, params))
+				Helper::generateDescriptorsCache(cloud, params, descriptors);
 
-			if (!Helper::loadClusteringCache(descriptors, params))
-			{
-				std::cout << "Cache not found, calculating descriptors\n";
-
-				// Extract the descriptors
-				for (size_t i = 0; i < cloudSize; i++)
-				{
-					pcl::PointNormal target = cloud->points[i];
-					std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
-
-					for (size_t j = 0; j < bands.size(); j++)
-						memcpy(&descriptors.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
-				}
-
-				// Save cache to file
-				Helper::writeClusteringCache(descriptors, params);
-			}
+			/**************************************************
+			 * Only for debug
+			 */
+			int coordinatesNumber = 3;
+			descriptors = cv::Mat::zeros(cloud->size(), coordinatesNumber, CV_32FC1);
+			for (size_t i = 0; i < cloud->size(); i++)
+				memcpy(descriptors.row(i).data, cloud->at(i).data, sizeof(float) * coordinatesNumber);
+			/**************************************************/
 
 			// Create an 'elbow criterion' graph using kmeans
-			if (params.showElbow)
+			if (params.genElbowCurve)
 				Helper::generateElbowGraph(descriptors, params);
 
 			std::cout << "Calculating clusters\n";
@@ -105,7 +98,7 @@ int main(int _argn, char **_argv)
 						break;
 
 					case CLUSTERING_STOCHASTIC:
-						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, ClosestPermutationMetric(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, ClosestPermutationMetric(params.getSequenceLength()), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 						break;
 
 					default:

@@ -33,7 +33,8 @@ public:
 	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
 	static uint32_t getColor(const int _index);
 
-	static bool loadClusteringCache(cv::Mat &_descriptors, const ExecutionParams &_params);
+	static bool loadDescriptorsCache(cv::Mat &_descriptors, const ExecutionParams &_params);
+	static void generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors);
 	static void writeClusteringCache(const cv::Mat &_descriptors, const ExecutionParams &_params);
 
 	static double calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_centers, const cv::Mat &_labels);

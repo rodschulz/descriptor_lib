@@ -18,7 +18,7 @@ Calculator::~Calculator()
 {
 }
 
-std::vector<BandPtr> Calculator::calculateDescriptor(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_target, const ExecutionParams &_params)
+std::vector<BandPtr> Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_target, const ExecutionParams &_params)
 {
 	// Get target point and surface patch
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _target, _params.patchSize);

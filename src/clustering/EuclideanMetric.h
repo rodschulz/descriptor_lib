@@ -18,6 +18,9 @@ public:
 
 	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
 	{
+		if (_vector1.cols != _vector2.cols || _vector1.rows != _vector2.rows)
+			throw std::runtime_error("Invalid matrix dimensions in distance");
+
 		return cv::norm(_vector1, _vector2);
 	}
 
@@ -35,10 +38,8 @@ public:
 			_itemsPerCenter[clusterIndex] += 1;
 		}
 
-		std::cout << "+++\n"<< newCenters << std::endl;
 		for (int i = 0; i < newCenters.rows; i++)
 			newCenters.row(i) /= _itemsPerCenter[i];
-		std::cout << "%%%\n"<< newCenters << std::endl;
 
 		return newCenters;
 	}

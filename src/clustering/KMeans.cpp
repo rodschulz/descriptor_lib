@@ -7,6 +7,30 @@
 #include "../utils/Helper.h"
 #include "../io/Writer.h"
 
+template<typename T>
+void print(cv::Mat mat, int prec = 0)
+{
+	std::cout << "[";
+	for (int i = 0; i < mat.size().height; i++)
+	{
+		std::cout << " ";
+		for (int j = 0; j < mat.size().width; j++)
+		{
+			float num = mat.at<T>(i, j);
+			if (num < 0 || (i == 0 && j == 0))
+				printf("%.3f", num);
+			else
+				printf(" %.3f", num);
+
+			if (j != mat.size().width - 1)
+				std::cout << "\t";
+			else
+				std::cout << std::endl;
+		}
+	}
+	std::cout << "]" << std::endl;
+}
+
 KMeans::KMeans()
 {
 }
@@ -33,8 +57,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
 	std::vector<int> itemsPerCenter;
-
-	std::vector<double> sseEvolution;
+	std::vector<double> sseSeries;
 
 	double currentSSE = std::numeric_limits<double>::max();
 	for (int i = 0; i < _attempts; i++)
@@ -59,23 +82,22 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 				labels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
 			// Store SSE evolution
-			sseEvolution.push_back(calculateSSE(_items, labels, centers, _metric));
+			sseSeries.push_back(calculateSSE(_items, labels, centers, _metric));
 
-			// Calculate updated centers
+			// Calculate updated centers and check has to stop
 			cv::Mat newCenters = _metric.calculateCenters(_clusterNumber, _items, labels, itemCount);
-
-			// Evaluate the stop condition
 			bool thresholdReached = evaluateStopCondition(centers, newCenters, _threshold, _metric);
 
 			// Update centers
 			newCenters.copyTo(centers);
-
-			if (thresholdReached)
+			if (thresholdReached && false)
 			{
 				std::cout << "\tthreshold reached --> [attempt: " << i << " - iteration: " << j << "]" << std::endl;
 				break;
 			}
 		}
+
+		print<int>(labels);
 
 		double finalSSE = calculateSSE(_items, labels, centers, _metric);
 		std::cout << "\tSSE: " << std::fixed << finalSSE << std::endl;
@@ -94,7 +116,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		std::cout << "\tcluster " << i << ": " << itemsPerCenter[i] << " points\n";
 
 	std::cout << "Generating SSE plot" << std::endl;
-	Writer::writePlotSSE("sse", "SSE Evolution", sseEvolution);
+	Writer::writePlotSSE("sse", "SSE Evolution", sseSeries);
 }
 
 void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
@@ -192,7 +214,7 @@ double KMeans::calculateSSE(const cv::Mat &_items, const cv::Mat &_labels, const
 	return sse;
 }
 
-int KMeans::findClosestCenter(const cv::Mat &_items, cv::Mat &_centers, const Metric &_metric)
+int KMeans::findClosestCenter(const cv::Mat &_vector, cv::Mat &_centers, const Metric &_metric)
 {
 	int closestCenter = -1;
 
@@ -200,7 +222,7 @@ int KMeans::findClosestCenter(const cv::Mat &_items, cv::Mat &_centers, const Me
 	double minDist = std::numeric_limits<double>::max();
 	for (int i = 0; i < _centers.rows; i++)
 	{
-		double distance = _metric.distance(_items, _centers.row(i));
+		double distance = _metric.distance(_vector, _centers.row(i));
 		if (distance < minDist)
 		{
 			minDist = distance;

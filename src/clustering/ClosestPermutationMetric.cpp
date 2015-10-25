@@ -4,6 +4,7 @@
  */
 #include "ClosestPermutationMetric.h"
 #include <iostream>
+#include <stdexcept>
 
 ClosestPermutationMetric::ClosestPermutationMetric(const int _permutationSize)
 {
@@ -60,6 +61,9 @@ cv::Mat ClosestPermutationMetric::calculateCenters(const int _clusterNumber, con
 
 ClosestPermutationMetric::Permutation ClosestPermutationMetric::getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
 {
+	if (_vector1.cols != _vector2.cols || _vector1.rows != _vector2.rows)
+		throw std::runtime_error("Invalid matrix dimensions in distance");
+
 	// Number of permutations to be evaluated
 	int permutationNumber = std::floor(_vector1.cols / permutationSize);
 

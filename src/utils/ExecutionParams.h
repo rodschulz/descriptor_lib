@@ -72,7 +72,7 @@ public:
 	double gaussianRadius;				// Search radius used for the gaussian smoothing
 	double mlsRadius;				// Search radius used for the mls smoothing
 
-	bool showElbow;					// Flag indicating if an elbow graph has to be done
+	bool genElbowCurve;				// Flag indicating if an elbow graph has to be generated
 	ClusteringImplementation implementation;	// Implementation of clustering to be used
 	int clusters;					// Number of clusters used in the clustering test
 	int maxIterations;				// Clustering max iterations

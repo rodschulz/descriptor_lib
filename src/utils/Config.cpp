@@ -69,8 +69,8 @@ void Config::parse(const std::string _key, const std::string _value)
 
 	/*****************************/
 	// Clustering parameters
-	else if (boost::iequals(_key, "showElbow"))
-		getInstance()->params.showElbow = boost::iequals(_value, "true");
+	else if (boost::iequals(_key, "genElbowCurve"))
+		getInstance()->params.genElbowCurve = boost::iequals(_value, "true");
 
 	else if (boost::iequals(_key, "implementation"))
 		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(_value);

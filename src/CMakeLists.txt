@@ -17,8 +17,8 @@ file(GLOB PCL_DESCRIPTOR_SRC
     "*.cpp"
 )
 
-add_subdirectory(factories)
 add_subdirectory(clustering)
+add_subdirectory(factories)
 add_subdirectory(descriptor)
 add_subdirectory(utils)
 add_subdirectory(io)

@@ -208,7 +208,7 @@ unsigned int Helper::getColor(const int _index)
 	return palette[_index % 12];
 }
 
-bool Helper::loadClusteringCache(cv::Mat &_descriptors, const ExecutionParams &_params)
+bool Helper::loadDescriptorsCache(cv::Mat &_descriptors, const ExecutionParams &_params)
 {
 	bool loadOK = true;
 	std::string filename = _params.cacheLocation + _params.getHash();
@@ -242,6 +242,25 @@ bool Helper::loadClusteringCache(cv::Mat &_descriptors, const ExecutionParams &_
 		loadOK = false;
 
 	return loadOK;
+}
+
+void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors)
+{
+	std::cout << "Generating descriptors cache\n";
+	int sequenceSize = _params.getSequenceLength();
+
+	// Extract the descriptors
+	for (size_t i = 0; i < _cloud->size(); i++)
+	{
+		pcl::PointNormal target = _cloud->points[i];
+		std::vector<BandPtr> bands = Calculator::calculateDescriptor(_cloud, target, _params);
+
+		for (size_t j = 0; j < bands.size(); j++)
+			memcpy(&_descriptors.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
+	}
+
+	// Save cache to file
+	Helper::writeClusteringCache(_descriptors, _params);
 }
 
 void Helper::writeClusteringCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
