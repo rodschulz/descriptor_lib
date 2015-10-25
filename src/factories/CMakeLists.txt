@@ -4,3 +4,4 @@ file(GLOB FACTORIES_SRC
 )
 
 add_library(factories ${FACTORIES_SRC})
+target_link_libraries(factories clustering)

@@ -47,7 +47,7 @@ public:
 	Band()
 	{
 		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		point = PointFactory::makePointNormal(1, 0, 0, 1, 0, 0);
+		point = PointFactory::createPointNormal(1, 0, 0, 1, 0, 0);
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		sequenceString = "";
 	}

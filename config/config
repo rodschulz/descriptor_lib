@@ -13,13 +13,18 @@ gaussianRadius	0.005
 mlsRadius	0.05
 
 ##############################
-# Clustering options (implementation can be opencv, custom or stochastic)
-showElbow	false
+# Elbow curve generation for clustering
+genElbowCurve	false
+
+# Clustering implementation (opencv, custom or stochastic)
 implementation	custom
-clusters	5
-maxIter		500
-stopThres	0.0001
-attempts	3
+
+# Clustering options (metric can be euclidean or closestPermutation)
+metric		closestPermutation
+clusters	4
+maxIter		50
+stopThres	0.000001
+attempts	1
 cacheLocation	./cache/
 
 ##############################
@@ -33,7 +38,7 @@ bidirectional	false
 useProjection	false
 
 # Sequence calculation (stat can be mean or median)
-sequenceBin	0.0025
+sequenceBin	0.01
 sequenceStat	mean
 
 # Use of synthetic clouds (cube, cylinder or sphere)

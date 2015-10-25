@@ -10,6 +10,7 @@
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 #include "Helper.h"
+#include "../factories/MetricFactory.h"
 
 enum SynCloudType
 {
@@ -43,6 +44,7 @@ public:
 	static SmoothingType getSmoothingType(const std::string &_type);
 	static SequenceStat getStatType(const std::string &_type);
 	static ClusteringImplementation getClusteringImplementation(const std::string &_type);
+	static MetricType getMetricType(const std::string &_type);
 
 	std::string getHash() const;
 	double getBandsAngularRange() const;
@@ -74,9 +76,10 @@ public:
 
 	bool genElbowCurve;				// Flag indicating if an elbow graph has to be generated
 	ClusteringImplementation implementation;	// Implementation of clustering to be used
+	MetricType metric;				// Type of metric to use in clustering execution
 	int clusters;					// Number of clusters used in the clustering test
 	int maxIterations;				// Clustering max iterations
 	double stopThreshold;				// Clustering stop threshold
-	int attempts;				// Number of attemtps to try when clustering
+	int attempts;					// Number of attemtps to try when clustering
 	std::string cacheLocation;			// Location of the cachefiles
 };

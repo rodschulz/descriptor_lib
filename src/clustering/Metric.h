@@ -5,6 +5,11 @@
 #pragma once
 
 #include <opencv2/core/core.hpp>
+#include <boost/shared_ptr.hpp>
+
+// Forward declaration to define a metric's shared pointer
+class Metric;
+typedef boost::shared_ptr<Metric> MetricPtr;
 
 class Metric
 {

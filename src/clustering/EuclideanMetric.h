@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Metric.h"
+#include <stdexcept>
 
 class EuclideanMetric: public Metric
 {

@@ -17,6 +17,7 @@
 #include "utils/Helper.h"
 #include "utils/ExtractData.h"
 #include "factories/CloudFactory.h"
+#include "factories/MetricFactory.h"
 #include "io/Writer.h"
 
 #define CONFIG_LOCATION "./config/config"
@@ -84,28 +85,17 @@ int main(int _argn, char **_argv)
 
 			// Make clusters of data
 			cv::Mat labels, centers;
-			//if (!Helper::loadClusters(centers, labels, params))
-			{
-				switch (params.implementation)
-				{
-					case CLUSTERING_OPENCV:
-						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
-						break;
+			MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength());
+			if (params.implementation == CLUSTERING_OPENCV)
+				cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
 
-					case CLUSTERING_CUSTOM:
-						//KMeans::searchClusters(descriptors, params.clusters, ClosestPermutationMetric(sequenceSize), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
-						KMeans::searchClusters(descriptors, params.clusters, EuclideanMetric(), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
-						break;
+			else if (params.implementation == CLUSTERING_CUSTOM)
+				KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 
-					case CLUSTERING_STOCHASTIC:
-						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, ClosestPermutationMetric(params.getSequenceLength()), params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
-						break;
+			else if (params.implementation == CLUSTERING_STOCHASTIC)
+				KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 
-					default:
-						break;
-				}
-			}
-
+			// Save the visualization cloud
 			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr clusteredCloud = Helper::generateClusterRepresentation(cloud, labels, centers, params);
 			pcl::io::savePCDFileASCII("./output/visualization.pcd", *clusteredCloud);
 

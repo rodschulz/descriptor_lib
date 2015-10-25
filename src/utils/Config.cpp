@@ -75,6 +75,9 @@ void Config::parse(const std::string _key, const std::string _value)
 	else if (boost::iequals(_key, "implementation"))
 		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(_value);
 
+	else if (boost::iequals(_key, "metric"))
+			getInstance()->params.metric = ExecutionParams::getMetricType(_value);
+
 	else if (boost::iequals(_key, "clusters"))
 		getInstance()->params.clusters = atoi(_value.c_str());
 

@@ -12,7 +12,7 @@ PointFactory::~PointFactory()
 {
 }
 
-pcl::PointXYZ PointFactory::makePointXYZ(const float _x, const float _y, const float _z)
+pcl::PointXYZ PointFactory::createPointXYZ(const float _x, const float _y, const float _z)
 {
 	pcl::PointXYZ p;
 	p.x = _x;
@@ -21,7 +21,7 @@ pcl::PointXYZ PointFactory::makePointXYZ(const float _x, const float _y, const f
 	return p;
 }
 
-pcl::PointXYZRGB PointFactory::makePointXYZRGB(const float _x, const float _y, const float _z, const float _rgb)
+pcl::PointXYZRGB PointFactory::createPointXYZRGB(const float _x, const float _y, const float _z, const float _rgb)
 {
 	pcl::PointXYZRGB p;
 	p.x = _x;
@@ -31,7 +31,7 @@ pcl::PointXYZRGB PointFactory::makePointXYZRGB(const float _x, const float _y, c
 	return p;
 }
 
-pcl::PointXYZRGB PointFactory::makePointXYZRGB(const float _x, const float _y, const float _z, const uint8_t _r, const uint8_t _g, const uint8_t _b)
+pcl::PointXYZRGB PointFactory::createPointXYZRGB(const float _x, const float _y, const float _z, const uint8_t _r, const uint8_t _g, const uint8_t _b)
 {
 	uint32_t color = ((uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
 
@@ -43,7 +43,7 @@ pcl::PointXYZRGB PointFactory::makePointXYZRGB(const float _x, const float _y, c
 	return p;
 }
 
-pcl::PointXYZRGBNormal PointFactory::makePointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const uint8_t _r, const uint8_t _g, const uint8_t _b)
+pcl::PointXYZRGBNormal PointFactory::createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const uint8_t _r, const uint8_t _g, const uint8_t _b)
 {
 	uint32_t color = ((uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
 
@@ -59,7 +59,7 @@ pcl::PointXYZRGBNormal PointFactory::makePointXYZRGBNormal(const float _x, const
 	return p;
 }
 
-pcl::PointXYZRGBNormal PointFactory::makePointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const float _rgb)
+pcl::PointXYZRGBNormal PointFactory::createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const float _rgb)
 {
 	pcl::PointXYZRGBNormal p;
 	p.x = _x;
@@ -73,7 +73,7 @@ pcl::PointXYZRGBNormal PointFactory::makePointXYZRGBNormal(const float _x, const
 	return p;
 }
 
-pcl::PointNormal PointFactory::makePointNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature)
+pcl::PointNormal PointFactory::createPointNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature)
 {
 	pcl::PointNormal p;
 	p.x = _x;

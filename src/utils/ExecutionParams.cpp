@@ -28,12 +28,13 @@ ExecutionParams::ExecutionParams()
 	gaussianRadius = 0.02;
 	mlsRadius = 0.02;
 
+	genElbowCurve = false;
+	implementation = CLUSTERING_NONE;
+	metric = METRIC_NONE;
 	clusters = 5;
 	maxIterations = 10000;
 	stopThreshold = 0.001;
-	genElbowCurve = false;
 	attempts = 1;
-	implementation = CLUSTERING_NONE;
 }
 
 SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)
@@ -74,6 +75,15 @@ ClusteringImplementation ExecutionParams::getClusteringImplementation(const std:
 	else if (boost::iequals(_type, "stochastic"))
 		return CLUSTERING_STOCHASTIC;
 	return CLUSTERING_NONE;
+}
+
+MetricType ExecutionParams::getMetricType(const std::string &_type)
+{
+	if (boost::iequals(_type, "euclidean"))
+		return METRIC_EUCLIDEAN;
+	else if (boost::iequals(_type, "closestPermutation"))
+		return METRIC_CLOSEST_PERMUTATION;
+	return METRIC_NONE;
 }
 
 std::string ExecutionParams::getHash() const

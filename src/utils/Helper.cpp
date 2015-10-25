@@ -121,15 +121,15 @@ bool Helper::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Exe
 		switch (_params.synCloudType)
 		{
 			case CLOUD_CUBE:
-				CloudFactory::generateCube(0.3, PointFactory::makePointXYZ(0.3, 0.3, 0.3), cloudXYZ);
+				CloudFactory::createCube(0.3, PointFactory::createPointXYZ(0.3, 0.3, 0.3), cloudXYZ);
 				break;
 
 			case CLOUD_CYLINDER:
-				CloudFactory::generateCylinder(0.2, 0.5, PointFactory::makePointXYZ(0.4, 0.4, 0.4), cloudXYZ);
+				CloudFactory::createCylinder(0.2, 0.5, PointFactory::createPointXYZ(0.4, 0.4, 0.4), cloudXYZ);
 				break;
 
 			case CLOUD_SPHERE:
-				CloudFactory::generateSphere(0.2, PointFactory::makePointXYZ(0.2, 0.2, 0.2), cloudXYZ);
+				CloudFactory::createSphere(0.2, PointFactory::createPointXYZ(0.2, 0.2, 0.2), cloudXYZ);
 				break;
 
 			default:
@@ -337,7 +337,7 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
 	int sequenceLength = _params.getSequenceLength();
-	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::makePointNormal(0, 0, 0, 0, 0, 0, 0));
+	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::createPointNormal(0, 0, 0, 0, 0, 0, 0));
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
 
 	for (size_t i = 0; i < locations.size(); i++)
@@ -400,7 +400,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 						float ny = rotatedNormal.y();
 						float nz = rotatedNormal.z();
 
-						output->push_back(PointFactory::makePointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Helper::getColor(i)));
+						output->push_back(PointFactory::createPointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Helper::getColor(i)));
 					}
 				}
 			}
