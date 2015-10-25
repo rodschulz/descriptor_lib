@@ -7,8 +7,6 @@
 #include <string>
 #include <opencv2/core/core.hpp>
 #include <pcl/io/pcd_io.h>
-#include "clustering/ClosestPermutationMetric.h"
-#include "clustering/EuclideanMetric.h"
 #include "clustering/KMeans.h"
 #include "descriptor/Calculator.h"
 #include "descriptor/Extractor.h"
@@ -16,7 +14,6 @@
 #include "utils/Config.h"
 #include "utils/Helper.h"
 #include "utils/ExtractData.h"
-#include "factories/CloudFactory.h"
 #include "factories/MetricFactory.h"
 #include "io/Writer.h"
 
@@ -95,15 +92,9 @@ int main(int _argn, char **_argv)
 			else if (params.implementation == CLUSTERING_STOCHASTIC)
 				KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 
-			// Save the visualization cloud
-			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr clusteredCloud = Helper::generateClusterRepresentation(cloud, labels, centers, params);
-			pcl::io::savePCDFileASCII("./output/visualization.pcd", *clusteredCloud);
-
-			// Color the data according to the clusters
-			pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(cloud, Helper::getColor(0));
-			for (int i = 0; i < labels.rows; i++)
-				(*colored)[i].rgb = Helper::getColor(labels.at<int>(i));
-			pcl::io::savePCDFileASCII("./output/clusters.pcd", *colored);
+			// Generate outputs
+			Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
+			pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
 		}
 	}
 	catch (std::exception &_ex)

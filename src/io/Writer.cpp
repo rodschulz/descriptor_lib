@@ -199,3 +199,13 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 	if (system(cmd.c_str()) != 0)
 		std::cout << "WARNING, bad return for command: " << cmd << "\n";
 }
+
+void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
+{
+	// Color the data according to the clusters
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
+	for (int i = 0; i < _labels.rows; i++)
+		(*colored)[i].rgb = Helper::getColor(_labels.at<int>(i));
+
+	pcl::io::savePCDFileASCII(_filename, *colored);
+}

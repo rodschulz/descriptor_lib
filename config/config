@@ -20,11 +20,11 @@ genElbowCurve	false
 implementation	custom
 
 # Clustering options (metric can be euclidean or closestPermutation)
-metric		closestPermutation
+metric		euclidean
 clusters	4
-maxIter		50
+maxIter		200
 stopThres	0.000001
-attempts	1
+attempts	5
 cacheLocation	./cache/
 
 ##############################
