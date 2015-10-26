@@ -41,19 +41,6 @@ KMeans::~KMeans()
 
 void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
-	/**
-	 * @TODO revisar que el new centers se este actualizando
-	 *
-	 * -hacer prueba de que el kmeans esta funcionado bien, para esto evaluar clusters de pocos puntos
-	 * 	que esten bien separados y usar metrica euclideana.
-	 * -hacer tests de funcionamiento de kmeans.
-	 * -hacer matriz de distancias cruzadas (como una matriz de confusión) con todos
-	 * 	los puntos => la matriz por bloques con las distancias que vimos en mineria
-	 * -hacer una matriz de distancias, pero esta vez de la distancia con respecto al
-	 * 	 promedio de los puntos dentro del cluster =>
-	 *
-	 */
-
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
 	std::vector<int> itemsPerCenter;
@@ -69,6 +56,15 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 
 		// Select some of the elements as the staring points
 		selectStartCenters(_items, centers);
+
+		/**************************************************
+		 * Only for debug
+		 *
+		_items.row(0).copyTo(centers.row(0));
+		_items.row(10).copyTo(centers.row(1));
+		_items.row(20).copyTo(centers.row(2));
+		_items.row(30).copyTo(centers.row(3));
+		/**************************************************/
 
 		// Iterate until the desired max iterations
 		std::vector<int> itemCount;

@@ -67,7 +67,7 @@ int main(int _argn, char **_argv)
 
 			/**************************************************
 			 * Only for debug
-			 */
+			 *
 			int coordinatesNumber = 3;
 			descriptors = cv::Mat::zeros(cloud->size(), coordinatesNumber, CV_32FC1);
 			for (size_t i = 0; i < cloud->size(); i++)
@@ -95,6 +95,7 @@ int main(int _argn, char **_argv)
 			// Generate outputs
 			Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
 			pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
+			Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
 		}
 	}
 	catch (std::exception &_ex)

@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <pcl/pcl_macros.h>
 #include <pcl/io/pcd_io.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include "../factories/CloudFactory.h"
 
 #define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"
@@ -208,4 +210,57 @@ void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointC
 		(*colored)[i].rgb = Helper::getColor(_labels.at<int>(i));
 
 	pcl::io::savePCDFileASCII(_filename, *colored);
+}
+
+void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat &_items, const cv::Mat &_centers, const cv::Mat &_labels, const MetricPtr &_metric)
+{
+	std::vector<std::pair<int, int> > data; // fist=index - second=cluster
+	for (int i = 0; i < _labels.rows; i++)
+	{
+		data.push_back(std::make_pair(i, _labels.at<int>(i)));
+	}
+	std::sort(data.begin(), data.end(), comparePairs);
+
+	// Generate a matrix of distances between points
+	float maxDistanceBetween = 0;
+	cv::Mat distBetweenPoints = cv::Mat::zeros(_items.rows, _items.rows, CV_32FC1);
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		int index1 = data[i].first;
+		for (size_t j = 0; j < data.size(); j++)
+		{
+			int index2 = data[j].first;
+			float distance = (float) _metric->distance(_items.row(index1), _items.row(index2));
+			distBetweenPoints.at<float>(index1, index2) = distance;
+
+			maxDistanceBetween = distance > maxDistanceBetween ? distance : maxDistanceBetween;
+		}
+	}
+
+	// Generate a matrix of distances to the centers
+	float maxDistanceToCenter = 0;
+	cv::Mat distToCenters = cv::Mat::zeros(_items.rows, _centers.rows, CV_32FC1);
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		int index = data[i].first;
+		for (int j = 0; j < _centers.rows; j++)
+		{
+			float distance = (float) _metric->distance(_items.row(index), _centers.row(j));
+			distToCenters.at<float>(index, j) = distance;
+
+			maxDistanceToCenter = distance > maxDistanceToCenter ? distance : maxDistanceToCenter;
+		}
+	}
+
+	// Write images
+	cv::Mat imageDistBetweenPoints;
+	distBetweenPoints.convertTo(imageDistBetweenPoints, CV_8UC1, 255 / maxDistanceBetween, 0);
+	cv::imwrite(_outputFolder + "distanceBetweenPoints.png", imageDistBetweenPoints);
+
+	cv::Mat imageDistToCenter;
+	distToCenters.convertTo(imageDistToCenter, CV_8UC1, 255 / maxDistanceToCenter, 0);
+	cv::imwrite(_outputFolder + "distanceToCenter.png", imageDistToCenter);
+
+	std::cout << "DBP (max: " << maxDistanceBetween << ")\n" << distBetweenPoints << "\n---\n" << imageDistBetweenPoints << "\n---\n" << std::endl;
+	std::cout << "DTC (max: " << maxDistanceToCenter << ")\n" << distToCenters << "\n---\n" << imageDistToCenter << "\n---\n" << std::endl;
 }
