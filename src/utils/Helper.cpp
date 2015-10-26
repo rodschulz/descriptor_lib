@@ -37,7 +37,7 @@ int Helper::getRandomNumber(const int _min, const int _max)
 
 std::vector<int> Helper::getRandomSet(const unsigned int _size, const int _min, const int _max)
 {
-	randomGenerator.seed(std::time(0));
+	randomGenerator.seed(std::rand());
 	boost::random::uniform_int_distribution<> dist(_min, _max);
 
 	std::vector<int> numbers;

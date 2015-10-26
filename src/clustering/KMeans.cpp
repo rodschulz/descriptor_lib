@@ -97,7 +97,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 			}
 		}
 
-		print<int>(labels);
+		//print<int>(labels);
 
 		double finalSSE = calculateSSE(_items, labels, centers, _metric);
 		std::cout << "\tSSE: " << std::fixed << finalSSE << std::endl;
@@ -197,7 +197,7 @@ bool KMeans::evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_n
 
 void KMeans::selectStartCenters(const cv::Mat &_items, cv::Mat &_centers)
 {
-	std::vector<int> randomSet = Helper::getRandomSet(_centers.rows, 0, _items.rows);
+	std::vector<int> randomSet = Helper::getRandomSet(_centers.rows, 0, _items.rows - 1);
 	for (int j = 0; j < _centers.rows; j++)
 		_items.row(randomSet[j]).copyTo(_centers.row(j));
 }
@@ -235,7 +235,7 @@ int KMeans::findClosestCenter(const cv::Mat &_vector, cv::Mat &_centers, const M
 
 void KMeans::getSample(const cv::Mat &_items, cv::Mat &_sample)
 {
-	std::vector<int> randomSet = Helper::getRandomSet(_sample.rows, 0, _items.rows);
+	std::vector<int> randomSet = Helper::getRandomSet(_sample.rows, 0, _items.rows - 1);
 	for (int j = 0; j < _sample.rows; j++)
 		_items.row(randomSet[j]).copyTo(_sample.row(j));
 }
