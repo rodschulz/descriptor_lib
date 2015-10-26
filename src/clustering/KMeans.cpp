@@ -64,7 +64,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		_items.row(10).copyTo(centers.row(1));
 		_items.row(20).copyTo(centers.row(2));
 		_items.row(30).copyTo(centers.row(3));
-		/**************************************************/
+		/*////////////////////////////////////////////////*/
 
 		// Iterate until the desired max iterations
 		std::vector<int> itemCount;

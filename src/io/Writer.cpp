@@ -246,7 +246,7 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 		for (int j = 0; j < _centers.rows; j++)
 		{
 			float distance = (float) _metric->distance(_items.row(index), _centers.row(j));
-			distToCenters.at<float>(index, j) = distance;
+			distToCenters.at<float>(i, j) = distance;
 
 			maxDistanceToCenter = distance > maxDistanceToCenter ? distance : maxDistanceToCenter;
 		}
@@ -260,7 +260,4 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	cv::Mat imageDistToCenter;
 	distToCenters.convertTo(imageDistToCenter, CV_8UC1, 255 / maxDistanceToCenter, 0);
 	cv::imwrite(_outputFolder + "distanceToCenter.png", imageDistToCenter);
-
-	std::cout << "DBP (max: " << maxDistanceBetween << ")\n" << distBetweenPoints << "\n---\n" << imageDistBetweenPoints << "\n---\n" << std::endl;
-	std::cout << "DTC (max: " << maxDistanceToCenter << ")\n" << distToCenters << "\n---\n" << imageDistToCenter << "\n---\n" << std::endl;
 }

@@ -72,7 +72,7 @@ int main(int _argn, char **_argv)
 			descriptors = cv::Mat::zeros(cloud->size(), coordinatesNumber, CV_32FC1);
 			for (size_t i = 0; i < cloud->size(); i++)
 				memcpy(descriptors.row(i).data, cloud->at(i).data, sizeof(float) * coordinatesNumber);
-			/**************************************************/
+			/*////////////////////////////////////////////////*/
 
 			// Create an 'elbow criterion' graph using kmeans
 			if (params.genElbowCurve)
