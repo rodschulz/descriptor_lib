@@ -93,6 +93,7 @@ int main(int _argn, char **_argv)
 				KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 
 			// Generate outputs
+			std::cout << "Writing outputs" << std::endl;
 			Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
 			pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
 			Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);

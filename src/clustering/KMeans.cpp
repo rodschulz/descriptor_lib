@@ -44,15 +44,16 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
 	std::vector<int> itemsPerCenter;
-	std::vector<double> sseSeries;
+	std::vector<double> minSSECurve;
 
-	double currentSSE = std::numeric_limits<double>::max();
+	double minSSE = std::numeric_limits<double>::max();
 	for (int i = 0; i < _attempts; i++)
 	{
 		std::cout << "\t** attempt " << i << std::endl;
 
 		cv::Mat centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 		cv::Mat labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
+		std::vector<double> sseCurve;
 
 		// Select some of the elements as the staring points
 		selectStartCenters(_items, centers);
@@ -60,12 +61,11 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		/**************************************************
 		 * Only for debug
 		 *
-		_items.row(0).copyTo(centers.row(0));
-		_items.row(10).copyTo(centers.row(1));
-		_items.row(20).copyTo(centers.row(2));
-		_items.row(30).copyTo(centers.row(3));
-		/*////////////////////////////////////////////////*/
-
+		 _items.row(0).copyTo(centers.row(0));
+		 _items.row(10).copyTo(centers.row(1));
+		 _items.row(20).copyTo(centers.row(2));
+		 _items.row(30).copyTo(centers.row(3));
+		 /*/ ///////////////////////////////////////////////*/
 		// Iterate until the desired max iterations
 		std::vector<int> itemCount;
 		for (int j = 0; j < _maxIterations; j++)
@@ -78,7 +78,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 				labels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
 			// Store SSE evolution
-			sseSeries.push_back(calculateSSE(_items, labels, centers, _metric));
+			sseCurve.push_back(calculateSSE(_items, labels, centers, _metric));
 
 			// Calculate updated centers and check has to stop
 			cv::Mat newCenters = _metric.calculateCenters(_clusterNumber, _items, labels, itemCount);
@@ -95,24 +95,25 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 
 		//print<int>(labels);
 
-		double finalSSE = calculateSSE(_items, labels, centers, _metric);
-		std::cout << "\tSSE: " << std::fixed << finalSSE << std::endl;
+		double sse = calculateSSE(_items, labels, centers, _metric);
+		std::cout << "\tSSE: " << std::fixed << sse << std::endl;
 
-		if (finalSSE < currentSSE)
+		if (sse < minSSE)
 		{
 			labels.copyTo(_labels);
 			centers.copyTo(_centers);
-			currentSSE = finalSSE;
+			minSSE = sse;
 			itemsPerCenter = itemCount;
+			minSSECurve = sseCurve;
 		}
 	}
 
-	std::cout << "KMeans finished\n";
+	std::cout << "KMeans finished\nmin SSE: " << minSSE << "\n";
 	for (size_t i = 0; i < itemsPerCenter.size(); i++)
 		std::cout << "\tcluster " << i << ": " << itemsPerCenter[i] << " points\n";
 
 	std::cout << "Generating SSE plot" << std::endl;
-	Writer::writePlotSSE("sse", "SSE Evolution", sseSeries);
+	Writer::writePlotSSE("sse", "SSE Evolution", minSSECurve);
 }
 
 void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
