@@ -231,23 +231,23 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 		{
 			int index2 = data[j].first;
 			float distance = (float) _metric->distance(_items.row(index1), _items.row(index2));
-			distBetweenPoints.at<float>(index1, index2) = distance;
+			distBetweenPoints.at<float>(i, j) = distance;
 
 			maxDistanceBetween = distance > maxDistanceBetween ? distance : maxDistanceBetween;
 		}
 	}
 
 	// Generate a matrix of distances to the centers
+	int pixels = 40;
 	float maxDistanceToCenter = 0;
-	cv::Mat distToCenters = cv::Mat::zeros(_items.rows, _centers.rows, CV_32FC1);
+	cv::Mat distToCenters = cv::Mat::zeros(_items.rows, _centers.rows * pixels, CV_32FC1);
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index = data[i].first;
 		for (int j = 0; j < _centers.rows; j++)
 		{
 			float distance = (float) _metric->distance(_items.row(index), _centers.row(j));
-			distToCenters.at<float>(i, j) = distance;
-
+			distToCenters.row(i).colRange(j * pixels, (j + 1) * pixels) = distance;
 			maxDistanceToCenter = distance > maxDistanceToCenter ? distance : maxDistanceToCenter;
 		}
 	}

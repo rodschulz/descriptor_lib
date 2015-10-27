@@ -86,7 +86,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 
 			// Update centers
 			newCenters.copyTo(centers);
-			if (thresholdReached && false)
+			if (thresholdReached)
 			{
 				std::cout << "\tthreshold reached --> [attempt: " << i << " - iteration: " << j << "]" << std::endl;
 				break;
