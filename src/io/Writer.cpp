@@ -227,11 +227,13 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index1 = data[i].first;
-		for (size_t j = 0; j < data.size(); j++)
+		//for (size_t j = 0; j < data.size(); j++)
+		for (size_t j = 0; j <= i; j++)
 		{
 			int index2 = data[j].first;
 			float distance = (float) _metric->distance(_items.row(index1), _items.row(index2));
 			distBetweenPoints.at<float>(i, j) = distance;
+			distBetweenPoints.at<float>(j, i) = distance;
 
 			maxDistanceBetween = distance > maxDistanceBetween ? distance : maxDistanceBetween;
 		}
