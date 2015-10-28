@@ -63,6 +63,8 @@ ClosestPermutationMetric::Permutation ClosestPermutationMetric::getClosestPermut
 {
 	if (_vector1.cols != _vector2.cols || _vector1.rows != _vector2.rows)
 		throw std::runtime_error("Invalid matrix dimensions in distance");
+	if (_vector1.cols % permutationSize != 0 && _vector2.cols % permutationSize != 0)
+		throw std::runtime_error("Permutation size incompatible with vector lenghts");
 
 	// Number of permutations to be evaluated
 	int permutationNumber = std::floor(_vector1.cols / permutationSize);

@@ -12,6 +12,11 @@
 #include "Helper.h"
 #include "../factories/MetricFactory.h"
 
+enum ExecutionType
+{
+	EXECUTION_NONE, EXECUTION_DESCRIPTOR, EXECUTION_CLUSTERING, EXECUTION_METRIC
+};
+
 enum SynCloudType
 {
 	CLOUD_NONE, CLOUD_CUBE, CLOUD_CYLINDER, CLOUD_SPHERE
@@ -40,6 +45,7 @@ public:
 	{
 	}
 
+	static ExecutionType getExecutionType(const std::string &_type);
 	static SynCloudType getSynCloudType(const std::string &_type);
 	static SmoothingType getSmoothingType(const std::string &_type);
 	static SequenceStat getStatType(const std::string &_type);
@@ -51,7 +57,7 @@ public:
 	double getBandsAngularStep() const;
 	int getSequenceLength() const;
 
-	bool normalExecution;				// Flag indicating if the execution has to be normal or a clustering evaluation
+	ExecutionType executionType;			// Type of execution to run
 
 	std::string inputLocation;			// Location of the input file
 	int targetPoint;				// Target point
@@ -82,4 +88,7 @@ public:
 	double stopThreshold;				// Clustering stop threshold
 	int attempts;					// Number of attemtps to try when clustering
 	std::string cacheLocation;			// Location of the cachefiles
+
+	MetricType targetMetric;			// Metric type to be used in the metric evaluation
+	std::vector<std::string> metricArgs;		// Arguments to initialize the target metric
 };

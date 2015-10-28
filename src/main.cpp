@@ -35,68 +35,73 @@ int main(int _argn, char **_argv)
 		ExecutionParams params = Config::getExecutionParams();
 		pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
 
-		// Load cloud
-		if (!Helper::loadCloud(cloud, params))
-			throw std::runtime_error("Can't load cloud");
-		std::cout << "Loaded " << cloud->size() << " points in cloud\n";
-
-		// Select execution type
-		if (params.normalExecution)
-		{
-			std::cout << "Target point: " << params.targetPoint << "\n";
-
-			pcl::PointNormal target = cloud->at(params.targetPoint);
-			std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
-
-			// Calculate histograms
-			std::cout << "Generating angle histograms\n";
-			std::vector<Hist> histograms;
-			Calculator::calculateAngleHistograms(bands, histograms, params.useProjection);
-
-			// Write output
-			std::cout << "Writing output\n";
-			Writer::writeOuputData(cloud, bands, histograms, params);
-		}
+		if (params.executionType == EXECUTION_METRIC)
+			Helper::evaluateMetricCases("./output/metricEvaluation", "./input/testcases.json", params.targetMetric, params.metricArgs);
 		else
 		{
-			std::cout << "Execution for clustering\n";
+			// Load cloud
+			if (!Helper::loadCloud(cloud, params))
+				throw std::runtime_error("Can't load cloud");
+			std::cout << "Loaded " << cloud->size() << " points in cloud\n";
 
-			cv::Mat descriptors = cv::Mat::zeros(cloud->size(), params.getSequenceLength() * params.bandNumber, CV_32FC1);
-			if (!Helper::loadDescriptorsCache(descriptors, params))
-				Helper::generateDescriptorsCache(cloud, params, descriptors);
+			// Select execution type
+			if (params.executionType == EXECUTION_DESCRIPTOR)
+			{
+				std::cout << "Target point: " << params.targetPoint << "\n";
 
-			/**************************************************
-			 * Only for debug
-			 *
-			int coordinatesNumber = 3;
-			descriptors = cv::Mat::zeros(cloud->size(), coordinatesNumber, CV_32FC1);
-			for (size_t i = 0; i < cloud->size(); i++)
-				memcpy(descriptors.row(i).data, cloud->at(i).data, sizeof(float) * coordinatesNumber);
-			/*////////////////////////////////////////////////*/
+				pcl::PointNormal target = cloud->at(params.targetPoint);
+				std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
 
-			// Create an 'elbow criterion' graph using kmeans
-			if (params.genElbowCurve)
-				Helper::generateElbowGraph(descriptors, params);
+				// Calculate histograms
+				std::cout << "Generating angle histograms\n";
+				std::vector<Hist> histograms;
+				Calculator::calculateAngleHistograms(bands, histograms, params.useProjection);
 
-			std::cout << "Calculating clusters\n";
+				// Write output
+				std::cout << "Writing output\n";
+				Writer::writeOuputData(cloud, bands, histograms, params);
+			}
+			else if (params.executionType == EXECUTION_CLUSTERING)
+			{
+				std::cout << "Execution for clustering\n";
 
-			// Make clusters of data
-			cv::Mat labels, centers;
-			MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength());
-			if (params.implementation == CLUSTERING_OPENCV)
-				cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
+				cv::Mat descriptors = cv::Mat::zeros(cloud->size(), params.getSequenceLength() * params.bandNumber, CV_32FC1);
+				if (!Helper::loadDescriptorsCache(descriptors, params))
+					Helper::generateDescriptorsCache(cloud, params, descriptors);
 
-			else if (params.implementation == CLUSTERING_CUSTOM)
-				KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+				/**************************************************
+				 * Only for debug: points positions
+				 *
+				 int coordinatesNumber = 3;
+				 descriptors = cv::Mat::zeros(cloud->size(), coordinatesNumber, CV_32FC1);
+				 for (size_t i = 0; i < cloud->size(); i++)
+				 memcpy(descriptors.row(i).data, cloud->at(i).data, sizeof(float) * coordinatesNumber);
+				 /*/ ///////////////////////////////////////////////*/
 
-			else if (params.implementation == CLUSTERING_STOCHASTIC)
-				KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+				// Create an 'elbow criterion' graph using kmeans
+				if (params.genElbowCurve)
+					Helper::generateElbowGraph(descriptors, params);
 
-			// Generate outputs
-			std::cout << "Writing outputs" << std::endl;
-			Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
-			pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
-			Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
+				std::cout << "Calculating clusters\n";
+
+				// Make clusters of data
+				cv::Mat labels, centers;
+				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength());
+				if (params.implementation == CLUSTERING_OPENCV)
+					cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
+
+				else if (params.implementation == CLUSTERING_CUSTOM)
+					KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+
+				else if (params.implementation == CLUSTERING_STOCHASTIC)
+					KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+
+				// Generate outputs
+				std::cout << "Writing outputs" << std::endl;
+				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
+				pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
+				Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
+			}
 		}
 	}
 	catch (std::exception &_ex)

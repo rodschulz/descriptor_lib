@@ -1,5 +1,5 @@
-# Selector between normal calculation and clustering evaluation
-normalExec	false	
+# Selector between execution type (descriptor, clustering, metric)
+executionType	metric
 
 ##############################
 # Filter parameters (gaussian, mls or none)
@@ -20,9 +20,9 @@ genElbowCurve	false
 implementation	custom
 
 # Clustering options (metric can be euclidean or closestPermutation)
-metric		euclidean
+metric		closestPermutation
 clusters	4
-maxIter		200
+maxIter		500
 stopThres	0.000001
 attempts	5
 cacheLocation	./cache/
@@ -38,9 +38,15 @@ bidirectional	false
 useProjection	false
 
 # Sequence calculation (stat can be mean or median)
-sequenceBin	0.01
+sequenceBin	0.005
 sequenceStat	mean
 
+##############################
 # Use of synthetic clouds (cube, cylinder or sphere)
 useSynthetic	false
 synCloudType	cube
+
+##############################
+# Metric test case evaluation (metric can be euclidean or closestPermutation)
+targetMetric	closestPermutation
+permutationSize	1

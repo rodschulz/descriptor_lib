@@ -12,7 +12,11 @@
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/common/io.h>
 #include <Eigen/Geometry>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 #include <ctype.h>
+#include <stdexcept>
 #include "ExecutionParams.h"
 #include "../factories/CloudFactory.h"
 #include "../factories/PointFactory.h"
@@ -408,4 +412,61 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 	}
 
 	return output;
+}
+
+void Helper::evaluateMetricCases(const std::string &_resultsFilename, const std::string &_testcasesFilename, const MetricType &_metricType, const std::vector<std::string> &_args)
+{
+	MetricPtr targetMetric;
+	if (_metricType == METRIC_EUCLIDEAN)
+		targetMetric = MetricPtr(new EuclideanMetric());
+	else if (_metricType == METRIC_CLOSEST_PERMUTATION)
+		targetMetric = MetricPtr(new ClosestPermutationMetric(atoi(_args[0].c_str())));
+	else
+		throw std::runtime_error("Invalid metric type");
+
+	// Extract the testcases
+	boost::property_tree::ptree tree;
+	boost::property_tree::read_json(_testcasesFilename, tree);
+
+	std::cout << "Test cases loaded" << std::endl;
+
+	int k = 0;
+	bool shift = true;
+	std::vector<std::vector<float> > data1, data2;
+	BOOST_FOREACH (boost::property_tree::ptree::value_type& testCase, tree.get_child("vectors")){
+	// Generate arrays for the vectors of this testcase
+	data1.push_back(std::vector<float>());
+	data2.push_back(std::vector<float>());
+
+	// Iterate over the array of vectors
+	BOOST_FOREACH (boost::property_tree::ptree::value_type& vectors, testCase.second)
+	{
+		// Extract data for a vector
+		BOOST_FOREACH (boost::property_tree::ptree::value_type& vector, vectors.second)
+		{
+			float value = vector.second.get_value<float>();
+			shift ? data1[k].push_back(value) : data2[k].push_back(value);
+		}
+
+		shift = !shift;
+	}
+	k++;
+}
+
+	std::cout << "Evaluating metric" << std::endl;
+
+	// Evaluate each testcase and write the results
+	std::ofstream results;
+	results.open(_resultsFilename.c_str(), std::ofstream::out);
+	for (size_t i = 0; i < data1.size(); i++)
+	{
+		cv::Mat vector1 = cv::Mat(data1[i]).t();
+		cv::Mat vector2 = cv::Mat(data2[i]).t();
+		double distance = targetMetric->distance(vector1, vector2);
+
+		results << vector1 << "\n" << vector2 << "\ndistance = " << distance << "\n\n";
+	}
+	results.close();
+
+	std::cout << "Metric evaluated" << std::endl;
 }

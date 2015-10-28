@@ -6,7 +6,7 @@
 
 ExecutionParams::ExecutionParams()
 {
-	normalExecution = true;
+	executionType = EXECUTION_NONE;
 
 	targetPoint = 1000;
 
@@ -35,6 +35,19 @@ ExecutionParams::ExecutionParams()
 	maxIterations = 10000;
 	stopThreshold = 0.001;
 	attempts = 1;
+
+	targetMetric = METRIC_NONE;
+}
+
+ExecutionType ExecutionParams::getExecutionType(const std::string &_type)
+{
+	if (boost::iequals(_type, "descriptor"))
+		return EXECUTION_DESCRIPTOR;
+	else if (boost::iequals(_type, "clustering"))
+		return EXECUTION_CLUSTERING;
+	else if (boost::iequals(_type, "metric"))
+		return EXECUTION_METRIC;
+	return EXECUTION_NONE;
 }
 
 SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)

@@ -64,8 +64,8 @@ void Config::parse(const std::string _key, const std::string _value)
 {
 	/*****************************/
 	// Execution type selection
-	if (boost::iequals(_key, "normalExec"))
-		getInstance()->params.normalExecution = boost::iequals(_value, "true");
+	if (boost::iequals(_key, "executionType"))
+		getInstance()->params.executionType = ExecutionParams::getExecutionType(_value);
 
 	/*****************************/
 	// Clustering parameters
@@ -76,7 +76,7 @@ void Config::parse(const std::string _key, const std::string _value)
 		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(_value);
 
 	else if (boost::iequals(_key, "metric"))
-			getInstance()->params.metric = ExecutionParams::getMetricType(_value);
+		getInstance()->params.metric = ExecutionParams::getMetricType(_value);
 
 	else if (boost::iequals(_key, "clusters"))
 		getInstance()->params.clusters = atoi(_value.c_str());
@@ -145,4 +145,17 @@ void Config::parse(const std::string _key, const std::string _value)
 
 	else if (boost::iequals(_key, "mlsRadius"))
 		getInstance()->params.mlsRadius = atof(_value.c_str());
+
+	/*****************************/
+	// Smoothing params
+	else if (boost::iequals(_key, "targetMetric"))
+		getInstance()->params.targetMetric = ExecutionParams::getMetricType(_value);
+
+	else if (boost::iequals(_key, "permutationSize"))
+	{
+		std::vector<std::string> args;
+		std::istringstream iss(_value);
+		std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(args));
+		getInstance()->params.metricArgs = args;
+	}
 }
