@@ -17,7 +17,7 @@
 #include "factories/MetricFactory.h"
 #include "io/Writer.h"
 
-#define CONFIG_LOCATION "./config/config"
+#define CONFIG_LOCATION "./config/config.yaml"
 
 int main(int _argn, char **_argv)
 {
@@ -29,10 +29,15 @@ int main(int _argn, char **_argv)
 			std::cout << "WARNING: can't clean output folder\n";
 
 		std::cout << "Loading configuration file\n";
-		if (!Config::load(CONFIG_LOCATION, _argn, _argv))
-			throw std::runtime_error("Can't read configuration file at " CONFIG_LOCATION);
-
+		if (!Config::load(CONFIG_LOCATION))
+			throw std::runtime_error("Problem reading configuration file at " CONFIG_LOCATION);
 		ExecutionParams params = Config::getExecutionParams();
+
+		// Check if enough params were given
+		if (_argn < 2 && !params.useSynthetic)
+			std::cout << "Not enough parameters\nUsage:\tDescriptor <target_cloud_file.pcd>";
+		params.inputLocation = _argv[1];
+
 		pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
 
 		if (params.executionType == EXECUTION_METRIC)
@@ -77,7 +82,6 @@ int main(int _argn, char **_argv)
 				 for (size_t i = 0; i < cloud->size(); i++)
 				 memcpy(descriptors.row(i).data, cloud->at(i).data, sizeof(float) * coordinatesNumber);
 				 /*/ ///////////////////////////////////////////////*/
-
 				// Create an 'elbow criterion' graph using kmeans
 				if (params.genElbowCurve)
 					Helper::generateElbowGraph(descriptors, params);

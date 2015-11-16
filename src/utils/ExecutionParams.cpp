@@ -94,7 +94,7 @@ MetricType ExecutionParams::getMetricType(const std::string &_type)
 {
 	if (boost::iequals(_type, "euclidean"))
 		return METRIC_EUCLIDEAN;
-	else if (boost::iequals(_type, "closestPermutation"))
+	else if (boost::iequals(_type, "closest"))
 		return METRIC_CLOSEST_PERMUTATION;
 	return METRIC_NONE;
 }

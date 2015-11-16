@@ -20,8 +20,7 @@ public:
 	}
 
 	// Loads the configuration file
-	static bool load(const std::string &_filename, int _argn, char **_argv);
-
+	static bool load(const std::string &_filename);
 	static inline ExecutionParams getExecutionParams()
 	{
 		return getInstance()->params;
@@ -29,7 +28,5 @@ public:
 
 private:
 	Config();
-	static void parse(const std::string _key, const std::string _value);
-
 	ExecutionParams params;
 };

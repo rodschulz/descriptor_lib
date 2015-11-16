@@ -4,9 +4,11 @@ project(PCL_DESCRIPTOR)
 
 find_package(PCL 1.7 REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
+
 add_definitions(${PCL_DEFINITIONS})
 add_definitions ("-Wall")
 
@@ -30,4 +32,5 @@ target_link_libraries(Descriptor io
 			descriptor
 			factories
 			${PCL_LIBRARIES}
-			${OpenCV_LIBS})
+			${OpenCV_LIBS}
+			${YAML_CPP_LIBRARIES})

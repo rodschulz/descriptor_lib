@@ -11,6 +11,7 @@
 #include <math.h>
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include <yaml-cpp/yaml.h>
 
 Config::Config()
 {
@@ -20,142 +21,66 @@ Config::~Config()
 {
 }
 
-bool Config::load(const std::string &_filename, int _argn, char **_argv)
+bool Config::load(const std::string &_filename)
 {
 	bool loadOk = true;
-
-	std::string line;
-	std::ifstream inputFile;
-	inputFile.open(_filename.c_str(), std::fstream::in);
-	if (inputFile.is_open())
+	try
 	{
-		while (getline(inputFile, line))
-		{
-			if (line.empty() || line[0] == '#')
-				continue;
+		YAML::Node config = YAML::LoadFile(_filename);
 
-			std::vector<std::string> tokens;
-			std::istringstream iss(line);
-			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
+		// Execution type
+		getInstance()->params.executionType = ExecutionParams::getExecutionType(config["executionType"].as<std::string>());
 
-			parse(tokens[0], tokens[1]);
-		}
-		inputFile.close();
+		// Descriptor calculation
+		getInstance()->params.targetPoint = config["descriptor"]["targetPoint"].as<int>();
 
-		if (_argn < 2 && !getInstance()->params.useSynthetic)
-		{
-			loadOk = false;
-			std::cout << "Not enough parameters\n";
-		}
-		else if (_argn >= 2)
-			getInstance()->params.inputLocation = _argv[1];
+		getInstance()->params.patchSize = config["descriptor"]["patchSize"].as<double>();
+		getInstance()->params.normalEstimationRadius = config["descriptor"]["normalRadius"].as<double>();
+		getInstance()->params.bandNumber = config["descriptor"]["bandNumber"].as<int>();
+		getInstance()->params.bandWidth = config["descriptor"]["bandWidth"].as<double>();
+		getInstance()->params.bidirectional = config["descriptor"]["bidirectional"].as<bool>();
+		getInstance()->params.useProjection = config["descriptor"]["useProjection"].as<bool>();
 
+		getInstance()->params.sequenceBin = config["descriptor"]["sequenceBin"].as<double>();
+		getInstance()->params.sequenceStat = ExecutionParams::getStatType(config["descriptor"]["sequenceStat"].as<std::string>());
+
+		// Clustering generation
+		getInstance()->params.genElbowCurve = config["clustering"]["generateElbowCurve"].as<bool>();
+
+		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(config["clustering"]["implementation"].as<std::string>());
+
+		getInstance()->params.metric = ExecutionParams::getMetricType(config["clustering"]["metric"].as<std::string>());
+		getInstance()->params.clusters = config["clustering"]["clusters"].as<int>();
+		getInstance()->params.maxIterations = config["clustering"]["maxIterations"].as<int>();
+		getInstance()->params.stopThreshold = config["clustering"]["stopThreshold"].as<double>();
+		getInstance()->params.attempts = config["clustering"]["attempts"].as<int>();
+		getInstance()->params.cacheLocation = config["clustering"]["cacheLocation"].as<std::string>();
+
+		// Metric testcase evaluation
+		getInstance()->params.targetMetric = ExecutionParams::getMetricType(config["metric"]["targetMetric"].as<std::string>());
+
+		std::vector<std::string> args;
+		std::istringstream iss(config["metric"]["metricArgs"].as<std::string>());
+		std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(args));
+		getInstance()->params.metricArgs = args;
+
+		// Cloud smoothing params
+		getInstance()->params.smoothingType = ExecutionParams::getSmoothingType(config["cloudSmoothing"]["type"].as<std::string>());
+
+		getInstance()->params.gaussianSigma = config["cloudSmoothing"]["gaussian"]["sigma"].as<double>();
+		getInstance()->params.gaussianRadius = config["cloudSmoothing"]["gaussian"]["radius"].as<double>();
+
+		getInstance()->params.mlsRadius = config["cloudSmoothing"]["mls"]["radius"].as<double>();
+
+		// Synthetic cloud generation
+		getInstance()->params.useSynthetic = config["syntheticClouds"]["generateCloud"].as<bool>();
+		getInstance()->params.synCloudType = ExecutionParams::getSynCloudType(config["syntheticClouds"]["type"].as<std::string>());
 	}
-	else
+	catch (std::exception &_ex)
 	{
+		std::cout << "ERROR: " << _ex.what() << std::endl;
 		loadOk = false;
-		std::cout << "Unable to open input: " << _filename;
 	}
 
 	return loadOk;
-}
-
-void Config::parse(const std::string _key, const std::string _value)
-{
-	/*****************************/
-	// Execution type selection
-	if (boost::iequals(_key, "executionType"))
-		getInstance()->params.executionType = ExecutionParams::getExecutionType(_value);
-
-	/*****************************/
-	// Clustering parameters
-	else if (boost::iequals(_key, "genElbowCurve"))
-		getInstance()->params.genElbowCurve = boost::iequals(_value, "true");
-
-	else if (boost::iequals(_key, "implementation"))
-		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(_value);
-
-	else if (boost::iequals(_key, "metric"))
-		getInstance()->params.metric = ExecutionParams::getMetricType(_value);
-
-	else if (boost::iequals(_key, "clusters"))
-		getInstance()->params.clusters = atoi(_value.c_str());
-
-	else if (boost::iequals(_key, "maxIter"))
-		getInstance()->params.maxIterations = atoi(_value.c_str());
-
-	else if (boost::iequals(_key, "stopThres"))
-		getInstance()->params.stopThreshold = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "attempts"))
-		getInstance()->params.attempts = atoi(_value.c_str());
-
-	else if (boost::iequals(_key, "cacheLocation"))
-		getInstance()->params.cacheLocation = _value.c_str();
-
-	/*****************************/
-	// Descriptor calculation
-	else if (boost::iequals(_key, "targetPoint"))
-		getInstance()->params.targetPoint = atoi(_value.c_str());
-
-	else if (boost::iequals(_key, "patchSize"))
-		getInstance()->params.patchSize = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "normalRadius"))
-		getInstance()->params.normalEstimationRadius = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "bandNumber"))
-		getInstance()->params.bandNumber = atoi(_value.c_str());
-
-	else if (boost::iequals(_key, "bandWidth"))
-		getInstance()->params.bandWidth = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "bidirectional"))
-		getInstance()->params.bidirectional = boost::iequals(_value, "true");
-
-	else if (boost::iequals(_key, "useProjection"))
-		getInstance()->params.useProjection = boost::iequals(_value, "true");
-
-	/*****************************/
-	// Sequence calculation
-	else if (boost::iequals(_key, "sequenceBin"))
-		getInstance()->params.sequenceBin = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "sequenceStat"))
-		getInstance()->params.sequenceStat = ExecutionParams::getStatType(_value);
-
-	/*****************************/
-	// Use of synthetic clouds
-	else if (boost::iequals(_key, "useSynthetic"))
-		getInstance()->params.useSynthetic = boost::iequals(_value, "true");
-
-	else if (boost::iequals(_key, "synCloudType"))
-		getInstance()->params.synCloudType = ExecutionParams::getSynCloudType(_value);
-
-	/*****************************/
-	// Smoothing params
-	else if (boost::iequals(_key, "smoothingType"))
-		getInstance()->params.smoothingType = ExecutionParams::getSmoothingType(_value);
-
-	else if (boost::iequals(_key, "gaussianSigma"))
-		getInstance()->params.gaussianSigma = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "gaussianRadius"))
-		getInstance()->params.gaussianRadius = atof(_value.c_str());
-
-	else if (boost::iequals(_key, "mlsRadius"))
-		getInstance()->params.mlsRadius = atof(_value.c_str());
-
-	/*****************************/
-	// Smoothing params
-	else if (boost::iequals(_key, "targetMetric"))
-		getInstance()->params.targetMetric = ExecutionParams::getMetricType(_value);
-
-	else if (boost::iequals(_key, "permutationSize"))
-	{
-		std::vector<std::string> args;
-		std::istringstream iss(_value);
-		std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(args));
-		getInstance()->params.metricArgs = args;
-	}
 }
