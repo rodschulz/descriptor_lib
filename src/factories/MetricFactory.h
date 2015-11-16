@@ -25,9 +25,11 @@ public:
 				break;
 
 			case METRIC_CLOSEST_PERMUTATION:
+			{
 				va_list argsList;
 				va_start(argsList, _type);
-				metric = MetricPtr(new ClosestPermutationMetric(va_arg(argsList, int)));
+				metric = MetricPtr(new ClosestPermutationMetric(va_arg(argsList, int), va_arg(argsList, int) == 1));
+			}
 				break;
 
 			default:

@@ -88,6 +88,7 @@ public:
 	double stopThreshold;				// Clustering stop threshold
 	int attempts;					// Number of attemtps to try when clustering
 	std::string cacheLocation;			// Location of the cachefiles
+	bool useConfidence;				// Use confidence, if the metric allows it
 
 	MetricType targetMetric;			// Metric type to be used in the metric evaluation
 	std::vector<std::string> metricArgs;		// Arguments to initialize the target metric

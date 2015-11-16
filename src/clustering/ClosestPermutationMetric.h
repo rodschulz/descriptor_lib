@@ -9,7 +9,7 @@
 class ClosestPermutationMetric: public Metric
 {
 public:
-	ClosestPermutationMetric(const int _permutationSize);
+	ClosestPermutationMetric(const int _permutationSize, const bool _useConfidence);
 	~ClosestPermutationMetric();
 
 	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
@@ -17,6 +17,7 @@ public:
 
 private:
 	int permutationSize;
+	bool useConfidence;
 
 	struct Permutation
 	{

@@ -35,6 +35,7 @@ ExecutionParams::ExecutionParams()
 	maxIterations = 10000;
 	stopThreshold = 0.001;
 	attempts = 1;
+	useConfidence = false;
 
 	targetMetric = METRIC_NONE;
 }

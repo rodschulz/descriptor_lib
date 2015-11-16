@@ -420,7 +420,7 @@ void Helper::evaluateMetricCases(const std::string &_resultsFilename, const std:
 	if (_metricType == METRIC_EUCLIDEAN)
 		targetMetric = MetricPtr(new EuclideanMetric());
 	else if (_metricType == METRIC_CLOSEST_PERMUTATION)
-		targetMetric = MetricPtr(new ClosestPermutationMetric(atoi(_args[0].c_str())));
+		targetMetric = MetricPtr(new ClosestPermutationMetric(atoi(_args[0].c_str()), _args[1].compare("true") == 0));
 	else
 		throw std::runtime_error("Invalid metric type");
 

@@ -55,12 +55,14 @@ bool Config::load(const std::string &_filename)
 		getInstance()->params.stopThreshold = config["clustering"]["stopThreshold"].as<double>();
 		getInstance()->params.attempts = config["clustering"]["attempts"].as<int>();
 		getInstance()->params.cacheLocation = config["clustering"]["cacheLocation"].as<std::string>();
+		getInstance()->params.useConfidence = config["clustering"]["useConfidence"].as<bool>();
 
 		// Metric testcase evaluation
 		getInstance()->params.targetMetric = ExecutionParams::getMetricType(config["metric"]["targetMetric"].as<std::string>());
 
 		std::vector<std::string> args;
-		std::istringstream iss(config["metric"]["metricArgs"].as<std::string>());
+		std::string str = config["metric"]["metricArgs"].as<std::string>();
+		std::istringstream iss(str.substr(0, str.find_last_of('#')));
 		std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(args));
 		getInstance()->params.metricArgs = args;
 

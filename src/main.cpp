@@ -35,7 +35,7 @@ int main(int _argn, char **_argv)
 
 		// Check if enough params were given
 		if (_argn < 2 && !params.useSynthetic)
-			std::cout << "Not enough parameters\nUsage:\tDescriptor <target_cloud_file.pcd>";
+			std::cout << "Not enough parameters\nUsage:\tDescriptor <input_file>";
 		params.inputLocation = _argv[1];
 
 		pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
@@ -90,7 +90,7 @@ int main(int _argn, char **_argv)
 
 				// Make clusters of data
 				cv::Mat labels, centers;
-				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength());
+				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
 				if (params.implementation == CLUSTERING_OPENCV)
 					cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
 

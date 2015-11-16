@@ -6,9 +6,10 @@
 #include <iostream>
 #include <stdexcept>
 
-ClosestPermutationMetric::ClosestPermutationMetric(const int _permutationSize)
+ClosestPermutationMetric::ClosestPermutationMetric(const int _permutationSize, const bool _useConfidence)
 {
 	permutationSize = _permutationSize;
+	useConfidence = _useConfidence;
 }
 
 ClosestPermutationMetric::~ClosestPermutationMetric()
@@ -89,24 +90,33 @@ ClosestPermutationMetric::Permutation ClosestPermutationMetric::getClosestPermut
 			float x2 = _vector2.at<float>((baseIndex + j) % _vector1.cols);
 
 			int bandIndex = j / permutationSize;
-			if (x1 > M_PI || x2 > M_PI)
+			if (useConfidence && (x1 > M_PI || x2 > M_PI))
 				bandConfidence[bandIndex] -= subtract;
 			else
 				bandDistance[bandIndex] += (x1 - x2) * (x1 - x2);
 		}
 
-		double confidenceSum = 0;
-		for (int j = 0; j < permutationNumber; j++)
-			confidenceSum += bandConfidence[j];
-
+		// Calculate the actual distance between vectors
 		double distance = 0;
-		if (confidenceSum > 0)
+		double confidenceSum = 0;
+		if (useConfidence)
 		{
 			for (int j = 0; j < permutationNumber; j++)
-				distance += (bandDistance[j] * bandConfidence[j] / confidenceSum);
+				confidenceSum += bandConfidence[j];
+			if (confidenceSum > 0)
+			{
+				for (int j = 0; j < permutationNumber; j++)
+					distance += (bandDistance[j] * bandConfidence[j] / confidenceSum);
+			}
+			else
+				distance = std::numeric_limits<double>::max();
 		}
 		else
-			distance = std::numeric_limits<double>::max();
+		{
+			for (size_t j = 0; j < bandDistance.size(); j++)
+				distance += bandDistance[j];
+			distance = sqrt(distance);
+		}
 
 		// Check if the permutation is closer
 		if (distance < minDistance)

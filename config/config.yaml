@@ -1,6 +1,6 @@
 ---
 # execution type (descriptor, clustering or metric)
-executionType: clustering
+executionType: metric
 
 ##### execution types #####
 # descriptor calculation execution params
@@ -29,11 +29,12 @@ clustering:
     stopThreshold: 0.000001
     attempts: 5
     cacheLocation: ./cache/
+    useConfidence: false # use confidence when the metric allows it
 
 # metric testcase evaluation params
 metric:
     targetMetric: closest # closest or euclidean
-    metricArgs: 1 # arguments passed to the metric
+    metricArgs: 1 false # arguments passed to the metric
 
 ##### cloud smoothing params #####
 cloudSmoothing:
