@@ -46,6 +46,7 @@ bool Config::load(const std::string &_filename)
 
 		// Clustering generation
 		getInstance()->params.genElbowCurve = config["clustering"]["generateElbowCurve"].as<bool>();
+		getInstance()->params.genDistanceMatrix = config["clustering"]["generateDistanceMatrix"].as<bool>();
 
 		getInstance()->params.implementation = ExecutionParams::getClusteringImplementation(config["clustering"]["implementation"].as<std::string>());
 

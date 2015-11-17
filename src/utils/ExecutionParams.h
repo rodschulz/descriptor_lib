@@ -81,6 +81,7 @@ public:
 	double mlsRadius;				// Search radius used for the mls smoothing
 
 	bool genElbowCurve;				// Flag indicating if an elbow graph has to be generated
+	bool genDistanceMatrix;				// Flag indicating if the distance matrix image has to be generated
 	ClusteringImplementation implementation;	// Implementation of clustering to be used
 	MetricType metric;				// Type of metric to use in clustering execution
 	int clusters;					// Number of clusters used in the clustering test

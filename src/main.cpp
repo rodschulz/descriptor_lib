@@ -41,7 +41,7 @@ int main(int _argn, char **_argv)
 		pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
 
 		if (params.executionType == EXECUTION_METRIC)
-			Helper::evaluateMetricCases("./output/metricEvaluation", "./input/testcases.json", params.targetMetric, params.metricArgs);
+			Helper::evaluateMetricCases("./output/metricEvaluation", params.inputLocation, params.targetMetric, params.metricArgs);
 		else
 		{
 			// Load cloud
@@ -102,9 +102,12 @@ int main(int _argn, char **_argv)
 
 				// Generate outputs
 				std::cout << "Writing outputs" << std::endl;
-				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
 				pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
-				Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
+				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
+				Writer::writeClustersCenters("./output/", centers);
+
+				if(params.genDistanceMatrix)
+					Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
 			}
 		}
 	}

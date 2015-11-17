@@ -263,3 +263,40 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	distToCenters.convertTo(imageDistToCenter, CV_8UC1, 255 / maxDistanceToCenter, 0);
 	cv::imwrite(_outputFolder + "distanceToCenter.png", imageDistToCenter);
 }
+
+void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
+{
+	std::string destination = _params.cacheLocation + _params.getHash();
+
+	if (!boost::filesystem::exists(_params.cacheLocation))
+		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
+			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
+
+	std::ofstream cacheFile;
+	cacheFile.open(destination.c_str(), std::fstream::out);
+
+	for (int i = 0; i < _descriptors.rows; i++)
+	{
+		for (int j = 0; j < _descriptors.cols; j++)
+			cacheFile << std::setprecision(15) << _descriptors.at<float>(i, j) << " ";
+		cacheFile << "\n";
+	}
+
+	cacheFile.close();
+}
+
+void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers)
+{
+	std::string destination = _outputFolder + "centers";
+	std::ofstream centersFile;
+	centersFile.open(destination.c_str(), std::fstream::out);
+
+	for (int i = 0; i < _centers.rows; i++)
+	{
+		for (int j = 0; j < _centers.cols; j++)
+			centersFile << std::setprecision(15) << _centers.at<float>(i, j) << " ";
+		centersFile << "\n";
+	}
+
+	centersFile.close();
+}

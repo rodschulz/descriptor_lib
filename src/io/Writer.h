@@ -18,6 +18,8 @@ public:
 	static void writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse);
 	static void writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels);
 	static void writeDistanceMatrix(const std::string &_filename, const cv::Mat &_items, const cv::Mat &_centers, const cv::Mat &_labels, const MetricPtr &_metric);
+	static void writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params);
+	static void writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers);
 
 private:
 	Writer();

@@ -29,6 +29,7 @@ ExecutionParams::ExecutionParams()
 	mlsRadius = 0.02;
 
 	genElbowCurve = false;
+	genDistanceMatrix = false;
 	implementation = CLUSTERING_NONE;
 	metric = METRIC_NONE;
 	clusters = 5;

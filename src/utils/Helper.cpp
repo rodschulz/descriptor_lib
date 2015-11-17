@@ -21,6 +21,7 @@
 #include "../factories/CloudFactory.h"
 #include "../factories/PointFactory.h"
 #include "../descriptor/Calculator.h"
+#include "../io/Writer.h"
 
 boost::random::mt19937 randomGenerator;
 
@@ -265,28 +266,7 @@ void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::P
 	}
 
 	// Save cache to file
-	Helper::writeClusteringCache(_descriptors, _params);
-}
-
-void Helper::writeClusteringCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
-{
-	std::string destination = _params.cacheLocation + _params.getHash();
-
-	if (!boost::filesystem::exists(_params.cacheLocation))
-		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
-			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
-
-	std::ofstream cacheFile;
-	cacheFile.open(destination.c_str(), std::fstream::out);
-
-	for (int i = 0; i < _descriptors.rows; i++)
-	{
-		for (int j = 0; j < _descriptors.cols; j++)
-			cacheFile << std::setprecision(15) << _descriptors.at<float>(i, j) << " ";
-		cacheFile << "\n";
-	}
-
-	cacheFile.close();
+	Writer::writeDescriptorsCache(_descriptors, _params);
 }
 
 double Helper::calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_centers, const cv::Mat &_labels)
@@ -416,6 +396,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 
 void Helper::evaluateMetricCases(const std::string &_resultsFilename, const std::string &_testcasesFilename, const MetricType &_metricType, const std::vector<std::string> &_args)
 {
+	std::cout << "Evaluating metric testcases" << std::endl;
 	MetricPtr targetMetric;
 	if (_metricType == METRIC_EUCLIDEAN)
 		targetMetric = MetricPtr(new EuclideanMetric());
