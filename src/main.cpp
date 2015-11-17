@@ -16,6 +16,7 @@
 #include "utils/ExtractData.h"
 #include "factories/MetricFactory.h"
 #include "io/Writer.h"
+#include "io/Loader.h"
 
 #define CONFIG_LOCATION "./config/config.yaml"
 
@@ -71,34 +72,46 @@ int main(int _argn, char **_argv)
 				std::cout << "Execution for clustering\n";
 
 				cv::Mat descriptors = cv::Mat::zeros(cloud->size(), params.getSequenceLength() * params.bandNumber, CV_32FC1);
-				if (!Helper::loadDescriptorsCache(descriptors, params))
+				if (!Loader::loadDescriptorsCache(descriptors, params))
 					Helper::generateDescriptorsCache(cloud, params, descriptors);
 
-				/**************************************************
-				 * Only for debug: points positions
-				 *
-				 int coordinatesNumber = 3;
-				 descriptors = cv::Mat::zeros(cloud->size(), coordinatesNumber, CV_32FC1);
-				 for (size_t i = 0; i < cloud->size(); i++)
-				 memcpy(descriptors.row(i).data, cloud->at(i).data, sizeof(float) * coordinatesNumber);
-				 /*/ ///////////////////////////////////////////////*/
-				// Create an 'elbow criterion' graph using kmeans
-				if (params.genElbowCurve)
-					Helper::generateElbowGraph(descriptors, params);
-
-				std::cout << "Calculating clusters\n";
-
-				// Make clusters of data
 				cv::Mat labels, centers;
 				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
-				if (params.implementation == CLUSTERING_OPENCV)
-					cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
+				if (false)
+				{
+					// Make clusters of data
+					if (params.implementation == CLUSTERING_OPENCV)
+						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
 
-				else if (params.implementation == CLUSTERING_CUSTOM)
-					KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+					else if (params.implementation == CLUSTERING_CUSTOM)
+						KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
 
-				else if (params.implementation == CLUSTERING_STOCHASTIC)
-					KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+					else if (params.implementation == CLUSTERING_STOCHASTIC)
+						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+				}
+				else
+				{
+					// Label data according to given centers
+					centers = cv::Mat::zeros(5, 32, CV_32FC1);
+					Loader::loadClusterCenters("./input/clusters.centers", centers);
+
+					labels = cv::Mat::zeros(descriptors.rows, 1, CV_32SC1);
+					std::vector<double> distance(descriptors.rows, std::numeric_limits<double>::max());
+					for (int i = 0; i < descriptors.rows; i++)
+					{
+						for (int j = 0; j < centers.rows; j++)
+						{
+							double dist = metric->distance(centers.row(j), descriptors.row(i));
+							if (dist < distance[i])
+							{
+								distance[i] = dist;
+								labels.at<int>(i) = j;
+							}
+						}
+					}
+				}
+
+				std::cout << "Calculating clusters\n";
 
 				// Generate outputs
 				std::cout << "Writing outputs" << std::endl;
@@ -106,8 +119,10 @@ int main(int _argn, char **_argv)
 				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
 				Writer::writeClustersCenters("./output/", centers);
 
-				if(params.genDistanceMatrix)
+				if (params.genDistanceMatrix)
 					Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
+				if (params.genElbowCurve)
+					Helper::generateElbowGraph(descriptors, params);
 			}
 		}
 	}

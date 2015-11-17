@@ -214,42 +214,6 @@ unsigned int Helper::getColor(const int _index)
 	return palette[_index % 12];
 }
 
-bool Helper::loadDescriptorsCache(cv::Mat &_descriptors, const ExecutionParams &_params)
-{
-	bool loadOK = true;
-	std::string filename = _params.cacheLocation + _params.getHash();
-	size_t row = 0;
-
-	std::string line;
-	std::ifstream cacheFile;
-	cacheFile.open(filename.c_str(), std::fstream::in);
-	if (cacheFile.is_open())
-	{
-		while (getline(cacheFile, line))
-		{
-			if (line.empty())
-				continue;
-
-			std::vector<std::string> tokens;
-			std::istringstream iss(line);
-			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
-
-			loadOK = (int) tokens.size() == _descriptors.cols;
-			if (!loadOK)
-				break;
-
-			for (size_t col = 0; col < tokens.size(); col++)
-				_descriptors.at<float>(row, col) = (float) atof(tokens[col].c_str());
-			row++;
-		}
-		cacheFile.close();
-	}
-	else
-		loadOK = false;
-
-	return loadOK;
-}
-
 void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors)
 {
 	std::cout << "Generating descriptors cache\n";

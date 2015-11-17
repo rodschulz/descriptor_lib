@@ -22,7 +22,7 @@ clustering:
     generateElbowCurve: false
     generateDistanceMatrix: false
 
-    implementation: custom # openCV, custom or stochastic
+    implementation: custom # opencv, custom or stochastic
 
     metric: closest # closest or euclidean
     clusters: 20
@@ -35,7 +35,7 @@ clustering:
 # metric testcase evaluation params
 metric:
     targetMetric: closest # closest or euclidean
-    metricArgs: 1 false # arguments passed to the metric
+    metricArgs: 4 false # arguments passed to the metric
 
 ##### cloud smoothing params #####
 cloudSmoothing:

@@ -42,7 +42,7 @@ KMeans::~KMeans()
 void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
-	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
+	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
 	std::vector<int> itemsPerCenter;
 	std::vector<double> minSSECurve;
 
@@ -52,7 +52,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		std::cout << "\t** attempt " << i << std::endl;
 
 		cv::Mat centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
-		cv::Mat labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
+		cv::Mat labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
 		std::vector<double> sseCurve;
 
 		// Select some of the elements as the staring points
@@ -119,7 +119,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
-	_labels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
+	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
 
 	double bestSSE = std::numeric_limits<double>::max();
 	for (int i = 0; i < _attempts; i++)
@@ -127,8 +127,8 @@ void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterN
 		std::cout << "\t** attempt " << i << std::endl;
 
 		cv::Mat centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
-		cv::Mat sample = cv::Mat::zeros(_sampleSize, _items.cols, CV_32FC1);
-		cv::Mat sampleLabels = cv::Mat::zeros(_sampleSize, 1, CV_32FC1);
+		cv::Mat sample = cv::Mat::zeros(_sampleSize, _items.cols, CV_32SC1);
+		cv::Mat sampleLabels = cv::Mat::zeros(_sampleSize, 1, CV_32SC1);
 
 		// Select some of the elements as the staring points
 		selectStartCenters(_items, centers);
@@ -166,7 +166,7 @@ void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterN
 		}
 
 		// Get the labels for the whole set
-		cv::Mat setLabels = cv::Mat::zeros(_items.rows, 1, CV_32FC1);
+		cv::Mat setLabels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
 		for (int k = 0; k < _items.rows; k++)
 			setLabels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
