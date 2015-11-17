@@ -133,30 +133,30 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
-	pcl::io::savePCDFileASCII("./output/cloud.pcd", *coloredCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "cloud.pcd", *coloredCloud);
 
 	(*coloredCloud)[_params.targetPoint].rgb = Helper::getColor(255, 0, 0);
-	pcl::io::savePCDFileASCII("./output/pointPosition.pcd", *coloredCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "pointPosition.pcd", *coloredCloud);
 
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
 
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_params.targetPoint), _params.patchSize);
-	pcl::io::savePCDFileASCII("./output/patch.pcd", *patch);
+	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "patch.pcd", *patch);
 
 	std::ofstream sequences;
-	sequences.open("./output/sequences", std::fstream::out);
+	sequences.open(OUTPUT_FOLDER "sequences", std::fstream::out);
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
 		if (!_bands[i]->data->empty())
 		{
 			char name[100];
-			sprintf(name, "./output/band%d.pcd", (int) i);
+			sprintf(name, OUTPUT_FOLDER "band%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
-			sprintf(name, "./output/planeBand%d.pcd", (int) i);
+			sprintf(name, OUTPUT_FOLDER "planeBand%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *planes[i]);
 		}
 	}
@@ -266,37 +266,32 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 
 void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
 {
-	std::string destination = _params.cacheLocation + _params.getHash();
-
 	if (!boost::filesystem::exists(_params.cacheLocation))
 		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
 			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
 
-	std::ofstream cacheFile;
-	cacheFile.open(destination.c_str(), std::fstream::out);
-
-	for (int i = 0; i < _descriptors.rows; i++)
-	{
-		for (int j = 0; j < _descriptors.cols; j++)
-			cacheFile << std::setprecision(15) << _descriptors.at<float>(i, j) << " ";
-		cacheFile << "\n";
-	}
-
-	cacheFile.close();
+	std::string destination = _params.cacheLocation + _params.getHash();
+	writeMatrix(destination, _descriptors);
 }
 
 void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers)
 {
 	std::string destination = _outputFolder + "centers";
-	std::ofstream centersFile;
-	centersFile.open(destination.c_str(), std::fstream::out);
+	writeMatrix(destination, _centers);
+}
 
-	for (int i = 0; i < _centers.rows; i++)
+void Writer::writeMatrix(const std::string &_filename, const cv::Mat &_matrix)
+{
+	std::ofstream outputFile;
+	outputFile.open(_filename.c_str(), std::fstream::out);
+
+	outputFile << MATRIX_DIMENSIONS << " " << _matrix.rows << " " << _matrix.cols << "\n";
+	for (int i = 0; i < _matrix.rows; i++)
 	{
-		for (int j = 0; j < _centers.cols; j++)
-			centersFile << std::setprecision(15) << _centers.at<float>(i, j) << " ";
-		centersFile << "\n";
+		for (int j = 0; j < _matrix.cols; j++)
+			outputFile << std::setprecision(15) << _matrix.at<float>(i, j) << " ";
+		outputFile << "\n";
 	}
 
-	centersFile.close();
+	outputFile.close();
 }

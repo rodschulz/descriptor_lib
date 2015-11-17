@@ -21,6 +21,7 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 
 	try
 	{
+		bool firstLine = true;
 		std::string line;
 		std::ifstream cacheFile;
 		cacheFile.open(_filename.c_str(), std::fstream::in);
@@ -35,13 +36,23 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 				std::istringstream iss(line);
 				std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
-				loadOk = (int) tokens.size() == _matrix.cols;
-				if (!loadOk)
-					break;
+				if (firstLine)
+				{
+					firstLine = false;
+					int rows = atoi(tokens[1].c_str());
+					int cols = atoi(tokens[2].c_str());
+					_matrix = cv::Mat::zeros(rows, cols, CV_32FC1);
+				}
+				else
+				{
+					loadOk = (int) tokens.size() == _matrix.cols;
+					if (!loadOk)
+						break;
 
-				for (size_t col = 0; col < tokens.size(); col++)
-					_matrix.at<float>(row, col) = (float) atof(tokens[col].c_str());
-				row++;
+					for (size_t col = 0; col < tokens.size(); col++)
+						_matrix.at<float>(row, col) = (float) atof(tokens[col].c_str());
+					row++;
+				}
 			}
 			cacheFile.close();
 		}
@@ -65,4 +76,9 @@ bool Loader::loadDescriptorsCache(cv::Mat &_descriptors, const ExecutionParams &
 bool Loader::loadClusterCenters(const std::string &_filename, cv::Mat &_centers)
 {
 	return loadMatrix(_centers, _filename);
+}
+
+bool Loader::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+{
+	return false;
 }

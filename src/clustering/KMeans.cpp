@@ -4,8 +4,9 @@
  */
 #include "KMeans.h"
 #include <limits>
-#include "../utils/Helper.h"
-#include "../io/Writer.h"
+#include <boost/random.hpp>
+
+boost::random::mt19937 randomGenerator;
 
 template<typename T>
 void print(cv::Mat mat, int prec = 0)
@@ -39,12 +40,31 @@ KMeans::~KMeans()
 {
 }
 
-void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
+std::vector<int> KMeans::getRandomSet(const unsigned int _size, const int _min, const int _max)
+{
+	randomGenerator.seed(std::rand());
+	boost::random::uniform_int_distribution<> dist(_min, _max);
+
+	std::vector<int> numbers;
+	numbers.reserve(_size);
+
+	std::map<int, bool> used;
+	while (numbers.size() < _size)
+	{
+		int number = dist(randomGenerator);
+		if (used.find(number) == used.end())
+			numbers.push_back(number);
+	}
+
+	return numbers;
+}
+
+void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers, std::vector<double> &_errorCurve)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
 	std::vector<int> itemsPerCenter;
-	std::vector<double> minSSECurve;
+	_errorCurve.clear();
 
 	double minSSE = std::numeric_limits<double>::max();
 	for (int i = 0; i < _attempts; i++)
@@ -58,14 +78,6 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		// Select some of the elements as the staring points
 		selectStartCenters(_items, centers);
 
-		/**************************************************
-		 * Only for debug
-		 *
-		 _items.row(0).copyTo(centers.row(0));
-		 _items.row(10).copyTo(centers.row(1));
-		 _items.row(20).copyTo(centers.row(2));
-		 _items.row(30).copyTo(centers.row(3));
-		 /*/ ///////////////////////////////////////////////*/
 		// Iterate until the desired max iterations
 		std::vector<int> itemCount;
 		for (int j = 0; j < _maxIterations; j++)
@@ -104,19 +116,16 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 			centers.copyTo(_centers);
 			minSSE = sse;
 			itemsPerCenter = itemCount;
-			minSSECurve = sseCurve;
+			_errorCurve = sseCurve;
 		}
 	}
 
 	std::cout << "KMeans finished\nmin SSE: " << minSSE << "\n";
 	for (size_t i = 0; i < itemsPerCenter.size(); i++)
 		std::cout << "\tcluster " << i << ": " << itemsPerCenter[i] << " points\n";
-
-	std::cout << "Generating SSE plot" << std::endl;
-	Writer::writePlotSSE("sse", "SSE Evolution", minSSECurve);
 }
 
-void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers)
+void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers, std::vector<double> &_errorCurve)
 {
 	_centers = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
@@ -194,7 +203,7 @@ bool KMeans::evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_n
 
 void KMeans::selectStartCenters(const cv::Mat &_items, cv::Mat &_centers)
 {
-	std::vector<int> randomSet = Helper::getRandomSet(_centers.rows, 0, _items.rows - 1);
+	std::vector<int> randomSet = getRandomSet(_centers.rows, 0, _items.rows - 1);
 	for (int j = 0; j < _centers.rows; j++)
 		_items.row(randomSet[j]).copyTo(_centers.row(j));
 }
@@ -232,7 +241,7 @@ int KMeans::findClosestCenter(const cv::Mat &_vector, cv::Mat &_centers, const M
 
 void KMeans::getSample(const cv::Mat &_items, cv::Mat &_sample)
 {
-	std::vector<int> randomSet = Helper::getRandomSet(_sample.rows, 0, _items.rows - 1);
+	std::vector<int> randomSet = getRandomSet(_sample.rows, 0, _items.rows - 1);
 	for (int j = 0; j < _sample.rows; j++)
 		_items.row(randomSet[j]).copyTo(_sample.row(j));
 }

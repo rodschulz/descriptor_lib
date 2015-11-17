@@ -21,7 +21,6 @@
 #include "../factories/CloudFactory.h"
 #include "../factories/PointFactory.h"
 #include "../descriptor/Calculator.h"
-#include "../io/Writer.h"
 
 boost::random::mt19937 randomGenerator;
 
@@ -38,25 +37,6 @@ int Helper::getRandomNumber(const int _min, const int _max)
 	randomGenerator.seed(std::time(0));
 	boost::random::uniform_int_distribution<> dist(_min, _max);
 	return dist(randomGenerator);
-}
-
-std::vector<int> Helper::getRandomSet(const unsigned int _size, const int _min, const int _max)
-{
-	randomGenerator.seed(std::rand());
-	boost::random::uniform_int_distribution<> dist(_min, _max);
-
-	std::vector<int> numbers;
-	numbers.reserve(_size);
-
-	std::map<int, bool> used;
-	while (numbers.size() < _size)
-	{
-		int number = dist(randomGenerator);
-		if (used.find(number) == used.end())
-			numbers.push_back(number);
-	}
-
-	return numbers;
 }
 
 void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
@@ -228,9 +208,6 @@ void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::P
 		for (size_t j = 0; j < bands.size(); j++)
 			memcpy(&_descriptors.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
 	}
-
-	// Save cache to file
-	Writer::writeDescriptorsCache(_descriptors, _params);
 }
 
 double Helper::calculateSSE(const cv::Mat &_descriptors, const cv::Mat &_centers, const cv::Mat &_labels)

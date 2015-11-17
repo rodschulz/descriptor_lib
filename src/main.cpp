@@ -39,13 +39,13 @@ int main(int _argn, char **_argv)
 			std::cout << "Not enough parameters\nUsage:\tDescriptor <input_file>";
 		params.inputLocation = _argv[1];
 
-		pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
-
+		// Do things according to the execution type
 		if (params.executionType == EXECUTION_METRIC)
 			Helper::evaluateMetricCases("./output/metricEvaluation", params.inputLocation, params.targetMetric, params.metricArgs);
 		else
 		{
 			// Load cloud
+			pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
 			if (!Helper::loadCloud(cloud, params))
 				throw std::runtime_error("Can't load cloud");
 			std::cout << "Loaded " << cloud->size() << " points in cloud\n";
@@ -71,29 +71,41 @@ int main(int _argn, char **_argv)
 			{
 				std::cout << "Execution for clustering\n";
 
-				cv::Mat descriptors = cv::Mat::zeros(cloud->size(), params.getSequenceLength() * params.bandNumber, CV_32FC1);
+				cv::Mat descriptors, labels, centers;
 				if (!Loader::loadDescriptorsCache(descriptors, params))
+				{
 					Helper::generateDescriptorsCache(cloud, params, descriptors);
+					Writer::writeDescriptorsCache(descriptors, params);
+				}
 
-				cv::Mat labels, centers;
+				std::vector<double> sseError;
 				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
 				if (false)
 				{
 					// Make clusters of data
+					std::cout << "Calculating clusters\n";
 					if (params.implementation == CLUSTERING_OPENCV)
 						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
 
 					else if (params.implementation == CLUSTERING_CUSTOM)
-						KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers, sseError);
 
 					else if (params.implementation == CLUSTERING_STOCHASTIC)
-						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers);
+						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers, sseError);
+
+					if (!sseError.empty())
+					{
+						std::cout << "Generating SSE plot" << std::endl;
+						Writer::writePlotSSE("sse", "SSE Evolution", sseError);
+					}
 				}
 				else
 				{
+					std::cout << "Loading centers" << std::endl;
+
 					// Label data according to given centers
-					centers = cv::Mat::zeros(5, 32, CV_32FC1);
-					Loader::loadClusterCenters("./input/clusters.centers", centers);
+					if (!Loader::loadClusterCenters("./input/clusters.centers", centers))
+						throw std::runtime_error("Can't load clusters centers");
 
 					labels = cv::Mat::zeros(descriptors.rows, 1, CV_32SC1);
 					std::vector<double> distance(descriptors.rows, std::numeric_limits<double>::max());
@@ -110,8 +122,6 @@ int main(int _argn, char **_argv)
 						}
 					}
 				}
-
-				std::cout << "Calculating clusters\n";
 
 				// Generate outputs
 				std::cout << "Writing outputs" << std::endl;

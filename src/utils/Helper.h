@@ -24,6 +24,7 @@ class Helper
 public:
 	static int getRandomNumber(const int _min, const int _max);
 	static std::vector<int> getRandomSet(const unsigned int _size, const int _min, const int _max);
+
 	static void removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud);
 	static std::string toHexString(const size_t _number);
 

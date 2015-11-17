@@ -9,6 +9,7 @@
 #include "../descriptor/Extractor.h"
 
 #define OUTPUT_FOLDER		"./output/"
+#define MATRIX_DIMENSIONS	"dims"
 
 class Writer
 {
@@ -25,6 +26,7 @@ private:
 	Writer();
 	~Writer();
 
+	static void writeMatrix(const std::string &_filename, const cv::Mat &_matrix);
 	static void generateHistogramScript(const std::string &_outputFolder, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit);
 
 	static bool comparePairs(const std::pair<int, int> &_item1, const std::pair<int, int> &_item2)
