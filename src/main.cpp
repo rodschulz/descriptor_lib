@@ -80,7 +80,7 @@ int main(int _argn, char **_argv)
 
 				std::vector<double> sseError;
 				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
-				if (false)
+				if (!params.labelData)
 				{
 					// Make clusters of data
 					std::cout << "Calculating clusters\n";
@@ -104,7 +104,7 @@ int main(int _argn, char **_argv)
 					std::cout << "Loading centers" << std::endl;
 
 					// Label data according to given centers
-					if (!Loader::loadClusterCenters("./input/clusters.centers", centers))
+					if (!Loader::loadClusterCenters(params.centersLocation, centers))
 						throw std::runtime_error("Can't load clusters centers");
 
 					labels = cv::Mat::zeros(descriptors.rows, 1, CV_32SC1);

@@ -22,8 +22,10 @@ clustering:
     generateElbowCurve: false
     generateDistanceMatrix: false
 
-    implementation: custom # opencv, custom or stochastic
+    labelData: true
+    centersLocation: ./input/centers_5.dat
 
+    implementation: custom # opencv, custom or stochastic
     metric: closest # closest or euclidean
     clusters: 20
     maxIterations: 200

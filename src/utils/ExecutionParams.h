@@ -82,6 +82,10 @@ public:
 
 	bool genElbowCurve;				// Flag indicating if an elbow graph has to be generated
 	bool genDistanceMatrix;				// Flag indicating if the distance matrix image has to be generated
+
+	bool labelData;					// Flag indicating if data has to be labeled instead of calculate clusters
+	std::string centersLocation;			// Location of the file storing the centers for data labeling
+
 	ClusteringImplementation implementation;	// Implementation of clustering to be used
 	MetricType metric;				// Type of metric to use in clustering execution
 	int clusters;					// Number of clusters used in the clustering test

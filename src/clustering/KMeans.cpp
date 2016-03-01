@@ -6,7 +6,7 @@
 #include <limits>
 #include <boost/random.hpp>
 
-boost::random::mt19937 randomGenerator;
+boost::random::mt19937 randomGen;
 
 template<typename T>
 void print(cv::Mat mat, int prec = 0)
@@ -42,7 +42,7 @@ KMeans::~KMeans()
 
 std::vector<int> KMeans::getRandomSet(const unsigned int _size, const int _min, const int _max)
 {
-	randomGenerator.seed(std::rand());
+	randomGen.seed(std::rand());
 	boost::random::uniform_int_distribution<> dist(_min, _max);
 
 	std::vector<int> numbers;
@@ -51,7 +51,7 @@ std::vector<int> KMeans::getRandomSet(const unsigned int _size, const int _min, 
 	std::map<int, bool> used;
 	while (numbers.size() < _size)
 	{
-		int number = dist(randomGenerator);
+		int number = dist(randomGen);
 		if (used.find(number) == used.end())
 			numbers.push_back(number);
 	}
