@@ -199,6 +199,12 @@ void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::P
 	std::cout << "Generating descriptors cache\n";
 	int sequenceSize = _params.getSequenceLength();
 
+	// Resize the matrix in case it doesn't match the required dimensions
+	int rows = _cloud->size();
+	int cols = sequenceSize * _params.bandNumber;
+	if (_descriptors.rows != rows || _descriptors.cols != cols)
+		_descriptors = cv::Mat::zeros(rows, cols, CV_32FC1);
+
 	// Extract the descriptors
 	for (size_t i = 0; i < _cloud->size(); i++)
 	{
