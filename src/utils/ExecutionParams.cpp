@@ -30,6 +30,7 @@ ExecutionParams::ExecutionParams()
 
 	genElbowCurve = false;
 	genDistanceMatrix = false;
+	labelData = false;
 	implementation = CLUSTERING_NONE;
 	metric = METRIC_NONE;
 	clusters = 5;

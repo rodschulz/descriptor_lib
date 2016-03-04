@@ -131,7 +131,7 @@ bool Helper::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Exe
 		pcl::PointCloud<pcl::Normal>::Ptr normals = Helper::estimateNormals(cloudXYZ, _params.normalEstimationRadius);
 
 		_cloud->clear();
-		concatenateFields(*cloudXYZ, *normals, *_cloud);
+		pcl::concatenateFields(*cloudXYZ, *normals, *_cloud);
 	}
 
 	return loadOk;
