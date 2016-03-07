@@ -3,9 +3,10 @@
  * 2015
  */
 #pragma once
-#include "../clustering/EuclideanMetric.h"
-#include "../clustering/ClosestPermutationMetric.h"
+
 #include <stdarg.h>
+#include "EuclideanMetric.h"
+#include "ClosestPermutationMetric.h"
 #include "../utils/ExecutionParams.h"
 
 class MetricFactory

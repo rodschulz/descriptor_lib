@@ -5,14 +5,6 @@
 #include "CloudFactory.h"
 #include "PointFactory.h"
 
-CloudFactory::CloudFactory()
-{
-}
-
-CloudFactory::~CloudFactory()
-{
-}
-
 void CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	_cloud->clear();

@@ -4,14 +4,6 @@
  */
 #include "PointFactory.h"
 
-PointFactory::PointFactory()
-{
-}
-
-PointFactory::~PointFactory()
-{
-}
-
 pcl::PointXYZ PointFactory::createPointXYZ(const float _x, const float _y, const float _z)
 {
 	pcl::PointXYZ p;
