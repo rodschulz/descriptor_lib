@@ -5,9 +5,9 @@
 #include "CloudFactory.h"
 #include "PointFactory.h"
 
-void CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
+pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center)
 {
-	_cloud->clear();
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
 
 	double minX = _center.x - _size * 0.5;
 	double minY = _center.y - _size * 0.5;
@@ -24,8 +24,8 @@ void CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center, 
 	{
 		for (double z = minZ; z <= maxZ; z += step)
 		{
-			_cloud->push_back(PointFactory::createPointXYZ(minX, y, z));
-			_cloud->push_back(PointFactory::createPointXYZ(maxX, y, z));
+			cloud->push_back(PointFactory::createPointXYZ(minX, y, z));
+			cloud->push_back(PointFactory::createPointXYZ(maxX, y, z));
 		}
 	}
 
@@ -34,8 +34,8 @@ void CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center, 
 	{
 		for (double z = minZ; z <= maxZ; z += step)
 		{
-			_cloud->push_back(PointFactory::createPointXYZ(x, minY, z));
-			_cloud->push_back(PointFactory::createPointXYZ(x, maxY, z));
+			cloud->push_back(PointFactory::createPointXYZ(x, minY, z));
+			cloud->push_back(PointFactory::createPointXYZ(x, maxY, z));
 		}
 	}
 
@@ -44,15 +44,17 @@ void CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center, 
 	{
 		for (double y = minY; y <= maxY; y += step)
 		{
-			_cloud->push_back(PointFactory::createPointXYZ(x, y, minZ));
-			_cloud->push_back(PointFactory::createPointXYZ(x, y, maxZ));
+			cloud->push_back(PointFactory::createPointXYZ(x, y, minZ));
+			cloud->push_back(PointFactory::createPointXYZ(x, y, maxZ));
 		}
 	}
+
+	return cloud;
 }
 
-void CloudFactory::createCylinder(const double _radius, const double _height, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
+pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createCylinder(const double _radius, const double _height, const pcl::PointXYZ &_center)
 {
-	_cloud->clear();
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
 
 	double minZ = _center.z - _height * 0.5;
 	double maxZ = _center.z + _height * 0.5;
@@ -66,8 +68,8 @@ void CloudFactory::createCylinder(const double _radius, const double _height, co
 	{
 		for (double r = _radius; r > 0; r -= radialStep)
 		{
-			_cloud->push_back(PointFactory::createPointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, minZ));
-			_cloud->push_back(PointFactory::createPointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, maxZ));
+			cloud->push_back(PointFactory::createPointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, minZ));
+			cloud->push_back(PointFactory::createPointXYZ(r * cos(angle) + _center.x, r * sin(angle) + _center.y, maxZ));
 		}
 	}
 
@@ -76,23 +78,28 @@ void CloudFactory::createCylinder(const double _radius, const double _height, co
 	{
 		for (double angle = 0; angle < 2 * M_PI; angle += angularStep)
 		{
-			_cloud->push_back(PointFactory::createPointXYZ(_radius * cos(angle) + _center.x, _radius * sin(angle) + _center.y, z));
+			cloud->push_back(PointFactory::createPointXYZ(_radius * cos(angle) + _center.x, _radius * sin(angle) + _center.y, z));
 		}
 	}
+
+	return cloud;
 }
 
-void CloudFactory::createSphere(const double _radius, const pcl::PointXYZ &_center, pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
+pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createSphere(const double _radius, const pcl::PointXYZ &_center)
 {
-	_cloud->clear();
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
+	cloud->clear();
 
 	double angularStep = 2 * M_PI * 0.005;
 	for (double theta = 0; theta < 2 * M_PI; theta += angularStep)
 	{
 		for (double phi = 0; phi < 2 * M_PI; phi += angularStep)
 		{
-			_cloud->push_back(PointFactory::createPointXYZ(_radius * sin(theta) * cos(phi) + _center.x, _radius * sin(theta) * sin(phi) + _center.y, _radius * cos(theta) + _center.z));
+			cloud->push_back(PointFactory::createPointXYZ(_radius * sin(theta) * cos(phi) + _center.x, _radius * sin(theta) * sin(phi) + _center.y, _radius * cos(theta) + _center.z));
 		}
 	}
+
+	return cloud;
 }
 
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint32_t _color)
