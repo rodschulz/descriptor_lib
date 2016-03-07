@@ -46,8 +46,8 @@ target_link_libraries(Descriptor
 			descriptor
 			factories
 			${PCL_LIBRARIES}
-			${OpenCV_LIBS}
-			${YAML_CPP_LIBRARIES})
+			${YAML_CPP_LIBRARIES}
+			${OpenCV_LIBS})
 
 # Target Test
 add_executable(Test ${TEST_SRC})

@@ -5,15 +5,8 @@
 #include "Loader.h"
 #include <iostream>
 #include <fstream>
-#include "../utils/Helper.h"
-
-Loader::Loader()
-{
-}
-
-Loader::~Loader()
-{
-}
+#include <pcl/io/pcd_io.h>
+#include "../utils/CloudUtils.hpp"
 
 bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 {
@@ -81,5 +74,46 @@ bool Loader::loadClusterCenters(const std::string &_filename, cv::Mat &_centers)
 
 bool Loader::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
 {
-	return false;
+	bool loadOk = true;
+
+	// Load cartesian data from disk
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ(new pcl::PointCloud<pcl::PointXYZ>());
+	if (pcl::io::loadPCDFile<pcl::PointXYZ>(_params.inputLocation, *cloudXYZ) != 0)
+	{
+		std::cout << "ERROR: Can't read file from disk (" << _params.inputLocation << ")\n";
+		loadOk = false;
+	}
+
+	if (loadOk)
+	{
+		// Remove NANs
+		CloudUtils::removeNANs(cloudXYZ);
+
+		// Apply smoothing
+		switch (_params.smoothingType)
+		{
+			case SMOOTHING_GAUSSIAN:
+				std::cout << "Applying gaussian smoothing\n";
+				cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
+				break;
+
+			case SMOOTHING_MLS:
+				std::cout << "Applying MLS smoothing\n";
+				cloudXYZ = CloudUtils::MLSSmoothing(cloudXYZ, _params.mlsRadius);
+				break;
+
+			default:
+				break;
+		}
+
+		// Estimate normals
+		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, _params.normalEstimationRadius);
+
+		// Deliver the cloud
+		_cloud->clear();
+		pcl::concatenateFields(*cloudXYZ, *normals, *_cloud);
+	}
+
+	return loadOk;
+
 }

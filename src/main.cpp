@@ -45,7 +45,7 @@ int main(int _argn, char **_argv)
 		{
 			// Load cloud
 			pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
-			if (!Helper::loadCloud(cloud, params))
+			if (!Loader::loadCloud(cloud, params))
 				throw std::runtime_error("Can't load cloud");
 			std::cout << "Loaded " << cloud->size() << " points in cloud\n";
 
