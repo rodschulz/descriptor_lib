@@ -5,7 +5,8 @@
 #pragma once
 
 #include <string>
-#include "ExecutionParams.h"
+
+#include "ExecutionParams.hpp"
 
 class Config
 {

@@ -41,9 +41,7 @@ class ExecutionParams
 {
 public:
 	ExecutionParams();
-	~ExecutionParams()
-	{
-	}
+	~ExecutionParams() {}
 
 	static ExecutionType getExecutionType(const std::string &_type);
 	static SynCloudType getSynCloudType(const std::string &_type);
