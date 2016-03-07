@@ -38,3 +38,15 @@ uint32_t Utils::getColor(const int _index)
 
 	return palette[_index % 12];
 }
+
+double Utils::getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv::Mat &_labels)
+{
+	double sse = 0;
+	for (int i = 0; i < _vectors.rows; i++)
+	{
+		float norm = cv::norm(_vectors.row(i), _centers.row(_labels.at<int>(i)));
+		sse += (norm * norm);
+	}
+
+	return sse;
+}

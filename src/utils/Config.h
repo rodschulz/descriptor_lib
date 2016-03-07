@@ -15,8 +15,8 @@ public:
 	// Returns the instance of the singleton
 	static Config *getInstance()
 	{
-		static Config *instance = new Config();
-		return instance;
+		static Config instance = Config();
+		return &instance;
 	}
 
 	// Loads the configuration file

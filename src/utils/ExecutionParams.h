@@ -5,10 +5,7 @@
 #pragma once
 
 #include <string>
-#include <stdlib.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/functional/hash.hpp>
-#include <boost/lexical_cast.hpp>
+#include <vector>
 
 enum ExecutionType
 {
