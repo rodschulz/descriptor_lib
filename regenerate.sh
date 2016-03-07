@@ -1,19 +1,20 @@
 #!/bin/bash
 
 type=$1
+folder=./build/
 
 # Remove old build folder
-if [ -d "./build" ]; then
+if [ -d $folder ]; then
 	echo "Removing build folder"
-	rm -rf ./build
+	rm -rf $folder
 fi
 
 # Create build folder
 echo "Generating new build folder"
-mkdir ./build/
+mkdir $folder
 
 # Generate with cmake
-cd ./build/
+cd $folder
 if [ "$type" == "-r" ] ; then
 	echo "Generating project for release"
 	cmake -DCMAKE_BUILD_TYPE=Release ../src/
