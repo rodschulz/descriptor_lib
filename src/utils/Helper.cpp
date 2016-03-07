@@ -21,8 +21,7 @@
 #include "../factories/CloudFactory.h"
 #include "../factories/PointFactory.h"
 #include "../descriptor/Calculator.h"
-
-boost::random::mt19937 randomGenerator;
+#include "Utils.hpp"
 
 Helper::Helper()
 {
@@ -32,24 +31,10 @@ Helper::~Helper()
 {
 }
 
-int Helper::getRandomNumber(const int _min, const int _max)
-{
-	randomGenerator.seed(std::time(0));
-	boost::random::uniform_int_distribution<> dist(_min, _max);
-	return dist(randomGenerator);
-}
-
 void Helper::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud)
 {
 	std::vector<int> mapping;
 	pcl::removeNaNFromPointCloud(*_cloud, *_cloud, mapping);
-}
-
-std::string Helper::toHexString(const size_t _number)
-{
-	std::stringstream stream;
-	stream << std::hex << _number;
-	return stream.str();
 }
 
 pcl::PointCloud<pcl::Normal>::Ptr Helper::estimateNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius)
@@ -177,21 +162,6 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr Helper::MLSSmoothing(const pcl::PointCloud<p
 
 	pcl::copyPointCloud<pcl::PointNormal, pcl::PointXYZ>(*MLSPoints, *smoothedCloud);
 	return smoothedCloud;
-}
-
-float Helper::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
-{
-	uint32_t color = ((uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
-	float finalColor = *reinterpret_cast<float*>(&color);
-	return finalColor;
-}
-
-unsigned int Helper::getColor(const int _index)
-{
-	static uint32_t palette[12] =
-	{ 0xa6cee3, 0x1f78b4, 0xb2df8a, 0x33a02c, 0xfb9a99, 0xe31a1c, 0xfdbf6f, 0xff7f00, 0xcab2d6, 0x6a3d9a, 0xffff99, 0xb15928 };
-
-	return palette[_index % 12];
 }
 
 void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors)
@@ -331,7 +301,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 						float ny = rotatedNormal.y();
 						float nz = rotatedNormal.z();
 
-						output->push_back(PointFactory::createPointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Helper::getColor(i)));
+						output->push_back(PointFactory::createPointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Utils::getColor(i)));
 					}
 				}
 			}

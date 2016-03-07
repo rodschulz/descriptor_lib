@@ -13,6 +13,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "../factories/CloudFactory.h"
+#include "../utils/Utils.hpp"
 
 #define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"
 #define SCRIPT_SSE_NAME		OUTPUT_FOLDER "ssePlot.script"
@@ -132,10 +133,10 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
 {
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::getColor(0));
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "cloud.pcd", *coloredCloud);
 
-	(*coloredCloud)[_params.targetPoint].rgb = Helper::getColor(255, 0, 0);
+	(*coloredCloud)[_params.targetPoint].rgb = Utils::getColor(255, 0, 0);
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "pointPosition.pcd", *coloredCloud);
 
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
@@ -152,7 +153,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 		{
 			char name[100];
 			sprintf(name, OUTPUT_FOLDER "band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Helper::getColor(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::getColor(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
@@ -205,9 +206,9 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
 {
 	// Color the data according to the clusters
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Helper::getColor(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::getColor(0));
 	for (int i = 0; i < _labels.rows; i++)
-		(*colored)[i].rgb = Helper::getColor(_labels.at<int>(i));
+		(*colored)[i].rgb = Utils::getColor(_labels.at<int>(i));
 
 	pcl::io::savePCDFileASCII(_filename, *colored);
 }

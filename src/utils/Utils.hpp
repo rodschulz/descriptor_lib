@@ -20,6 +20,13 @@ public:
 	// Returns a color from the built-in color pallete (12 colors available)
 	static uint32_t getColor(const int _index);
 
+	// Returns +1 if the sign of the given value is positive, -1 if it's negative, and 0 when it's 0
+	template<typename T> static int sign(T val)
+	{
+		return (T(0) < val) - (val < T(0));
+	}
+
+
 private:
 	Utils() {};
 	~Utils() {};

@@ -13,27 +13,15 @@
 
 struct ExecutionParams;
 
-// Sign function
-template<typename T> inline int sign(T val)
-{
-	return (T(0) < val) - (val < T(0));
-}
-
 class Helper
 {
 public:
-	static int getRandomNumber(const int _min, const int _max);
-
 	static void removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud);
-	static std::string toHexString(const size_t _number);
 
 	static bool loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
 	static pcl::PointCloud<pcl::Normal>::Ptr estimateNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius = -1);
 	static pcl::PointCloud<pcl::PointXYZ>::Ptr gaussianSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _sigma, const double _radius);
 	static pcl::PointCloud<pcl::PointXYZ>::Ptr MLSSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _radius);
-
-	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
-	static uint32_t getColor(const int _index);
 
 	static void generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors);
 

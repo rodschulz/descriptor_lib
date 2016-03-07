@@ -8,13 +8,13 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
-boost::random::mt19937 randomGenerator;
+boost::random::mt19937 generator;
 
 int Utils::getRandomNumber(const int _min, const int _max)
 {
-	randomGenerator.seed(std::time(0));
+	generator.seed(std::time(0));
 	boost::random::uniform_int_distribution<> dist(_min, _max);
-	return dist(randomGenerator);
+	return dist(generator);
 }
 
 std::string Utils::num2Hex(const size_t _number)

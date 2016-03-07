@@ -13,7 +13,6 @@
 #include "descriptor/Hist.h"
 #include "utils/Config.h"
 #include "utils/Helper.h"
-#include "utils/ExtractData.h"
 #include "factories/MetricFactory.h"
 #include "io/Writer.h"
 #include "io/Loader.h"

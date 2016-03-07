@@ -6,11 +6,7 @@
 #include "../clustering/EuclideanMetric.h"
 #include "../clustering/ClosestPermutationMetric.h"
 #include <stdarg.h>
-
-enum MetricType
-{
-	METRIC_NONE, METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION
-};
+#include "../utils/ExecutionParams.h"
 
 class MetricFactory
 {

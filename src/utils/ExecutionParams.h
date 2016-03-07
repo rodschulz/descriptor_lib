@@ -9,8 +9,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
-#include "Helper.h"
-#include "../factories/MetricFactory.h"
 
 enum ExecutionType
 {
@@ -35,6 +33,11 @@ enum SequenceStat
 enum ClusteringImplementation
 {
 	CLUSTERING_NONE, CLUSTERING_OPENCV, CLUSTERING_CUSTOM, CLUSTERING_STOCHASTIC
+};
+
+enum MetricType
+{
+	METRIC_NONE, METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION
 };
 
 class ExecutionParams

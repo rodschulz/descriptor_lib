@@ -3,11 +3,13 @@
  * 2015
  */
 #include "ExecutionParams.h"
+#include "Utils.hpp"
 
 ExecutionParams::ExecutionParams()
 {
 	executionType = EXECUTION_NONE;
 
+	inputLocation = "";
 	targetPoint = 1000;
 
 	patchSize = 0.05;
@@ -30,16 +32,21 @@ ExecutionParams::ExecutionParams()
 
 	genElbowCurve = false;
 	genDistanceMatrix = false;
+
 	labelData = false;
+	centersLocation = "";
+
 	implementation = CLUSTERING_NONE;
 	metric = METRIC_NONE;
 	clusters = 5;
 	maxIterations = 10000;
 	stopThreshold = 0.001;
 	attempts = 1;
+	cacheLocation = "";
 	useConfidence = false;
 
 	targetMetric = METRIC_NONE;
+	metricArgs = std::vector<std::string>();
 }
 
 ExecutionType ExecutionParams::getExecutionType(const std::string &_type)
@@ -130,7 +137,7 @@ std::string ExecutionParams::getHash() const
 		str += "-mlsRadius=" + boost::lexical_cast<std::string>(mlsRadius);
 
 	boost::hash<std::string> strHash;
-	return Helper::toHexString(strHash(str));
+	return Utils::num2Hex(strHash(str));
 }
 
 double ExecutionParams::getBandsAngularRange() const

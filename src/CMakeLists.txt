@@ -52,4 +52,6 @@ target_link_libraries(Descriptor
 # Target Test
 add_executable(Test ${TEST_SRC})
 set_target_properties(Test PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK")
-target_link_libraries(Test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(Test 
+			utils
+			${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
