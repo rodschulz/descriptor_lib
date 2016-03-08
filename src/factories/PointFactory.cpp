@@ -3,7 +3,6 @@
  * 2015
  */
 #include "PointFactory.hpp"
-
 #include "../utils/Utils.hpp"
 
 pcl::PointXYZ PointFactory::createPointXYZ(const float _x, const float _y, const float _z)
