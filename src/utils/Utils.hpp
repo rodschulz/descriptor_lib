@@ -8,6 +8,8 @@
 #include <string>
 #include <stdint.h>
 #include <opencv2/core/core.hpp>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 class Utils
 {

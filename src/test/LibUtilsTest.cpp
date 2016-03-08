@@ -58,10 +58,8 @@ BOOST_AUTO_TEST_CASE(getSSE)
 	aux = cv::Mat::ones(1, dim, CV_32FC1) * center3;
 	aux.copyTo(centers.row(2));
 
-	std::cout << centers << "\n" << vectors << "\n";
-
 	double sse = center1 * center1 * dim * 4 + (center2 - 1) * (center2 - 1) * dim * 3 + (center3 - 2) * (center3 - 2) * dim * 3;
-	BOOST_CHECK(fabs(Utils::getSSE(vectors, centers, labels) - sse) < 1E-4);
+	BOOST_CHECK_CLOSE(Utils::getSSE(vectors, centers, labels), sse, 1E-5);
 }
 
 
@@ -86,6 +84,72 @@ BOOST_AUTO_TEST_CASE(sign)
 	BOOST_CHECK_EQUAL(Utils::sign<float>(10), 1);
 	BOOST_CHECK_EQUAL(Utils::sign<float>(-10), -1);
 	BOOST_CHECK_EQUAL(Utils::sign<float>(0), 0);
+}
+
+BOOST_AUTO_TEST_CASE(angle)
+{
+	Eigen::Vector3f v1(1, 0, 0);
+	Eigen::Vector3f v2(1, 0, 0);
+
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), 0, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(0, 1, 0);
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), M_PI_2, 1E-10);
+
+	v1 = Eigen::Vector3f(0, 1, 0);
+	v2 = Eigen::Vector3f(1, 0, 0);
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), M_PI_2, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(-1, 0, 0);
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), M_PI, 1E-10);
+
+	v1 = Eigen::Vector3f(-1, 0, 0);
+	v2 = Eigen::Vector3f(1, 0, 0);
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), M_PI, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(1, 1, 0);
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), M_PI_4, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(1, -1, 0);
+	BOOST_CHECK_CLOSE(Utils::angle<Eigen::Vector3f>(v1, v2), M_PI_4, 1E-10);
+}
+
+BOOST_AUTO_TEST_CASE(signedAngle)
+{
+	Eigen::Vector3f v1(1, 0, 0);
+	Eigen::Vector3f v2(1, 0, 0);
+	Eigen::Vector3f normal(0, 0, 1);
+
+	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), 0, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(0, 1, 0);
+	normal = Eigen::Vector3f(0, 0, 1);
+	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), M_PI_2, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(0, -1, 0);
+	normal = Eigen::Vector3f(0, 0, 1);
+	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), -M_PI_2, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(1, 1, 0);
+	normal = Eigen::Vector3f(0, 0, 1);
+	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), M_PI_4, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(1, -1, 0);
+	normal = Eigen::Vector3f(0, 0, 1);
+	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), -M_PI_4, 1E-10);
+
+	v1 = Eigen::Vector3f(1, 0, 0);
+	v2 = Eigen::Vector3f(-1, 0, 0);
+	normal = Eigen::Vector3f(0, 0, 1);
+	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), M_PI, 1E-10);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
