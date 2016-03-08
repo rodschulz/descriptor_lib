@@ -173,6 +173,12 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 
 void Writer::writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse)
 {
+	if (_sse.empty())
+	{
+		std::cout << "WARNING: array SSE empty, can't generate SSE plot" << std::endl;
+		return;
+	}
+
 	// Generate data file
 	std::ofstream dataFile;
 	dataFile.open(SSE_DATA_FILE, std::fstream::out);

@@ -22,6 +22,9 @@ public:
 	// Performs the search of clusters according to the given parameters
 	static void searchClusters(const cv::Mat &_items, const ExecutionParams &_params, ClusteringResults &_results);
 
+	// Labels the given data using the given centers
+	static void labelData(const cv::Mat &_items, const cv::Mat &_centers, const ExecutionParams &_params, cv::Mat &_labels);
+
 	// Generates an elbow graph according to the given params (to evaluate the SSE evolution)
 	static void generateElbowGraph(const cv::Mat &_items, const ExecutionParams &_params);
 

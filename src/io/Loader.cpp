@@ -94,12 +94,12 @@ bool Loader::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Exe
 		switch (_params.smoothingType)
 		{
 			case SMOOTHING_GAUSSIAN:
-				std::cout << "Applying gaussian smoothing\n";
+				std::cout << "\tApplying gaussian smoothing\n";
 				cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
 				break;
 
 			case SMOOTHING_MLS:
-				std::cout << "Applying MLS smoothing\n";
+				std::cout << "\tApplying MLS smoothing\n";
 				cloudXYZ = CloudUtils::MLSSmoothing(cloudXYZ, _params.mlsRadius);
 				break;
 

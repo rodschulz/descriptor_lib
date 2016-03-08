@@ -26,6 +26,8 @@ bool getPointCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Executi
 {
 	if (_params.useSynthetic)
 	{
+		std::cout << "Generating synthetic cloud\n";
+
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ;
 		switch (_params.synCloudType)
 		{
@@ -52,7 +54,13 @@ bool getPointCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Executi
 		return true;
 	}
 	else
-		return Loader::loadCloud(_cloud, _params);
+	{
+		std::cout << "Loading point cloud\n";
+		bool result = Loader::loadCloud(_cloud, _params);
+		std::cout << "Loaded " << _cloud->size() << " points in cloud\n";
+
+		return result;
+	}
 }
 
 int main(int _argn, char **_argv)
@@ -83,25 +91,26 @@ int main(int _argn, char **_argv)
 			pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
 			if (!getPointCloud(cloud, params))
 				throw std::runtime_error("Can't load cloud");
-			std::cout << "Loaded " << cloud->size() << " points in cloud\n";
 
 			// Select execution type
 			if (params.executionType == EXECUTION_DESCRIPTOR)
 			{
-				std::cout << "Target point: " << params.targetPoint << "\n";
+				std::cout << "...Execution for descriptor calculation\n";
+
+				std::cout << "\tTarget point: " << params.targetPoint << "\n";
 				Descriptor descriptor = Calculator::calculateDescriptor(cloud, params);
 
 				// Calculate histograms
-				std::cout << "Generating histograms\n";
+				std::cout << "\tGenerating histograms\n";
 				std::vector<Hist> histograms = Calculator::generateAngleHistograms(descriptor, params.useProjection);
 
 				// Write output
-				std::cout << "Writing output\n";
+				std::cout << "\tWriting output\n";
 				Writer::writeOuputData(cloud, descriptor, histograms, params);
 			}
 			else if (params.executionType == EXECUTION_CLUSTERING)
 			{
-				std::cout << "Execution for clustering\n";
+				std::cout << "...Execution for clustering\n";
 
 				cv::Mat descriptors;
 				if (!Loader::loadDescriptors(descriptors, params))
@@ -116,34 +125,17 @@ int main(int _argn, char **_argv)
 				{
 					Clustering::searchClusters(descriptors, params, results);
 
-					if (!results.errorEvolution.empty())
-					{
-						std::cout << "Generating SSE plot" << std::endl;
-						Writer::writePlotSSE("sse", "SSE Evolution", results.errorEvolution);
-					}
+					std::cout << "\tGenerating SSE plot" << std::endl;
+					Writer::writePlotSSE("sse", "SSE Evolution", results.errorEvolution);
 				}
 				else
 				{
-					std::cout << "Loading centers" << std::endl;
+					std::cout << "\tLoading centers" << std::endl;
 
-					// Label data according to given centers
 					if (!Loader::loadCenters(params.centersLocation, results.centers))
 						throw std::runtime_error("Can't load clusters centers");
 
-					results.labels = cv::Mat::zeros(descriptors.rows, 1, CV_32SC1);
-					std::vector<double> distance(descriptors.rows, std::numeric_limits<double>::max());
-					for (int i = 0; i < descriptors.rows; i++)
-					{
-						for (int j = 0; j < results.centers.rows; j++)
-						{
-							double dist = metric->distance(results.centers.row(j), descriptors.row(i));
-							if (dist < distance[i])
-							{
-								distance[i] = dist;
-								results.labels.at<int>(i) = j;
-							}
-						}
-					}
+					Clustering::labelData(descriptors, results.centers, params, results.labels);
 				}
 
 				// Generate outputs

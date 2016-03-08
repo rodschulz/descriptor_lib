@@ -35,11 +35,33 @@ void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_p
 	}
 }
 
+void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const ExecutionParams &_params, cv::Mat &_labels)
+{
+	MetricPtr metric = MetricFactory::createMetric(_params.metric, _params.getSequenceLength(), _params.useConfidence);
+
+	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
+	std::vector<double> distance(_items.rows, std::numeric_limits<double>::max());
+	for (int i = 0; i < _items.rows; i++)
+	{
+		for (int j = 0; j < _centers.rows; j++)
+		{
+			double dist = metric->distance(_centers.row(j), _items.row(i));
+			if (dist < distance[i])
+			{
+				distance[i] = dist;
+				_labels.at<int>(i) = j;
+			}
+		}
+	}
+}
+
 void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams &_params)
 {
+	std::cout << "*** ELBOW: begining graph generation ***" << std::endl;
+
 	// Clustering params for the graph generation
 	ExecutionParams params = _params;
-	params.attempts = 5;
+	params.attempts = 3;
 
 	MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
 
@@ -48,6 +70,8 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams
 	data.open("./output/elbow.dat", std::fstream::out);
 	for (int i = 2; i < 50; i++)
 	{
+		std::cout << "*** ELBOW: clustering " << i << " centers" << std::endl;
+
 		ClusteringResults results;
 		searchClusters(_items, _params, results);
 
@@ -81,6 +105,8 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams
 
 	if (system("gnuplot ./output/graph.plot") != 0)
 		std::cout << "WARNING: can't execute GNUPlot" << std::endl;
+
+	std::cout << "*** ELBOW: graph generation finished ***" << std::endl;
 }
 
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)

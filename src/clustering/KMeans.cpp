@@ -119,7 +119,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 		}
 	}
 
-	std::cout << "KMeans finished\nmin SSE: " << minSSE << "\n";
+	std::cout << "KMeans finished -- min SSE: " << minSSE << "\n";
 	for (size_t i = 0; i < itemsPerCenter.size(); i++)
 		std::cout << "\tcluster " << i << ": " << itemsPerCenter[i] << " points\n";
 }
