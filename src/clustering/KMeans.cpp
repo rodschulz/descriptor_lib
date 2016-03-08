@@ -2,7 +2,8 @@
  * Author: rodrigo
  * 2015
  */
-#include "KMeans.h"
+#include "KMeans.hpp"
+
 #include <limits>
 #include <boost/random.hpp>
 

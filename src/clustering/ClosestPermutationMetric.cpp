@@ -2,7 +2,8 @@
  * Author: rodrigo
  * 2015
  */
-#include "ClosestPermutationMetric.h"
+#include "ClosestPermutationMetric.hpp"
+
 #include <iostream>
 #include <stdexcept>
 

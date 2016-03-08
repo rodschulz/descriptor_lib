@@ -6,6 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 #include <boost/shared_ptr.hpp>
+#include "../utils/ExecutionParams.hpp"
 
 // Forward declaration to define a metric's shared pointer
 class Metric;
@@ -14,22 +15,25 @@ typedef boost::shared_ptr<Metric> MetricPtr;
 class Metric
 {
 public:
-	Metric()
-	{
-	}
-
-	virtual ~Metric()
-	{
-	}
-
-	// Methods to implement
+	// Returns the distance between the given vectors, according to the current metric
 	virtual double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const = 0;
+
+	// Returns the central point amongst the given items, according to the given labels
 	virtual cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const = 0;
 
-	// Auxiliary method to ease calls
+	// Evaluates the current metric according to the given testcase file
+	static void evaluateMetricCases(const std::string &_resultsFilename, const std::string &_casesFilename, const MetricType &_metricType, const std::vector<std::string> &_args);
+
+	// Calculates the central point amongst the given items, according to the given labels
 	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels) const
 	{
 		std::vector<int> itemCount;
 		return calculateCenters(_clusterNumber, _items, _labels, itemCount);
 	}
+
+protected:
+	// Constructor
+	Metric();
+	// Destructor
+	virtual ~Metric();
 };

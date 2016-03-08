@@ -5,18 +5,23 @@
 #include "Helper.h"
 //#include <pcl/io/pcd_io.h>
 #include <Eigen/Geometry>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
+//#include <boost/property_tree/ptree.hpp>
+//#include <boost/property_tree/json_parser.hpp>
+//#include <boost/foreach.hpp>
 #include <ctype.h>
 #include <stdexcept>
-#include "ExecutionParams.h"
-#include "../factories/CloudFactory.h"
-#include "../factories/PointFactory.h"
-#include "../descriptor/Calculator.h"
+#include "../factories/CloudFactory.hpp"
+#include "../factories/PointFactory.hpp"
+#include "../utils/ExecutionParams.hpp"
 
-#include "Utils.hpp"
-#include "CloudUtils.hpp"
+#include <string.h>
+#include <sstream>
+#include <iostream>
+#include <fstream>
+
+#include "../descriptor/Calculator.hpp"
+#include "../utils/Utils.hpp"
+#include "../utils/CloudUtils.hpp"
 
 Helper::Helper()
 {
@@ -25,96 +30,6 @@ Helper::Helper()
 Helper::~Helper()
 {
 }
-
-//bool Helper::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
-//{
-//	bool loadOk = true;
-//
-//	// Get cartesian data
-//	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ(new pcl::PointCloud<pcl::PointXYZ>());
-//	if (!_params.useSynthetic)
-//	{
-//		if (pcl::io::loadPCDFile<pcl::PointXYZ>(_params.inputLocation, *cloudXYZ) != 0)
-//		{
-//			std::cout << "ERROR: Can't read file from disk (" << _params.inputLocation << ")\n";
-//			loadOk = false;
-//		}
-//
-//		switch (_params.smoothingType)
-//		{
-//			case SMOOTHING_GAUSSIAN:
-//				std::cout << "Applying gaussian smoothing\n";
-//				cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
-//				break;
-//
-//			case SMOOTHING_MLS:
-//				std::cout << "Applying MLS smoothing\n";
-//				cloudXYZ = CloudUtils::MLSSmoothing(cloudXYZ, _params.mlsRadius);
-//				break;
-//
-//			default:
-//				break;
-//		}
-//	}
-//	else
-//	{
-//		switch (_params.synCloudType)
-//		{
-//			case CLOUD_CUBE:
-//				CloudFactory::createCube(0.3, PointFactory::createPointXYZ(0.3, 0.3, 0.3), cloudXYZ);
-//				break;
-//
-//			case CLOUD_CYLINDER:
-//				CloudFactory::createCylinder(0.2, 0.5, PointFactory::createPointXYZ(0.4, 0.4, 0.4), cloudXYZ);
-//				break;
-//
-//			case CLOUD_SPHERE:
-//				CloudFactory::createSphere(0.2, PointFactory::createPointXYZ(0.2, 0.2, 0.2), cloudXYZ);
-//				break;
-//
-//			default:
-//				cloudXYZ->clear();
-//				loadOk = false;
-//				std::cout << "WARNING, wrong cloud generation parameters\n";
-//		}
-//	}
-//
-//	// Estimate normals
-//	if (loadOk)
-//	{
-//		CloudUtils::removeNANs(cloudXYZ);
-//		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, _params.normalEstimationRadius);
-//
-//		_cloud->clear();
-//		pcl::concatenateFields(*cloudXYZ, *normals, *_cloud);
-//	}
-//
-//	return loadOk;
-//}
-
-void Helper::generateDescriptorsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors)
-{
-	std::cout << "Generating descriptors cache\n";
-	int sequenceSize = _params.getSequenceLength();
-
-	// Resize the matrix in case it doesn't match the required dimensions
-	int rows = _cloud->size();
-	int cols = sequenceSize * _params.bandNumber;
-	if (_descriptors.rows != rows || _descriptors.cols != cols)
-		_descriptors = cv::Mat::zeros(rows, cols, CV_32FC1);
-
-	// Extract the descriptors
-	for (size_t i = 0; i < _cloud->size(); i++)
-	{
-		pcl::PointNormal target = _cloud->points[i];
-		std::vector<BandPtr> bands = Calculator::calculateDescriptor(_cloud, target, _params);
-
-		for (size_t j = 0; j < bands.size(); j++)
-			memcpy(&_descriptors.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
-	}
-}
-
-
 
 void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionParams &_params)
 {
@@ -227,63 +142,4 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentati
 	}
 
 	return output;
-}
-
-void Helper::evaluateMetricCases(const std::string &_resultsFilename, const std::string &_testcasesFilename, const MetricType &_metricType, const std::vector<std::string> &_args)
-{
-	std::cout << "Evaluating metric testcases" << std::endl;
-	MetricPtr targetMetric;
-	if (_metricType == METRIC_EUCLIDEAN)
-		targetMetric = MetricPtr(new EuclideanMetric());
-	else if (_metricType == METRIC_CLOSEST_PERMUTATION)
-		targetMetric = MetricPtr(new ClosestPermutationMetric(atoi(_args[0].c_str()), _args[1].compare("true") == 0));
-	else
-		throw std::runtime_error("Invalid metric type");
-
-	// Extract the testcases
-	boost::property_tree::ptree tree;
-	boost::property_tree::read_json(_testcasesFilename, tree);
-
-	std::cout << "Test cases loaded" << std::endl;
-
-	int k = 0;
-	bool shift = true;
-	std::vector<std::vector<float> > data1, data2;
-	BOOST_FOREACH (boost::property_tree::ptree::value_type& testCase, tree.get_child("vectors"))
-	{
-		// Generate arrays for the vectors of this testcase
-		data1.push_back(std::vector<float>());
-		data2.push_back(std::vector<float>());
-
-		// Iterate over the array of vectors
-		BOOST_FOREACH (boost::property_tree::ptree::value_type& vectors, testCase.second)
-		{
-			// Extract data for a vector
-			BOOST_FOREACH (boost::property_tree::ptree::value_type& vector, vectors.second)
-			{
-				float value = vector.second.get_value<float>();
-				shift ? data1[k].push_back(value) : data2[k].push_back(value);
-			}
-
-			shift = !shift;
-		}
-		k++;
-	}
-
-	std::cout << "Evaluating metric" << std::endl;
-
-	// Evaluate each testcase and write the results
-	std::ofstream results;
-	results.open(_resultsFilename.c_str(), std::ofstream::out);
-	for (size_t i = 0; i < data1.size(); i++)
-	{
-		cv::Mat vector1 = cv::Mat(data1[i]).t();
-		cv::Mat vector2 = cv::Mat(data2[i]).t();
-		double distance = targetMetric->distance(vector1, vector2);
-
-		results << vector1 << "\n" << vector2 << "\ndistance = " << distance << "\n\n";
-	}
-	results.close();
-
-	std::cout << "Metric evaluated" << std::endl;
 }

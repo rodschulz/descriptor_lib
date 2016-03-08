@@ -4,3 +4,6 @@ file(GLOB CLUSTERING_SRC
 )
 
 add_library(clustering ${CLUSTERING_SRC})
+target_link_libraries(clustering
+			utils
+			${OpenCV_LIBS})

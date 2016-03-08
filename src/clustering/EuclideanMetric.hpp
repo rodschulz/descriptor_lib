@@ -4,18 +4,14 @@
  */
 #pragma once
 
-#include "Metric.h"
 #include <stdexcept>
+#include "Metric.hpp"
 
 class EuclideanMetric: public Metric
 {
 public:
-	EuclideanMetric()
-	{
-	}
-	~EuclideanMetric()
-	{
-	}
+	EuclideanMetric() {}
+	~EuclideanMetric() {}
 
 	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
 	{

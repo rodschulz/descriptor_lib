@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "Metric.h"
+#include "Metric.hpp"
 
 class ClosestPermutationMetric: public Metric
 {
