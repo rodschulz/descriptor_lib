@@ -41,18 +41,38 @@ class ExecutionParams
 {
 public:
 	ExecutionParams();
-	~ExecutionParams() {}
+	~ExecutionParams()
+	{
+	}
 
+	// Returns the execution type associated to the given string
 	static ExecutionType getExecutionType(const std::string &_type);
+
+	// Returns the synthetic cloud type associated to the given string
 	static SynCloudType getSynCloudType(const std::string &_type);
+
+	// Returns the cloud smoothing type associated to the given string
 	static SmoothingType getSmoothingType(const std::string &_type);
+
+	// Returns the statistic type associated to the given string
 	static SequenceStat getStatType(const std::string &_type);
+
+	// Returns the clustering implementation associated to the given string
 	static ClusteringImplementation getClusteringImplementation(const std::string &_type);
+
+	// Returns the metric type associated to the given string
 	static MetricType getMetricType(const std::string &_type);
 
+	// Returns a string with the hex representation of the hash calculated for the current params instance
 	std::string getHash() const;
+
+	// Returns the angular range of the bands according to the current config
 	double getBandsAngularRange() const;
+
+	// Returns the angular step of the bands according to the current config
 	double getBandsAngularStep() const;
+
+	// Returns the sequence length of the bands (number of bins) according to the current config
 	int getSequenceLength() const;
 
 	ExecutionType executionType;			// Type of execution to run

@@ -3,7 +3,6 @@
  * 2015
  */
 #include "ExecutionParams.hpp"
-
 #include <boost/algorithm/string.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>

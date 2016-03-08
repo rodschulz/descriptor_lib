@@ -3,7 +3,6 @@
  * 2015
  */
 #include "Config.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
