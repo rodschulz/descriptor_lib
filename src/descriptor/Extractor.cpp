@@ -8,14 +8,6 @@
 #include <pcl/features/normal_3d.h>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
 
-Extractor::Extractor()
-{
-}
-
-Extractor::~Extractor()
-{
-}
-
 pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr surfacePatch(new pcl::PointCloud<pcl::PointNormal>());

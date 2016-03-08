@@ -11,11 +11,15 @@
 
 void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionParams &_params)
 {
+	/**
+	 * @TODO change this to use a different clustering implementation according to the given params
+	 */
+
 	int attempts = 5;
 	cv::Mat labels, centers;
 
 	std::ofstream data;
-	data.open("./output/graph.dat", std::fstream::out);
+	data.open("./output/elbow.dat", std::fstream::out);
 	for (int i = 2; i < 50; i++)
 	{
 		cv::kmeans(_descriptors, i, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, _params.maxIterations, _params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
@@ -25,7 +29,7 @@ void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const Exec
 	data.close();
 
 	std::ofstream graph;
-	graph.open("./output/graph.plot", std::fstream::out);
+	graph.open("./output/elbow.plot", std::fstream::out);
 
 	graph << "set xtic auto\n";
 	graph << "set ytic auto\n";
@@ -36,9 +40,9 @@ void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const Exec
 	graph << "set ylabel 'SSE'\n\n";
 
 	graph << "set term png\n";
-	graph << "set output './output/elbowGraph.png'\n\n";
+	graph << "set output './output/elbow.png'\n\n";
 
-	graph << "plot './output/graph.dat' using 1:2 title 'SSE' with linespoints lt rgb 'blue'\n";
+	graph << "plot './output/elbow.dat' using 1:2 title 'SSE' with linespoints lt rgb 'blue'\n";
 
 	graph.close();
 
@@ -48,6 +52,10 @@ void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const Exec
 
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr ClusteringUtils::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
+	/**
+	 * @TODO improve the representation creating to "bend" the bands according to the mean normal in each bin
+	 */
+
 	int sequenceLength = _params.getSequenceLength();
 	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::createPointNormal(0, 0, 0, 0, 0, 0, 0));
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
