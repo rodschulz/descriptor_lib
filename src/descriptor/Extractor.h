@@ -5,7 +5,8 @@
 #pragma once
 
 #include <vector>
-#include "../utils/ExecutionParams.h"
+
+#include "../utils/ExecutionParams.hpp"
 #include "Band.h"
 
 class Extractor

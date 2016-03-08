@@ -10,14 +10,6 @@
 
 using namespace boost::accumulators;
 
-Calculator::Calculator()
-{
-}
-
-Calculator::~Calculator()
-{
-}
-
 std::vector<BandPtr> Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_target, const ExecutionParams &_params)
 {
 	// Get target point and surface patch

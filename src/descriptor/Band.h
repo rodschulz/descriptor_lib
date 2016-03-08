@@ -8,7 +8,8 @@
 #include <pcl/point_types.h>
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <eigen3/Eigen/src/Geometry/Hyperplane.h>
-#include "../factories/PointFactory.h"
+
+#include "../factories/PointFactory.hpp"
 
 // Forward declaration to define a band's shared pointer
 class Band;
@@ -19,12 +20,16 @@ class Band
 public:
 	// Vector holding the data which generated the current band
 	pcl::PointCloud<pcl::PointNormal>::Ptr data;
+
 	// Band's generator point
 	pcl::PointNormal point;
+
 	// Plane going along the longitudinal band
 	Eigen::Hyperplane<float, 3> plane;
+
 	// String representing the sequence of the current band
 	std::string sequenceString;
+
 	// Vector corresponding to the numeric sequence representation
 	std::vector<float> sequenceVector;
 
