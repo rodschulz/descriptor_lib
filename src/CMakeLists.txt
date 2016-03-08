@@ -32,7 +32,7 @@ add_subdirectory(utils)
 add_subdirectory(io)
 
 # Define files for each target
-file(GLOB DESCRIPTOR_SRC "main.cpp")
+file(GLOB DESCRIPTOR_SRC "Descriptor.cpp")
 file(GLOB TEST_SRC
 	"./test/*.h"
 	"./test/*.cpp")

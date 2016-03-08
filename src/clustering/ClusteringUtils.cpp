@@ -2,36 +2,14 @@
  * Author: rodrigo
  * 2015
  */
-#include "Helper.h"
-//#include <pcl/io/pcd_io.h>
-#include <Eigen/Geometry>
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/json_parser.hpp>
-//#include <boost/foreach.hpp>
-#include <ctype.h>
-#include <stdexcept>
-#include "../factories/CloudFactory.hpp"
-#include "../factories/PointFactory.hpp"
-#include "../utils/ExecutionParams.hpp"
-
+#include "ClusteringUtils.hpp"
 #include <string.h>
-#include <sstream>
-#include <iostream>
 #include <fstream>
-
-#include "../descriptor/Calculator.hpp"
 #include "../utils/Utils.hpp"
-#include "../utils/CloudUtils.hpp"
+#include "../descriptor/Calculator.hpp"
+#include "../factories/PointFactory.hpp"
 
-Helper::Helper()
-{
-}
-
-Helper::~Helper()
-{
-}
-
-void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionParams &_params)
+void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionParams &_params)
 {
 	int attempts = 5;
 	cv::Mat labels, centers;
@@ -68,7 +46,7 @@ void Helper::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionPara
 		std::cout << "WARNING: can't execute GNUPlot" << std::endl;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Helper::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr ClusteringUtils::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
 	int sequenceLength = _params.getSequenceLength();
 	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::createPointNormal(0, 0, 0, 0, 0, 0, 0));

@@ -6,8 +6,8 @@
 
 #include <string>
 #include <opencv2/core/core.hpp>
-#include "../descriptor/Hist.h"
-#include "../descriptor/Extractor.h"
+#include "../descriptor/Hist.hpp"
+#include "../descriptor/Extractor.hpp"
 #include "../clustering/Metric.hpp"
 
 #define OUTPUT_FOLDER		"./output/"

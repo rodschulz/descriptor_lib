@@ -7,17 +7,53 @@
 #include <string>
 #include <opencv2/core/core.hpp>
 #include <pcl/io/pcd_io.h>
-#include "clustering/KMeans.h"
-#include "descriptor/Calculator.h"
-#include "descriptor/Extractor.h"
-#include "descriptor/Hist.h"
-#include "utils/Config.h"
-#include "utils/Helper.h"
-#include "factories/MetricFactory.h"
-#include "io/Writer.h"
-#include "io/Loader.h"
+
+#include "clustering/ClusteringUtils.hpp"
+#include "clustering/KMeans.hpp"
+#include "clustering/MetricFactory.hpp"
+#include "descriptor/Calculator.hpp"
+#include "descriptor/Extractor.hpp"
+#include "descriptor/Hist.hpp"
+#include "factories/CloudFactory.hpp"
+#include "io/Loader.hpp"
+#include "io/Writer.hpp"
+#include "utils/Config.hpp"
+#include "utils/CloudUtils.hpp"
 
 #define CONFIG_LOCATION "./config/config.yaml"
+
+bool getPointCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+{
+	if (_params.useSynthetic)
+	{
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ;
+		switch (_params.synCloudType)
+		{
+			case CLOUD_CUBE:
+				cloudXYZ = CloudFactory::createCube(0.3, PointFactory::createPointXYZ(0.3, 0.3, 0.3));
+				break;
+
+			case CLOUD_CYLINDER:
+				cloudXYZ = CloudFactory::createCylinder(0.2, 0.5, PointFactory::createPointXYZ(0.4, 0.4, 0.4));
+				break;
+
+			case CLOUD_SPHERE:
+				cloudXYZ = CloudFactory::createSphere(0.2, PointFactory::createPointXYZ(0.2, 0.2, 0.2));
+				break;
+
+			default:
+				std::cout << "WARNING, wrong cloud generation parameters\n";
+				return false;
+		}
+
+		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, _params.normalEstimationRadius);
+		pcl::concatenateFields(*cloudXYZ, *normals, *_cloud);
+
+		return true;
+	}
+	else
+		return Loader::loadCloud(_cloud, _params);
+}
 
 int main(int _argn, char **_argv)
 {
@@ -40,12 +76,12 @@ int main(int _argn, char **_argv)
 
 		// Do things according to the execution type
 		if (params.executionType == EXECUTION_METRIC)
-			Helper::evaluateMetricCases("./output/metricEvaluation", params.inputLocation, params.targetMetric, params.metricArgs);
+			Metric::evaluateMetricCases("./output/metricEvaluation", params.inputLocation, params.targetMetric, params.metricArgs);
 		else
 		{
 			// Load cloud
 			pcl::PointCloud<pcl::PointNormal>::Ptr cloud(new pcl::PointCloud<pcl::PointNormal>());
-			if (!Loader::loadCloud(cloud, params))
+			if (!getPointCloud(cloud, params))
 				throw std::runtime_error("Can't load cloud");
 			std::cout << "Loaded " << cloud->size() << " points in cloud\n";
 
@@ -53,18 +89,15 @@ int main(int _argn, char **_argv)
 			if (params.executionType == EXECUTION_DESCRIPTOR)
 			{
 				std::cout << "Target point: " << params.targetPoint << "\n";
-
-				pcl::PointNormal target = cloud->at(params.targetPoint);
-				std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud, target, params);
+				Descriptor descriptor = Calculator::calculateDescriptor(cloud, params);
 
 				// Calculate histograms
-				std::cout << "Generating angle histograms\n";
-				std::vector<Hist> histograms;
-				Calculator::calculateAngleHistograms(bands, histograms, params.useProjection);
+				std::cout << "Generating histograms\n";
+				std::vector<Hist> histograms = Calculator::generateAngleHistograms(descriptor, params.useProjection);
 
 				// Write output
 				std::cout << "Writing output\n";
-				Writer::writeOuputData(cloud, bands, histograms, params);
+				Writer::writeOuputData(cloud, descriptor, histograms, params);
 			}
 			else if (params.executionType == EXECUTION_CLUSTERING)
 			{
@@ -73,7 +106,7 @@ int main(int _argn, char **_argv)
 				cv::Mat descriptors, labels, centers;
 				if (!Loader::loadDescriptorsCache(descriptors, params))
 				{
-					Helper::generateDescriptorsCache(cloud, params, descriptors);
+					Calculator::calculateDescriptors(cloud, params, descriptors);
 					Writer::writeDescriptorsCache(descriptors, params);
 				}
 
@@ -124,14 +157,14 @@ int main(int _argn, char **_argv)
 
 				// Generate outputs
 				std::cout << "Writing outputs" << std::endl;
-				pcl::io::savePCDFileASCII("./output/visualization.pcd", *Helper::generateClusterRepresentation(cloud, labels, centers, params));
+				pcl::io::savePCDFileASCII("./output/visualization.pcd", *ClusteringUtils::generateClusterRepresentation(cloud, labels, centers, params));
 				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
 				Writer::writeClustersCenters("./output/", centers);
 
 				if (params.genDistanceMatrix)
 					Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
 				if (params.genElbowCurve)
-					Helper::generateElbowGraph(descriptors, params);
+					ClusteringUtils::generateElbowGraph(descriptors, params);
 			}
 		}
 	}
