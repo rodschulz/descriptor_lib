@@ -2,28 +2,61 @@
  * Author: rodrigo
  * 2015
  */
-#include "ClusteringUtils.hpp"
+#include "Clustering.hpp"
+
 #include <string.h>
 #include <fstream>
 #include "../utils/Utils.hpp"
-#include "../descriptor/Calculator.hpp"
 #include "../factories/PointFactory.hpp"
+#include "MetricFactory.hpp"
+#include "KMeans.hpp"
 
-void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const ExecutionParams &_params)
+void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_params, ClusteringResults &_results)
 {
-	/**
-	 * @TODO change this to use a different clustering implementation according to the given params
-	 */
+	MetricPtr metric = MetricFactory::createMetric(_params.metric, _params.getSequenceLength(), _params.useConfidence);
 
-	int attempts = 5;
-	cv::Mat labels, centers;
+	switch (_params.implementation)
+	{
+		default:
+			std::cout << "WARNING: invalid clustering method. Falling back to OpenCV" << std::endl;
+			/* no break */
 
+		case CLUSTERING_OPENCV:
+			cv::kmeans(_items, _params.clusters, _results.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, _params.maxIterations, _params.stopThreshold), _params.attempts, cv::KMEANS_PP_CENTERS, _results.centers);
+			break;
+
+		case CLUSTERING_CUSTOM:
+			KMeans::searchClusters(_items, _params.clusters, *metric, _params.attempts, _params.maxIterations, _params.stopThreshold, _results.labels, _results.centers, _results.errorEvolution);
+			break;
+
+		case CLUSTERING_STOCHASTIC:
+			KMeans::stochasticSearchClusters(_items, _params.clusters, _items.rows / 10, *metric, _params.attempts, _params.maxIterations, _params.stopThreshold, _results.labels, _results.centers, _results.errorEvolution);
+			break;
+	}
+}
+
+void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams &_params)
+{
+	// Clustering params for the graph generation
+	ExecutionParams params = _params;
+	params.attempts = 5;
+
+	MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
+
+	// Iterate clustering from 2 to 50 centers
 	std::ofstream data;
 	data.open("./output/elbow.dat", std::fstream::out);
 	for (int i = 2; i < 50; i++)
 	{
-		cv::kmeans(_descriptors, i, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, _params.maxIterations, _params.stopThreshold), attempts, cv::KMEANS_PP_CENTERS, centers);
-		double sse = Utils::getSSE(_descriptors, centers, labels);
+		ClusteringResults results;
+		searchClusters(_items, _params, results);
+
+		double sse;
+		if (params.implementation == CLUSTERING_OPENCV)
+			sse = Utils::getSSE(_items, results.centers, results.labels);
+		else
+			sse = KMeans::getSSE(_items, results.labels, results.centers, *metric);
+
 		data << i << " " << sse << "\n";
 	}
 	data.close();
@@ -50,7 +83,7 @@ void ClusteringUtils::generateElbowGraph(const cv::Mat &_descriptors, const Exec
 		std::cout << "WARNING: can't execute GNUPlot" << std::endl;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr ClusteringUtils::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
 	/**
 	 * @TODO improve the representation creating to "bend" the bands according to the mean normal in each bin

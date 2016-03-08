@@ -25,6 +25,46 @@ BOOST_AUTO_TEST_CASE(getColor)
 	BOOST_CHECK_MESSAGE(abs(color - value) < 1E-90, "Conversion RGB to float failling");
 }
 
+BOOST_AUTO_TEST_CASE(getSSE)
+{
+	int nvectors = 10;
+	int ncenters = 3;
+	int dim = 5;
+
+	cv::Mat vectors = cv::Mat::zeros(nvectors, dim, CV_32F);
+	cv::Mat centers = cv::Mat::zeros(ncenters, dim, CV_32FC1);
+	cv::Mat labels = cv::Mat::zeros(nvectors, 1, CV_32SC1);
+
+	BOOST_CHECK_EQUAL(Utils::getSSE(vectors, centers, labels), 0);
+
+	for (int i = 0; i < nvectors; i++)
+	{
+		labels.at<int>(i) = i % ncenters;
+
+		cv::Mat aux = cv::Mat::ones(1, dim, CV_32FC1) * (i % ncenters);
+		aux.copyTo(vectors.row(i));
+	}
+
+	int center1 = 7;
+	int center2 = 2;
+	int center3 = 3;
+
+	cv::Mat aux = cv::Mat::ones(1, dim, CV_32FC1) * center1;
+	aux.copyTo(centers.row(0));
+
+	aux = cv::Mat::ones(1, dim, CV_32FC1) * center2;
+	aux.copyTo(centers.row(1));
+
+	aux = cv::Mat::ones(1, dim, CV_32FC1) * center3;
+	aux.copyTo(centers.row(2));
+
+	std::cout << centers << "\n" << vectors << "\n";
+
+	double sse = center1 * center1 * dim * 4 + (center2 - 1) * (center2 - 1) * dim * 3 + (center3 - 2) * (center3 - 2) * dim * 3;
+	BOOST_CHECK(fabs(Utils::getSSE(vectors, centers, labels) - sse) < 1E-4);
+}
+
+
 BOOST_AUTO_TEST_CASE(sign)
 {
 	BOOST_CHECK_EQUAL(Utils::sign<short>(10), 1);

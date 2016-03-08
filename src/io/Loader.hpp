@@ -18,10 +18,10 @@ public:
 	static bool loadMatrix(cv::Mat &_matrix, const std::string &_filename);
 
 	// Loads a descriptors calculation cache. Returns true if was successfully loaded, false otherwise
-	static bool loadDescriptorsCache(cv::Mat &_descriptors, const ExecutionParams &_params);
+	static bool loadDescriptors(cv::Mat &_descriptors, const ExecutionParams &_params);
 
 	// Loads pre-calculated centers for clustering. Returns true if was successfully loaded, false otherwise
-	static bool loadClusterCenters(const std::string &_fileLocation, cv::Mat &_centers);
+	static bool loadCenters(const std::string &_fileLocation, cv::Mat &_centers);
 
 	// Loads a matrix from disk and stores it in the given matrix. Returns true if was successfully loaded, false otherwise
 	static bool loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params);

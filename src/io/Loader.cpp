@@ -62,13 +62,13 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 	return loadOk;
 }
 
-bool Loader::loadDescriptorsCache(cv::Mat &_descriptors, const ExecutionParams &_params)
+bool Loader::loadDescriptors(cv::Mat &_descriptors, const ExecutionParams &_params)
 {
 	std::string filename = _params.cacheLocation + _params.getHash();
 	return loadMatrix(_descriptors, filename);
 }
 
-bool Loader::loadClusterCenters(const std::string &_filename, cv::Mat &_centers)
+bool Loader::loadCenters(const std::string &_filename, cv::Mat &_centers)
 {
 	return loadMatrix(_centers, _filename);
 }

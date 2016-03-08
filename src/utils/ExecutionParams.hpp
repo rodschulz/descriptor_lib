@@ -41,9 +41,7 @@ class ExecutionParams
 {
 public:
 	ExecutionParams();
-	~ExecutionParams()
-	{
-	}
+	~ExecutionParams() {};
 
 	// Returns the execution type associated to the given string
 	static ExecutionType getExecutionType(const std::string &_type);

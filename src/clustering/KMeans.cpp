@@ -91,7 +91,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 				labels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
 			// Store SSE evolution
-			sseCurve.push_back(calculateSSE(_items, labels, centers, _metric));
+			sseCurve.push_back(getSSE(_items, labels, centers, _metric));
 
 			// Calculate updated centers and check has to stop
 			cv::Mat newCenters = _metric.calculateCenters(_clusterNumber, _items, labels, itemCount);
@@ -106,9 +106,7 @@ void KMeans::searchClusters(const cv::Mat &_items, const int _clusterNumber, con
 			}
 		}
 
-		//print<int>(labels);
-
-		double sse = calculateSSE(_items, labels, centers, _metric);
+		double sse = getSSE(_items, labels, centers, _metric);
 		std::cout << "\tSSE: " << std::fixed << sse << std::endl;
 
 		if (sse < minSSE)
@@ -180,7 +178,7 @@ void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterN
 		for (int k = 0; k < _items.rows; k++)
 			setLabels.at<int>(k) = findClosestCenter(_items.row(k), centers, _metric);
 
-		double sse = calculateSSE(_items, setLabels, centers, _metric);
+		double sse = getSSE(_items, setLabels, centers, _metric);
 		std::cout << "\tSSE: " << std::fixed << sse << std::endl;
 
 		// Update best clustering so far
@@ -191,6 +189,18 @@ void KMeans::stochasticSearchClusters(const cv::Mat &_items, const int _clusterN
 			bestSSE = sse;
 		}
 	}
+}
+
+double KMeans::getSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, const Metric &_metric)
+{
+	double sse = 0;
+	for (int i = 0; i < _items.rows; i++)
+	{
+		double norm = _metric.distance(_items.row(i), _centers.row(_labels.at<int>(i)));
+		sse += (norm * norm);
+	}
+
+	return sse;
 }
 
 bool KMeans::evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, const Metric &_metric)
@@ -207,18 +217,6 @@ void KMeans::selectStartCenters(const cv::Mat &_items, cv::Mat &_centers)
 	std::vector<int> randomSet = getRandomSet(_centers.rows, 0, _items.rows - 1);
 	for (int j = 0; j < _centers.rows; j++)
 		_items.row(randomSet[j]).copyTo(_centers.row(j));
-}
-
-double KMeans::calculateSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, const Metric &_metric)
-{
-	double sse = 0;
-	for (int i = 0; i < _items.rows; i++)
-	{
-		double norm = _metric.distance(_items.row(i), _centers.row(_labels.at<int>(i)));
-		sse += (norm * norm);
-	}
-
-	return sse;
 }
 
 int KMeans::findClosestCenter(const cv::Mat &_vector, cv::Mat &_centers, const Metric &_metric)

@@ -8,7 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include <pcl/io/pcd_io.h>
 
-#include "clustering/ClusteringUtils.hpp"
+#include "clustering/Clustering.hpp"
 #include "clustering/KMeans.hpp"
 #include "clustering/MetricFactory.hpp"
 #include "descriptor/Calculator.hpp"
@@ -103,32 +103,23 @@ int main(int _argn, char **_argv)
 			{
 				std::cout << "Execution for clustering\n";
 
-				cv::Mat descriptors, labels, centers;
-				if (!Loader::loadDescriptorsCache(descriptors, params))
+				cv::Mat descriptors;
+				if (!Loader::loadDescriptors(descriptors, params))
 				{
 					Calculator::calculateDescriptors(cloud, params, descriptors);
 					Writer::writeDescriptorsCache(descriptors, params);
 				}
 
-				std::vector<double> sseError;
+				ClusteringResults results;
 				MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
 				if (!params.labelData)
 				{
-					// Make clusters of data
-					std::cout << "Calculating clusters\n";
-					if (params.implementation == CLUSTERING_OPENCV)
-						cv::kmeans(descriptors, params.clusters, labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params.maxIterations, params.stopThreshold), params.attempts, cv::KMEANS_PP_CENTERS, centers);
+					Clustering::searchClusters(descriptors, params, results);
 
-					else if (params.implementation == CLUSTERING_CUSTOM)
-						KMeans::searchClusters(descriptors, params.clusters, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers, sseError);
-
-					else if (params.implementation == CLUSTERING_STOCHASTIC)
-						KMeans::stochasticSearchClusters(descriptors, params.clusters, cloud->size() / 10, *metric, params.attempts, params.maxIterations, params.stopThreshold, labels, centers, sseError);
-
-					if (!sseError.empty())
+					if (!results.errorEvolution.empty())
 					{
 						std::cout << "Generating SSE plot" << std::endl;
-						Writer::writePlotSSE("sse", "SSE Evolution", sseError);
+						Writer::writePlotSSE("sse", "SSE Evolution", results.errorEvolution);
 					}
 				}
 				else
@@ -136,20 +127,20 @@ int main(int _argn, char **_argv)
 					std::cout << "Loading centers" << std::endl;
 
 					// Label data according to given centers
-					if (!Loader::loadClusterCenters(params.centersLocation, centers))
+					if (!Loader::loadCenters(params.centersLocation, results.centers))
 						throw std::runtime_error("Can't load clusters centers");
 
-					labels = cv::Mat::zeros(descriptors.rows, 1, CV_32SC1);
+					results.labels = cv::Mat::zeros(descriptors.rows, 1, CV_32SC1);
 					std::vector<double> distance(descriptors.rows, std::numeric_limits<double>::max());
 					for (int i = 0; i < descriptors.rows; i++)
 					{
-						for (int j = 0; j < centers.rows; j++)
+						for (int j = 0; j < results.centers.rows; j++)
 						{
-							double dist = metric->distance(centers.row(j), descriptors.row(i));
+							double dist = metric->distance(results.centers.row(j), descriptors.row(i));
 							if (dist < distance[i])
 							{
 								distance[i] = dist;
-								labels.at<int>(i) = j;
+								results.labels.at<int>(i) = j;
 							}
 						}
 					}
@@ -157,14 +148,14 @@ int main(int _argn, char **_argv)
 
 				// Generate outputs
 				std::cout << "Writing outputs" << std::endl;
-				pcl::io::savePCDFileASCII("./output/visualization.pcd", *ClusteringUtils::generateClusterRepresentation(cloud, labels, centers, params));
-				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, labels);
-				Writer::writeClustersCenters("./output/", centers);
+				pcl::io::savePCDFileASCII("./output/visualization.pcd", *Clustering::generateClusterRepresentation(cloud, results.labels, results.centers, params));
+				Writer::writeClusteredCloud("./output/clusters.pcd", cloud, results.labels);
+				Writer::writeClustersCenters("./output/", results.centers);
 
 				if (params.genDistanceMatrix)
-					Writer::writeDistanceMatrix("./output/", descriptors, centers, labels, metric);
+					Writer::writeDistanceMatrix("./output/", descriptors, results.centers, results.labels, metric);
 				if (params.genElbowCurve)
-					ClusteringUtils::generateElbowGraph(descriptors, params);
+					Clustering::generateElbowGraph(descriptors, params);
 			}
 		}
 	}
