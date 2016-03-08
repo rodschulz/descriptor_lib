@@ -2,7 +2,8 @@
  * Author: rodrigo
  * 2015
  */
-#include "Writer.h"
+#include "Writer.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <math.h>
@@ -12,7 +13,8 @@
 #include <pcl/io/pcd_io.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "../factories/CloudFactory.h"
+
+#include "../factories/CloudFactory.hpp"
 #include "../utils/Utils.hpp"
 
 #define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"

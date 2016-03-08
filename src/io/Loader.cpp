@@ -2,7 +2,8 @@
  * Author: rodrigo
  * 2015
  */
-#include "Loader.h"
+#include "Loader.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <pcl/io/pcd_io.h>

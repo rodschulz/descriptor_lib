@@ -2,8 +2,9 @@
  * Author: rodrigo
  * 2015
  */
-#include "CloudFactory.h"
-#include "PointFactory.h"
+#include "CloudFactory.hpp"
+
+#include "PointFactory.hpp"
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center)
 {

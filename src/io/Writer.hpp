@@ -5,9 +5,9 @@
 #pragma once
 
 #include <string>
+#include <opencv2/core/core.hpp>
 #include "../descriptor/Hist.h"
 #include "../descriptor/Extractor.h"
-#include <opencv2/core/core.hpp>
 #include "../clustering/Metric.h"
 
 #define OUTPUT_FOLDER		"./output/"
