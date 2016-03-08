@@ -1,3 +1,7 @@
+/**
+ * Author: rodrigo
+ * 2016
+ */
 #include <boost/test/unit_test.hpp>
 
 #include "../utils/Utils.hpp"
@@ -22,7 +26,7 @@ BOOST_AUTO_TEST_CASE(getColor)
 {
 	float value = 2.05454233E-38;
 	float color = Utils::getColor(223, 184, 72);
-	BOOST_CHECK_MESSAGE(abs(color - value) < 1E-90, "Conversion RGB to float failling");
+	BOOST_CHECK_CLOSE(color, value, 1E-35);
 }
 
 BOOST_AUTO_TEST_CASE(getSSE)
@@ -121,7 +125,7 @@ BOOST_AUTO_TEST_CASE(angle)
 BOOST_AUTO_TEST_CASE(signedAngle)
 {
 	Eigen::Vector3f v1(1, 0, 0);
-	Eigen::Vector3f v2(1, 0, 0);
+	Eigen::Vector3f v2(0.99, 0, 0);
 	Eigen::Vector3f normal(0, 0, 1);
 
 	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), 0, 1E-10);
