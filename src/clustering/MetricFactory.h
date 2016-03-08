@@ -5,9 +5,10 @@
 #pragma once
 
 #include <stdarg.h>
+
+#include "../utils/ExecutionParams.hpp"
 #include "EuclideanMetric.h"
 #include "ClosestPermutationMetric.h"
-#include "../utils/ExecutionParams.h"
 
 class MetricFactory
 {

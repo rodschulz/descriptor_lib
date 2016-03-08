@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../utils/Utils.hpp"
-#include "../utils/ExecutionParams.h"
+#include "../utils/ExecutionParams.hpp"
 
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(Utils_class_suite)
@@ -184,10 +184,5 @@ BOOST_AUTO_TEST_CASE(getSequenceLength)
 	BOOST_CHECK_EQUAL(params.getSequenceLength(), 5);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-/**************************************************/
-
-/**************************************************/
-BOOST_AUTO_TEST_SUITE(Config_class_suite)
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
