@@ -97,15 +97,15 @@ int main(int _argn, char **_argv)
 			{
 				std::cout << "...Execution for descriptor calculation\n";
 
-				std::cout << "\tTarget point: " << params.targetPoint << "\n";
+				std::cout << "Target point: " << params.targetPoint << "\n";
 				Descriptor descriptor = Calculator::calculateDescriptor(cloud, params);
 
 				// Calculate histograms
-				std::cout << "\tGenerating histograms\n";
+				std::cout << "Generating histograms\n";
 				std::vector<Hist> histograms = Calculator::generateAngleHistograms(descriptor, params.useProjection);
 
 				// Write output
-				std::cout << "\tWriting output\n";
+				std::cout << "Writing output\n";
 				Writer::writeOuputData(cloud, descriptor, histograms, params);
 			}
 			else if (params.executionType == EXECUTION_CLUSTERING)
@@ -125,12 +125,12 @@ int main(int _argn, char **_argv)
 				{
 					Clustering::searchClusters(descriptors, params, results);
 
-					std::cout << "\tGenerating SSE plot" << std::endl;
+					std::cout << "Generating SSE plot" << std::endl;
 					Writer::writePlotSSE("sse", "SSE Evolution", results.errorEvolution);
 				}
 				else
 				{
-					std::cout << "\tLoading centers" << std::endl;
+					std::cout << "Loading centers" << std::endl;
 
 					if (!Loader::loadCenters(params.centersLocation, results.centers))
 						throw std::runtime_error("Can't load clusters centers");
