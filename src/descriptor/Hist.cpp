@@ -2,7 +2,7 @@
  * Author: rodrigo
  * 2015
  */
-#include "Hist.h"
+#include "Hist.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <cmath>

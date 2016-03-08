@@ -3,7 +3,6 @@
  * 2015
  */
 #include "CloudFactory.hpp"
-
 #include "PointFactory.hpp"
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createCube(const double _size, const pcl::PointXYZ &_center)

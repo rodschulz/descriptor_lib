@@ -2,7 +2,7 @@
  * Author: rodrigo
  * 2015
  */
-#include "Extractor.h"
+#include "Extractor.hpp"
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/features/normal_3d.h>

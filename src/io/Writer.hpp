@@ -8,7 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include "../descriptor/Hist.h"
 #include "../descriptor/Extractor.h"
-#include "../clustering/Metric.h"
+#include "../clustering/Metric.hpp"
 
 #define OUTPUT_FOLDER		"./output/"
 #define MATRIX_DIMENSIONS	"dims"
