@@ -7,7 +7,6 @@
 #include <string>
 #include <opencv2/core/core.hpp>
 #include <pcl/io/pcd_io.h>
-
 #include "clustering/Clustering.hpp"
 #include "clustering/KMeans.hpp"
 #include "clustering/MetricFactory.hpp"
@@ -115,6 +114,7 @@ int main(int _argn, char **_argv)
 				cv::Mat descriptors;
 				if (!Loader::loadDescriptors(descriptors, params))
 				{
+					std::cout << "Cache not found, calculating descriptors\n";
 					Calculator::calculateDescriptors(cloud, params, descriptors);
 					Writer::writeDescriptorsCache(descriptors, params);
 				}

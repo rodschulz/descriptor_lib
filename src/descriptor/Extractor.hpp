@@ -11,7 +11,7 @@
 class Extractor
 {
 public:
-	// Return the neighbors of the given point in the given cloud, according to the search radius
+	// Return the neighbors of the given point in the given cloud, according to the search radius (sphere)
 	static pcl::PointCloud<pcl::PointNormal>::Ptr getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius);
 
 	// Extracts the bands around the target point and according to the given params

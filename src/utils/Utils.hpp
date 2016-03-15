@@ -49,7 +49,7 @@ public:
 		// Check if the cross product is not zero
 		if (fabs(direction) > 1E-7)
 		{
-			if (_normal.dot(_vector1.cross(_vector2)) < 0)
+			if (direction < 0)
 				return -atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
 			else
 				return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));

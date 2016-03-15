@@ -3,7 +3,6 @@
  * 2016
  */
 #include <boost/test/unit_test.hpp>
-
 #include "../utils/Utils.hpp"
 #include "../utils/ExecutionParams.hpp"
 

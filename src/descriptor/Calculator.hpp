@@ -37,7 +37,8 @@ public:
 		int index = _value / _step;
 		if (index == 0)
 			return '0';
-		return index > 0 ? 'A' + index : 'a' - index;
+
+		return index > 0 ? 'A' + (index - 1) : 'a' - (index + 1);
 	}
 
 	// Calculares the angle between the two given vectors
