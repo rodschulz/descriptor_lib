@@ -66,8 +66,10 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 		for (size_t j = 0; j < lines.size(); j++)
 		{
 			if (_params.bidirectional)
+			{
 				if (lines[j].distance(projection) <= halfBand)
 					bands[j]->data->push_back(_cloud->points[i]);
+			}
 			else
 			{
 				/**

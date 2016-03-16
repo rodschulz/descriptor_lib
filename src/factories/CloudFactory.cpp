@@ -117,6 +117,22 @@ pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createHorizontalPlane(const
 	return cloud;
 }
 
+//pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createSpherePart(const float _angle, const float _centerX, const float _centerY, const float _centerZ, const float _radius)
+//{
+//	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
+//	int N = sqrt(1000);
+//
+//	// Set the steps for aprox N points
+//	float stepX = (_maxX - _minX) / N;
+//	float stepY = (_maxY - _minY) / N;
+//
+//	for (float dx = _minX; dx <= _maxX; dx += stepX)
+//		for (float dy = _minY; dy <= _maxY; dy += stepY)
+//			cloud->push_back(PointFactory::createPointNormal(dx, dy, _z, 0, 0, 1));
+//
+//	return cloud;
+//}
+
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint32_t _color)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());

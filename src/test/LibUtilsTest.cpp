@@ -155,6 +155,22 @@ BOOST_AUTO_TEST_CASE(signedAngle)
 	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), M_PI, 1E-10);
 }
 
+BOOST_AUTO_TEST_CASE(generatePlaneAxes)
+{
+	Eigen::Vector3f normal = Eigen::Vector3f(1, 1, 0).normalized();
+	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(normal, Eigen::Vector3f(10, 7, 5));
+
+	Eigen::Vector3f origin = plane.projection(Eigen::Vector3f(-3, 2, 70));
+	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePlaneAxes(plane, origin);
+
+	// Check vectors are actually perpendicular
+	BOOST_CHECK_SMALL(axes.first.dot(axes.second), 1E-8f);
+
+	// Check both are inside the plane
+	BOOST_CHECK_CLOSE(axes.first.cross(axes.second).dot(normal), 1, 2);
+	BOOST_CHECK_SMALL(axes.second.dot(normal), 1E-20f);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
 

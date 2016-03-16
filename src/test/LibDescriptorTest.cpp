@@ -12,13 +12,13 @@ struct ExecParamsFixture {
 	ExecParamsFixture()
 	{
 		params.targetPoint = 100;
-		params.patchSize = 0.02;
+		params.patchSize = 5;
 		params.normalEstimationRadius = -1;
 		params.bandNumber = 5;
-		params.bandWidth = 0.005;
+		params.bandWidth = 2;
 		params.bidirectional = false;
 		params.useProjection = false;
-		params.sequenceBin = 0.005;
+		params.sequenceBin = 2;
 		params.sequenceStat = STAT_MEAN;
 	}
 	~ ExecParamsFixture() {}
@@ -28,6 +28,50 @@ struct ExecParamsFixture {
 
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(Calculator_class_suite)
+
+BOOST_FIXTURE_TEST_CASE(calculateDescriptor, ExecParamsFixture)
+{
+	// Generate cloud
+	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 3000);
+	pcl::PointNormal point = cloud->at(params.targetPoint);
+
+	Descriptor descriptor1 = Calculator::calculateDescriptor(cloud, params);
+	Descriptor descriptor2 = Calculator::calculateDescriptor(cloud, params, point);
+
+	// Check sizes
+	BOOST_CHECK_EQUAL(descriptor1.size(), params.bandNumber);
+	BOOST_CHECK_EQUAL(descriptor1.size(), descriptor2.size());
+
+	// Check the fields are being filled
+	for (int i = 0; i < params.bandNumber; i++)
+	{
+		BOOST_CHECK(!descriptor1[i]->sequenceString.empty());
+		BOOST_CHECK(!descriptor1[i]->sequenceVector.empty());
+	}
+}
+
+BOOST_FIXTURE_TEST_CASE(fillSequences, ExecParamsFixture)
+{
+	// Generate cloud
+	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 5000);
+	pcl::PointNormal point = cloud->at(1);
+	point.x = 0;
+	point.y = 250;
+
+	// Extract bands
+	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
+	Calculator::fillSequences(bands, params, M_PI / 18);
+
+	int sequenceSize = params.getSequenceLength();
+	std::string zeroSequence = "";
+	zeroSequence.resize(sequenceSize, '0');
+	for (int i = 0; i < params.bandNumber; i++)
+	{
+		BOOST_CHECK_EQUAL(bands[i]->sequenceVector.size(), sequenceSize);
+		BOOST_CHECK_EQUAL(bands[i]->sequenceString.size(), sequenceSize);
+		BOOST_CHECK_EQUAL(bands[i]->sequenceString, zeroSequence);
+	}
+}
 
 BOOST_AUTO_TEST_CASE(getSequenceChar)
 {

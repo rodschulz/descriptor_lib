@@ -83,6 +83,7 @@ void Calculator::fillSequences(Descriptor &_descriptor, const ExecutionParams &_
 		Eigen::Vector3f n = planeNormal.cross(pointNormal).normalized();
 		Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, band->point.getVector3fMap());
 
+		// Accumulate
 		std::map<int, accumulator_set<double, features<tag::mean, tag::median, tag::min> > > dataMap;
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
