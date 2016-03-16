@@ -19,7 +19,7 @@ public:
 	// Band's generator point
 	pcl::PointNormal point;
 
-	// Plane going along the longitudinal band
+	// Plane going along the band and splitting the band in two (is perpendicular to the band, the point's normal is in the plane)
 	Eigen::Hyperplane<float, 3> plane;
 
 	// String representing the sequence of the current band

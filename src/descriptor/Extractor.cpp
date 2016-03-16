@@ -56,7 +56,7 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 		bands.push_back(BandPtr(new Band(_point, Eigen::Hyperplane<float, 3>(normals.back(), p))));
 	}
 
-	// Start extracting points
+	// Extracting points for each band
 	double halfBand = _params.bandWidth * 0.5;
 	for (size_t i = 0; i < _cloud->size(); i++)
 	{
@@ -66,18 +66,30 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 		for (size_t j = 0; j < lines.size(); j++)
 		{
 			if (_params.bidirectional)
-			{
 				if (lines[j].distance(projection) <= halfBand)
 					bands[j]->data->push_back(_cloud->points[i]);
-			}
 			else
 			{
-				// Create a vector going from the plane to the current point and the use the dot
-				// product to check if the std::vector points the same direction than the director std::vector
+				/**
+				 * This parts creates a vector going from the point's plane to the point currently being evaluated
+				 * to find the band to which it belongs. Then the dot product is used to check if the vector
+				 * points to the same direction that the director vector (which is a vector inside the band's plane).
+				 *
+				 * If the points as vector points to the same direction as the director vector, then the point belongs
+				 * to that band (if not then it would belong to the oppposite band).
+				 */
+
+				// Vector inside the original plane (the point's plane), defining point p1
 				Eigen::Vector3f pointOnPlane = p + normals[j];
+
+				// Vector going from a point inside the point's plane (p1) to the current target evaluation
 				Eigen::Vector3f planeToPoint = point - pointOnPlane;
+
+				// Calculate the orientation of the vector pointing from the plane to the current target point
 				double orientation = directors[j].dot(planeToPoint);
 
+				// If the orientation is right (the point is at the correct side of the plane) and is also under
+				// the band's limits, then add it to the current band.
 				if (orientation >= 0 && lines[j].distance(projection) <= halfBand)
 					bands[j]->data->push_back(_cloud->points[i]);
 			}
