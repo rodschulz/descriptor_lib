@@ -53,7 +53,11 @@ target_link_libraries(Descriptor
 add_executable(Test ${TEST_SRC})
 set_target_properties(Test PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK")
 target_link_libraries(Test 
+			clustering
+			descriptor
+			factories
 			utils
+			io
 			${PCL_LIBRARIES}
 			${OpenCV_LIBS}
 			${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

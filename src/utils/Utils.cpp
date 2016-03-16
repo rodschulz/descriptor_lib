@@ -50,3 +50,15 @@ double Utils::getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv:
 
 	return sse;
 }
+
+std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePlaneAxes(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point)
+{
+	Eigen::Vector3f normal = _plane.normal();
+
+	// Generates a pair of perpendicular vectors using an arbitrary direction for the director vector
+	Eigen::Vector3f v1 = _point + Eigen::Vector3f(10, 10, 10);
+	v1 = _plane.projection(v1).normalized();
+	Eigen::Vector3f v2 = normal.cross(v1).normalized();
+
+	return std::pair<Eigen::Vector3f, Eigen::Vector3f>(v1, v2);
+}

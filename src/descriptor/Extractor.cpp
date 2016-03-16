@@ -7,6 +7,7 @@
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/features/normal_3d.h>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
+#include "../utils/Utils.hpp"
 
 pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius)
 {
@@ -28,31 +29,6 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 
 std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params)
 {
-	return getLongitudinalBands(_cloud, _point, _params);
-}
-
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr Extractor::getTangentPlane(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point)
-{
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr tangentPlane(new pcl::PointCloud<pcl::PointXYZRGB>());
-
-	Eigen::Vector3f p = _point.getVector3fMap();
-	Eigen::Vector3f n = _point.getNormalVector3fMap();
-	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, p);
-
-	tangentPlane->clear();
-	tangentPlane->reserve(_cloud->size());
-	for (size_t i = 0; i < _cloud->size(); i++)
-	{
-		Eigen::Vector3f p = _cloud->points[i].getVector3fMap();
-		Eigen::Vector3f projection = plane.projection(p);
-		tangentPlane->push_back(PointFactory::createPointXYZRGB((float) projection[0], (float) projection[1], (float) projection[2], 0, 0, 255));
-	}
-
-	return tangentPlane;
-}
-
-std::vector<BandPtr> Extractor::getLongitudinalBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params)
-{
 	std::vector<BandPtr> bands;
 	bands.reserve(_params.bandNumber);
 
@@ -61,9 +37,7 @@ std::vector<BandPtr> Extractor::getLongitudinalBands(const pcl::PointCloud<pcl::
 	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, p);
 
 	// Create a pair of perpendicular vectors to be used as axes in the plane
-	Eigen::Vector3f v1 = p + Eigen::Vector3f(10, 10, 10); // TODO find a better way to get this initial director std::vector
-	v1 = plane.projection(v1).normalized();
-	Eigen::Vector3f v2 = n.cross(v1).normalized();
+	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePlaneAxes(plane, p);
 
 	// Angular step for bands definitions
 	double angleStep = _params.getBandsAngularStep();
@@ -74,14 +48,12 @@ std::vector<BandPtr> Extractor::getLongitudinalBands(const pcl::PointCloud<pcl::
 	for (int i = 0; i < _params.bandNumber; i++)
 	{
 		// Calculate the line's director std::vector and define the line
-		Eigen::Vector3f director = v1 * cos(angleStep * i) + v2 * sin(angleStep * i);
-		directors.push_back(director);
-		lines.push_back(Eigen::ParametrizedLine<float, 3>(p, director));
+		directors.push_back(axes.first * cos(angleStep * i) + axes.second * sin(angleStep * i));
+		lines.push_back(Eigen::ParametrizedLine<float, 3>(p, directors.back()));
 
 		// Calculate the normal to a plane going along the band and then define the plane
-		Eigen::Vector3f planeNormal = n.cross(director).normalized();
-		bands.push_back(BandPtr(new Band(_point, Eigen::Hyperplane<float, 3>(planeNormal, p))));
-		normals.push_back(planeNormal);
+		normals.push_back(n.cross(directors.back()).normalized());
+		bands.push_back(BandPtr(new Band(_point, Eigen::Hyperplane<float, 3>(normals.back(), p))));
 	}
 
 	// Start extracting points
@@ -115,7 +87,7 @@ std::vector<BandPtr> Extractor::getLongitudinalBands(const pcl::PointCloud<pcl::
 	return bands;
 }
 
-std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::getBandPlanes(const std::vector<BandPtr> &_bands, const ExecutionParams &_params)
+std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClouds(const std::vector<BandPtr> &_bands, const ExecutionParams &_params)
 {
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes;
 	planes.reserve(_bands.size());

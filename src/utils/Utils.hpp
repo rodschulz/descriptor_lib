@@ -29,6 +29,9 @@ public:
 	// Calculates the Sum of Squared Errors indicator for the given vectors over the given centers, using the given labeling
 	static double getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv::Mat &_labels);
 
+	// Generates a pair of arbitrary perpendicular vectors that can act as axes inside the given plane and starting at the given point
+	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePlaneAxes(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point);
+
 	// Returns +1 if the sign of the given value is positive, -1 if it's negative, and 0 when it's 0
 	template<typename T> static inline int sign(T val)
 	{

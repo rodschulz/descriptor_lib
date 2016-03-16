@@ -141,7 +141,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 	(*coloredCloud)[_params.targetPoint].rgb = Utils::getColor(255, 0, 0);
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "pointPosition.pcd", *coloredCloud);
 
-	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::getBandPlanes(_bands, _params);
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(_bands, _params);
 
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_params.targetPoint), _params.patchSize);
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "patch.pcd", *patch);

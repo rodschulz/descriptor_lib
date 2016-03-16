@@ -88,7 +88,6 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createCylinder(const double _r
 pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createSphere(const double _radius, const pcl::PointXYZ &_center)
 {
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
-	cloud->clear();
 
 	double angularStep = 2 * M_PI * 0.005;
 	for (double theta = 0; theta < 2 * M_PI; theta += angularStep)
@@ -98,6 +97,22 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr CloudFactory::createSphere(const double _rad
 			cloud->push_back(PointFactory::createPointXYZ(_radius * sin(theta) * cos(phi) + _center.x, _radius * sin(theta) * sin(phi) + _center.y, _radius * cos(theta) + _center.z));
 		}
 	}
+
+	return cloud;
+}
+
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createHorizontalPlane(const float _minX, const float _maxX, const float _minY, const float _maxY, const float _z, const int _npoints)
+{
+	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
+	int N = sqrt(_npoints);
+
+	// Set the steps for aprox N points
+	float stepX = (_maxX - _minX) / N;
+	float stepY = (_maxY - _minY) / N;
+
+	for (float dx = _minX; dx <= _maxX; dx += stepX)
+		for (float dy = _minY; dy <= _maxY; dy += stepY)
+			cloud->push_back(PointFactory::createPointNormal(dx, dy, _z, 0, 0, 1));
 
 	return cloud;
 }

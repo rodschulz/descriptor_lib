@@ -10,10 +10,6 @@
 #include <eigen3/Eigen/src/Geometry/Hyperplane.h>
 #include "../factories/PointFactory.hpp"
 
-// Forward declaration to define a band's shared pointer
-class Band;
-typedef boost::shared_ptr<Band> BandPtr;
-
 class Band
 {
 public:
@@ -56,3 +52,6 @@ public:
 		sequenceString = "";
 	}
 };
+
+// Declaration to define a band's shared pointer
+typedef boost::shared_ptr<Band> BandPtr;
