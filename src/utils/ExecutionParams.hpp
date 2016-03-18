@@ -83,7 +83,7 @@ public:
 	int bandNumber;					// Number of bands to sample
 	double bandWidth;				// Width of each band
 	bool bidirectional;				// Flag indicating if each band has to be analyzed bidirectional or not
-	bool useProjection;				// Flag indicating if angle calculation must be done by projecting the angles over the band's plane
+	bool useProjection;				// Flag indicating if angle calculation has to be projecting the angles over the band's plane
 
 	double sequenceBin;				// Size of the bins used in the sequence construction
 	SequenceStat sequenceStat;			// Statistic to use in the sequence calculation

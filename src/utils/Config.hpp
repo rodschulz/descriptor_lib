@@ -9,6 +9,7 @@
 
 #define OUTPUT_FOLDER		"./output/"
 #define CLOUD_FILE_EXTENSION	".pcd"
+#define DEBUG_PREFIX		"DEBUG_"
 
 class Config
 {
