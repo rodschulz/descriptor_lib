@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(generatePlaneAxes)
 	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(normal, Eigen::Vector3f(10, 7, 5));
 
 	Eigen::Vector3f origin = plane.projection(Eigen::Vector3f(-3, 2, 70));
-	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePlaneAxes(plane, origin);
+	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePerpendicularPointsInPlane(plane, origin);
 
 	// Check vectors are actually perpendicular
 	BOOST_CHECK_SMALL(axes.first.dot(axes.second), 1E-8f);
