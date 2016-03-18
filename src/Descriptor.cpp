@@ -25,28 +25,28 @@ bool getPointCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Executi
 {
 	if (_params.useSynthetic)
 	{
-		std::cout << "Generating synthetic cloud\n";
+		std::cout << "Generating synthetic cloud: " << _params.synCloudType << "\n";
 
 		switch (_params.synCloudType)
 		{
-//			case CLOUD_CUBE:
-//				_cloud = CloudFactory::createCube(0.3, PointFactory::createPointXYZ(0.3, 0.3, 0.3));
-//				break;
-//
-//			case CLOUD_CYLINDER:
-//				_cloud = CloudFactory::createCylinder(0.2, 0.5, PointFactory::createPointXYZ(0.4, 0.4, 0.4));
-//				break;
+			case CLOUD_CUBE:
+				_cloud = CloudFactory::createCube(5, Eigen::Vector3f(0, 0, 0), 20000);
+				break;
+
+			case CLOUD_CYLINDER:
+				_cloud = CloudFactory::createCylinderSection(2 * M_PI, 5, 10, Eigen::Vector3f(0, 0, 0), 20000);
+				break;
 
 			case CLOUD_SPHERE:
-				_cloud = CloudFactory::createSphereSection(2 * M_PI, 10, Eigen::Vector3f(0, 0, 0), 50000);
+				_cloud = CloudFactory::createSphereSection(2 * M_PI, 10, Eigen::Vector3f(0, 0, 0), 20000);
 				break;
 
 			case CLOUD_HALF_SPHERE:
-				_cloud = CloudFactory::createSphereSection(M_PI, 10, Eigen::Vector3f(0, 0, 0), 50000);
+				_cloud = CloudFactory::createSphereSection(M_PI, 10, Eigen::Vector3f(0, 0, 0), 20000);
 				break;
 
 			case CLOUD_PLANE:
-				_cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 50000);
+				_cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 20000);
 				break;
 
 			default:
@@ -82,8 +82,10 @@ int main(int _argn, char **_argv)
 
 		// Check if enough params were given
 		if (_argn < 2 && !params.useSynthetic)
+		{
 			throw std::runtime_error("Not enough exec params given\nUsage: Descriptor <input_file>");
-		params.inputLocation = _argv[1];
+			params.inputLocation = _argv[1];
+		}
 
 		// Do things according to the execution type
 		if (params.executionType == EXECUTION_METRIC)
