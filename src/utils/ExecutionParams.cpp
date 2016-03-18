@@ -71,6 +71,10 @@ SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)
 		return CLOUD_CYLINDER;
 	else if (boost::iequals(_type, "sphere"))
 		return CLOUD_SPHERE;
+	else if (boost::iequals(_type, "half_sphere"))
+		return CLOUD_HALF_SPHERE;
+	else if (boost::iequals(_type, "plane"))
+		return CLOUD_PLANE;
 	return CLOUD_NONE;
 }
 

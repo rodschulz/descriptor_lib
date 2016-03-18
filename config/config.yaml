@@ -12,7 +12,7 @@ descriptor:
 
     patchSize: 0.02
     normalRadius: -1
-    bandNumber: 4
+    bandNumber: 8
     bandWidth: 0.005
     bidirectional: false
     useProjection: false
@@ -57,5 +57,5 @@ cloudSmoothing:
 ##### Synthetic cloud generation params #####
 syntheticClouds:
     generateCloud: false
-    type: cube # cube, cylinder or sphere
+    type: cube # cube, cylinder, sphere, half_sphere, plane
 ...

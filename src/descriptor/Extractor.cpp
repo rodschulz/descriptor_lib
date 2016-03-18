@@ -74,8 +74,8 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 			DEBUG_generateExtractedLine(lines[l], debugLimit, "line" + boost::lexical_cast<std::string>(l), COLOR_YELLOW);
 	/********** Debug **********/
 
-	// Extracting points for each band (.55 instead of .5 to give a little extra room)
-	double halfBand = _params.bandWidth * 0.55;
+	// Extracting points for each band (.52 to give a little extra room)
+	double halfBand = _params.bandWidth * 0.52;
 	for (size_t j = 0; j < lines.size(); j++)
 	{
 		for (size_t i = 0; i < _cloud->size(); i++)

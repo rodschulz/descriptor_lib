@@ -27,28 +27,32 @@ bool getPointCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Executi
 	{
 		std::cout << "Generating synthetic cloud\n";
 
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ;
 		switch (_params.synCloudType)
 		{
-			case CLOUD_CUBE:
-				cloudXYZ = CloudFactory::createCube(0.3, PointFactory::createPointXYZ(0.3, 0.3, 0.3));
-				break;
-
-			case CLOUD_CYLINDER:
-				cloudXYZ = CloudFactory::createCylinder(0.2, 0.5, PointFactory::createPointXYZ(0.4, 0.4, 0.4));
-				break;
+//			case CLOUD_CUBE:
+//				_cloud = CloudFactory::createCube(0.3, PointFactory::createPointXYZ(0.3, 0.3, 0.3));
+//				break;
+//
+//			case CLOUD_CYLINDER:
+//				_cloud = CloudFactory::createCylinder(0.2, 0.5, PointFactory::createPointXYZ(0.4, 0.4, 0.4));
+//				break;
 
 			case CLOUD_SPHERE:
-				cloudXYZ = CloudFactory::createSphere(0.2, PointFactory::createPointXYZ(0.2, 0.2, 0.2));
+				_cloud = CloudFactory::createSphereSection(2 * M_PI, 10, Eigen::Vector3f(0, 0, 0), 50000);
+				break;
+
+			case CLOUD_HALF_SPHERE:
+				_cloud = CloudFactory::createSphereSection(M_PI, 10, Eigen::Vector3f(0, 0, 0), 50000);
+				break;
+
+			case CLOUD_PLANE:
+				_cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 50000);
 				break;
 
 			default:
 				std::cout << "WARNING, wrong cloud generation parameters\n";
 				return false;
 		}
-
-		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, _params.normalEstimationRadius);
-		pcl::concatenateFields(*cloudXYZ, *normals, *_cloud);
 
 		return true;
 	}
