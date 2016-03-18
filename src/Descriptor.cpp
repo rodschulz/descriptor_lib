@@ -83,10 +83,10 @@ int main(int _argn, char **_argv)
 
 		// Check if enough params were given
 		if (_argn < 2 && !params.useSynthetic)
-		{
 			throw std::runtime_error("Not enough exec params given\nUsage: Descriptor <input_file>");
+
+		if (!params.useSynthetic)
 			params.inputLocation = _argv[1];
-		}
 
 		// Do things according to the execution type
 		if (params.executionType == EXECUTION_METRIC)
