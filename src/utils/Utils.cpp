@@ -55,25 +55,32 @@ std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsIn
 {
 	Eigen::Vector3f normal = _plane.normal();
 
-	// Generates a pair of perpendicular vectors using an arbitrary direction for the director vector
-//	Eigen::Vector3f v1 = _point + Eigen::Vector3f(10, 10, 10);
-//	v1 = _plane.projection(v1).normalized();
-//	Eigen::Vector3f v2 = normal.cross(v1).normalized();
-//
-//	return std::pair<Eigen::Vector3f, Eigen::Vector3f>(v1, v2);
-
 	// Take an arbitrary direction from the plane's origin (OUTSIDE the plane)
-	Eigen::Vector3f u = _point + Eigen::Vector3f(10, 10, 10);
+	Eigen::Vector3f u = _point + Eigen::Vector3f(1E10, 1E10, 1E10);
 
-	// Project that arbitrary point into the plane to get an arbitrary point INSIDE the plane
-	Eigen::Vector3f v = _plane.projection(u).normalized();
-
-	// Generate the first unitary vector which will be part of the parpendicular pair
-	Eigen::Vector3f v1 = (v - _point).normalized();
+	// Project that arbitrary point into the plane to get the first axis inside the plane
+	Eigen::Vector3f v1 = _plane.projection(u).normalized();
 
 	// Generate the seconde unitary vector
 	Eigen::Vector3f v2 = normal.cross(v1).normalized();
 
-	// Return the vectors
+	// Return the axes
 	return std::pair<Eigen::Vector3f, Eigen::Vector3f>(v1, v2);
+
+
+
+//	// Take an arbitrary direction from the plane's origin (OUTSIDE the plane)
+//	Eigen::Vector3f u = _point + Eigen::Vector3f(10, 10, 10);
+//
+//	// Project that arbitrary point into the plane to get an arbitrary point INSIDE the plane
+//	Eigen::Vector3f v = _plane.projection(u).normalized();
+//
+//	// Generate the first unitary vector which will be part of the parpendicular pair
+//	Eigen::Vector3f v1 = (v - _point).normalized();
+//
+//	// Generate the seconde unitary vector
+//	Eigen::Vector3f v2 = normal.cross(v1).normalized();
+//
+//	// Return the vectors
+//	return std::pair<Eigen::Vector3f, Eigen::Vector3f>(v1, v2);
 }

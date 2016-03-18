@@ -24,6 +24,12 @@ private:
 	Extractor();
 	~Extractor();
 
-	static void DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_p, const Eigen::Vector3f &_n, const float _limit);
+	// Generates a cloud displaying the given plane, around the given point and using the given normal
+	static void DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_p, const Eigen::Vector3f &_n, const float _limit, const std::string &_filename, const PointColor &_color);
+
+	// Generates a cloud displaying the gieven line around the origin defined for it
 	static void DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line, const float _limit, const std::string &_filename, const PointColor &_color);
+
+	// Calculates the limit value to be used with the debug generation methods
+	static std::pair<float, float> DEBUG_getDebugGenerationLimit(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud);
 };

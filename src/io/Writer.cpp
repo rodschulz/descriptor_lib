@@ -49,7 +49,7 @@ void Writer::writeHistogram(const std::string &_filename, const std::string &_hi
 
 			int binsNumber = bins.bins.size();
 
-			// Create axes if not already done
+			// Create axes if not already created
 			if (!axesCreated)
 			{
 				rows.resize(binsNumber);

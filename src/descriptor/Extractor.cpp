@@ -4,12 +4,12 @@
  */
 #include "Extractor.hpp"
 #include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/kdtree/kdtree.h>
-#include <pcl/features/normal_3d.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/common/impl/common.hpp>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
+#include <boost/algorithm/minmax_element.hpp>
 #include "../utils/Utils.hpp"
 #include "../utils/Config.hpp"
-#include <pcl/io/pcd_io.h>
 
 pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius)
 {
@@ -31,13 +31,6 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 
 std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const ExecutionParams &_params)
 {
-	/**
-	 * TODO
-	 * - add colors to debug clouds
-	 * - isolate debug generation in different methods (hopefully reusable code)
-	 * - add debug enable/disable flag from configuration
-	 */
-
 	std::vector<BandPtr> bands;
 	bands.reserve(_params.bandNumber);
 
@@ -45,12 +38,18 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	Eigen::Vector3f n = ((Eigen::Vector3f) _point.getNormalVector3fMap()).normalized();
 	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, p);
 
-	// Generate debug
-	if (Config::debugEnabled())
-		DEBUG_generatePointPlane(plane, p, n, 0.1);
-
 	// Create a pair of perpendicular point from the given point to be used as axes in the plane
 	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePerpendicularPointsInPlane(plane, p);
+
+	/********** Debug **********/
+	float debugLimit = DEBUG_getDebugGenerationLimit(_cloud).second;
+	if (Config::debugEnabled())
+	{
+		DEBUG_generatePointPlane(plane, p, n, debugLimit, "pointPlane", COLOR_TURQUOISE);
+		DEBUG_generateExtractedLine(Eigen::ParametrizedLine<float, 3>(p, axes.first), debugLimit, "axis1", COLOR_RED);
+		DEBUG_generateExtractedLine(Eigen::ParametrizedLine<float, 3>(p, axes.second), debugLimit, "axis2", COLOR_GREEN);
+	}
+	/********** Debug **********/
 
 	// Angular step for bands definitions
 	double angleStep = _params.getBandsAngularStep();
@@ -69,59 +68,16 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 		bands.push_back(BandPtr(new Band(_point, Eigen::Hyperplane<float, 3>(normals.back(), p))));
 	}
 
-	/******************************/
-	if (true)
-	{
-		Eigen::ParametrizedLine<float, 3> axis1 = Eigen::ParametrizedLine<float, 3>(p, axes.first);
-		Eigen::ParametrizedLine<float, 3> axis2 = Eigen::ParametrizedLine<float, 3>(p, axes.second);
-		DEBUG_generateExtractedLine(axis1, 0.1, "axis1", COLOR_RED);
-		DEBUG_generateExtractedLine(axis2, 0.1, "axis2", COLOR_GREEN);
-
-//		std::vector<Eigen::ParametrizedLine<float, 3> > axs;
-//		for (size_t l = 0; l < lines.size(); l++)
-//		{
-//			std::cout << "line " << l << std::endl;
-//
-//			pcl::PointCloud<pcl::PointXYZ>::Ptr line = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
-//			float limit = 0.1;
-//			float step = limit / 20;
-//			for (float i = -limit; i <= limit; i += step)
-//			{
-//				Eigen::Vector3f pp = lines[l].pointAt(i);
-//				line->push_back(PointFactory::createPointXYZ(pp.x(), pp.y(), pp.z()));
-//			}
-//
-//			char name[100];
-//			sprintf(name, "./output/line%d.pcd", (int) l);
-//			pcl::io::savePCDFileASCII(name, *line);
-//		}
-
+	/********** Debug **********/
+	if (Config::debugEnabled())
 		for (size_t l = 0; l < lines.size(); l++)
-		{
-			std::cout << "line " << l << std::endl;
-
-			pcl::PointCloud<pcl::PointXYZ>::Ptr line = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
-			float limit = 0.1;
-			float step = limit / 20;
-			for (float i = -limit; i <= limit; i += step)
-			{
-				Eigen::Vector3f pp = lines[l].pointAt(i);
-				line->push_back(PointFactory::createPointXYZ(pp.x(), pp.y(), pp.z()));
-			}
-
-			char name[100];
-			sprintf(name, "./output/line%d.pcd", (int) l);
-			pcl::io::savePCDFileASCII(name, *line);
-		}
-	}
-	/******************************/
+			DEBUG_generateExtractedLine(lines[l], debugLimit, "line" + boost::lexical_cast<std::string>(l), COLOR_YELLOW);
+	/********** Debug **********/
 
 	// Extracting points for each band (.55 instead of .5 to give a little extra room)
 	double halfBand = _params.bandWidth * 0.55;
 	for (size_t j = 0; j < lines.size(); j++)
 	{
-		std::cout << "band " << j << std::endl;
-
 		for (size_t i = 0; i < _cloud->size(); i++)
 		{
 			Eigen::Vector3f point = _cloud->points[i].getVector3fMap();
@@ -152,9 +108,7 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 				// Calculate the orientation of the vector pointing from the plane to the current target point
 				double orientation = lines[j].direction().dot(planeToPoint);
 
-				// If the orientation is right (the point is at the correct side of the plane) and is also under
-				// the band's limits, then add it to the current band.
-				std::cout << "orient:" << (orientation >= 0) << " - dist: " << (lines[j].distance(projection) <= halfBand) << " // " << lines[j].distance(projection) << std::endl;
+				// Add the point if the point is at the correct side of the plane and if it's in the band's limits
 				if (orientation >= 0 && lines[j].distance(projection) <= halfBand)
 					bands[j]->data->push_back(_cloud->points[i]);
 			}
@@ -195,10 +149,10 @@ std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClou
 	return planes;
 }
 
-void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_p, const Eigen::Vector3f &_n, const float _limit)
+void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_p, const Eigen::Vector3f &_n, const float _limit, const std::string &_filename, const PointColor &_color)
 {
 
-	pcl::PointCloud<pcl::PointNormal>::Ptr targetPlane = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr targetPlane = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	float step = _limit / 15;
 	for (float i = -_limit; i <= _limit; i += step)
 	{
@@ -207,11 +161,11 @@ void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_pla
 			for (float k = -_limit; k <= _limit; k += step)
 			{
 				Eigen::Vector3f aux = _plane.projection(Eigen::Vector3f(_p.x() + i, _p.y() + j, _p.z() + k));
-				targetPlane->push_back(PointFactory::createPointNormal(aux.x(), aux.y(), aux.z(), _n.x(), _n.y(), _n.z(), 0));
+				targetPlane->push_back(PointFactory::createPointXYZRGBNormal(aux.x(), aux.y(), aux.z(), _n.x(), _n.y(), _n.z(), 0, _color));
 			}
 		}
 	}
-	pcl::io::savePCDFileASCII("targetPlane.pcd", *targetPlane);
+	pcl::io::savePCDFileASCII(OUTPUT_FOLDER DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *targetPlane);
 }
 
 void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line, const float _limit, const std::string &_filename, const PointColor &_color)
@@ -225,5 +179,21 @@ void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float,
 		lineCloud->push_back(PointFactory::createPointXYZRGB(point.x(), point.y(), point.z(), _color));
 	}
 
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER + _filename + CLOUD_FILE_EXTENSION, *lineCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_FOLDER DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *lineCloud);
+}
+
+std::pair<float, float> Extractor::DEBUG_getDebugGenerationLimit(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
+{
+	pcl::PointNormal minData, maxData;
+	pcl::getMinMax3D(*_cloud, minData, maxData);
+
+	float deltaX = maxData.x - minData.x;
+	float deltaY = maxData.y - minData.y;
+	float deltaZ = maxData.z - minData.z;
+
+	float data[] =
+	{ deltaX, deltaY, deltaZ };
+	std::pair<float *, float *> minmax = boost::minmax_element(&data[0], &data[3]);
+
+	return std::pair<float, float>((*minmax.first) / 2, (*minmax.second) / 2);
 }
