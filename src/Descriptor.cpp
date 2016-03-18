@@ -54,6 +54,7 @@ bool getPointCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Executi
 				return false;
 		}
 
+		std::cout << "Generated " << _cloud->size() << " points in cloud\n";
 		return true;
 	}
 	else
