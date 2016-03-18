@@ -38,10 +38,6 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	 * - add debug enable/disable flag from configuration
 	 */
 
-
-
-
-
 	std::vector<BandPtr> bands;
 	bands.reserve(_params.bandNumber);
 
@@ -50,13 +46,8 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, p);
 
 	// Generate debug
-	DEBUG_generatePointPlane(plane, p, n, 0.1);
-
-
-//	LINES SEEM TO BE BAD PLACED, THEY ARE POINTING THOWARDS ANYPLACE BUT THE RIGHT PLACE AND THEY ARE NOT INSIDE THE PLANE
-//	ALSO ADD COLORS TO LINES AND PLANES SO CLOUDS ARE EASIER TO READ
-
-
+	if (Config::debugEnabled())
+		DEBUG_generatePointPlane(plane, p, n, 0.1);
 
 	// Create a pair of perpendicular point from the given point to be used as axes in the plane
 	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePerpendicularPointsInPlane(plane, p);
@@ -81,24 +72,29 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	/******************************/
 	if (true)
 	{
-		std::vector<Eigen::ParametrizedLine<float, 3> > axs;
-		for (size_t l = 0; l < lines.size(); l++)
-		{
-			std::cout << "line " << l << std::endl;
+		Eigen::ParametrizedLine<float, 3> axis1 = Eigen::ParametrizedLine<float, 3>(p, axes.first);
+		Eigen::ParametrizedLine<float, 3> axis2 = Eigen::ParametrizedLine<float, 3>(p, axes.second);
+		DEBUG_generateExtractedLine(axis1, 0.1, "axis1", COLOR_RED);
+		DEBUG_generateExtractedLine(axis2, 0.1, "axis2", COLOR_GREEN);
 
-			pcl::PointCloud<pcl::PointXYZ>::Ptr line = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
-			float limit = 0.1;
-			float step = limit / 20;
-			for (float i = -limit; i <= limit; i += step)
-			{
-				Eigen::Vector3f pp = lines[l].pointAt(i);
-				line->push_back(PointFactory::createPointXYZ(pp.x(), pp.y(), pp.z()));
-			}
-
-			char name[100];
-			sprintf(name, "./output/line%d.pcd", (int) l);
-			pcl::io::savePCDFileASCII(name, *line);
-		}
+//		std::vector<Eigen::ParametrizedLine<float, 3> > axs;
+//		for (size_t l = 0; l < lines.size(); l++)
+//		{
+//			std::cout << "line " << l << std::endl;
+//
+//			pcl::PointCloud<pcl::PointXYZ>::Ptr line = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
+//			float limit = 0.1;
+//			float step = limit / 20;
+//			for (float i = -limit; i <= limit; i += step)
+//			{
+//				Eigen::Vector3f pp = lines[l].pointAt(i);
+//				line->push_back(PointFactory::createPointXYZ(pp.x(), pp.y(), pp.z()));
+//			}
+//
+//			char name[100];
+//			sprintf(name, "./output/line%d.pcd", (int) l);
+//			pcl::io::savePCDFileASCII(name, *line);
+//		}
 
 		for (size_t l = 0; l < lines.size(); l++)
 		{
@@ -201,26 +197,24 @@ std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClou
 
 void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_p, const Eigen::Vector3f &_n, const float _limit)
 {
-	if (Config::debugEnabled())
+
+	pcl::PointCloud<pcl::PointNormal>::Ptr targetPlane = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
+	float step = _limit / 15;
+	for (float i = -_limit; i <= _limit; i += step)
 	{
-		pcl::PointCloud<pcl::PointNormal>::Ptr targetPlane = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		float step = _limit / 15;
-		for (float i = -_limit; i <= _limit; i += step)
+		for (float j = -_limit; j <= _limit; j += step)
 		{
-			for (float j = -_limit; j <= _limit; j += step)
+			for (float k = -_limit; k <= _limit; k += step)
 			{
-				for (float k = -_limit; k <= _limit; k += step)
-				{
-					Eigen::Vector3f aux = _plane.projection(Eigen::Vector3f(_p.x() + i, _p.y() + j, _p.z() + k));
-					targetPlane->push_back(PointFactory::createPointNormal(aux.x(), aux.y(), aux.z(), _n.x(), _n.y(), _n.z(), 0));
-				}
+				Eigen::Vector3f aux = _plane.projection(Eigen::Vector3f(_p.x() + i, _p.y() + j, _p.z() + k));
+				targetPlane->push_back(PointFactory::createPointNormal(aux.x(), aux.y(), aux.z(), _n.x(), _n.y(), _n.z(), 0));
 			}
 		}
-		pcl::io::savePCDFileASCII("targetPlane.pcd", *targetPlane);
 	}
+	pcl::io::savePCDFileASCII("targetPlane.pcd", *targetPlane);
 }
 
-void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line, const float _limit, const std::string &_filename)
+void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line, const float _limit, const std::string &_filename, const PointColor &_color)
 {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr lineCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 
@@ -228,8 +222,8 @@ void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float,
 	for (float t = -_limit; t <= _limit; t += step)
 	{
 		Eigen::Vector3f point = _line.pointAt(t);
-		lineCloud->push_back(PointFactory::createPointXYZRGB(point.x(), point.y(), point.z(), 255, 0, 0));
+		lineCloud->push_back(PointFactory::createPointXYZRGB(point.x(), point.y(), point.z(), _color));
 	}
 
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER + _filename, *lineCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_FOLDER + _filename + CLOUD_FILE_EXTENSION, *lineCloud);
 }

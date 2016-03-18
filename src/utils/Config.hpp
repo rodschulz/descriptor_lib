@@ -7,7 +7,8 @@
 #include <string>
 #include "ExecutionParams.hpp"
 
-#define OUTPUT_FOLDER "./output/"
+#define OUTPUT_FOLDER		"./output/"
+#define CLOUD_FILE_EXTENSION	".pcd"
 
 class Config
 {
