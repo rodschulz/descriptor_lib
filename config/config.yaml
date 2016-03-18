@@ -1,6 +1,6 @@
 ---
 # flag to enable/disable the debug generation
-debug: true
+debug: false
 
 # execution type (descriptor, clustering or metric)
 executionType: descriptor
@@ -57,5 +57,5 @@ cloudSmoothing:
 ##### Synthetic cloud generation params #####
 syntheticClouds:
     generateCloud: false
-    type: cube # cube, cylinder, sphere, half_sphere, plane
+    type: half_sphere # cube, cylinder, sphere, half_sphere, plane
 ...
