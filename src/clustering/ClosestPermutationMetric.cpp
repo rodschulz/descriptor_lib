@@ -3,9 +3,11 @@
  * 2015
  */
 #include "ClosestPermutationMetric.hpp"
-
 #include <iostream>
 #include <stdexcept>
+
+// TODO check if this implementation can be improved in terms of speed
+// TODO check what is done now and check if the opencv's kmeans can be used instead, with different versions of the vectors (for the permutations)
 
 ClosestPermutationMetric::ClosestPermutationMetric(const int _permutationSize, const bool _useConfidence)
 {

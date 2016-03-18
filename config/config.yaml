@@ -1,6 +1,6 @@
 ---
 # flag to enable/disable the debug generation
-debug: false
+debug: true
 
 # execution type (descriptor, clustering or metric)
 executionType: descriptor

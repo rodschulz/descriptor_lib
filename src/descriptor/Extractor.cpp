@@ -74,6 +74,8 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 			DEBUG_generateExtractedLine(lines[l], debugLimit, "line" + boost::lexical_cast<std::string>(l), COLOR_YELLOW);
 	/********** Debug **********/
 
+	// TODO check if it's better to measure the distance between the projected point on the plane and the projection of the projection of the point over the line
+
 	// Extracting points for each band (.52 to give a little extra room)
 	double halfBand = _params.bandWidth * 0.52;
 	for (size_t j = 0; j < lines.size(); j++)

@@ -3,7 +3,6 @@
  * 2015
  */
 #include "Clustering.hpp"
-
 #include <string.h>
 #include <fstream>
 #include "../utils/Utils.hpp"
@@ -111,9 +110,7 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams
 
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
 {
-	/**
-	 * @TODO improve the representation creating to "bend" the bands according to the mean normal in each bin
-	 */
+	//TODO improve the representation creating to "bend" the bands according to the mean normal in each bin
 
 	int sequenceLength = _params.getSequenceLength();
 	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::createPointNormal(0, 0, 0, 0, 0, 0, 0));
