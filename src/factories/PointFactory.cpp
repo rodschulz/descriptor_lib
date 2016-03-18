@@ -34,6 +34,20 @@ pcl::PointXYZRGB PointFactory::createPointXYZRGB(const float _x, const float _y,
 	return p;
 }
 
+pcl::PointXYZRGB PointFactory::createPointXYZRGB(const float _x, const float _y, const float _z, const PointColor &_color)
+{
+	uint8_t r = 0xFF0000 & _color;
+	uint8_t g = 0x00FF00 & _color;
+	uint8_t b = 0x0000FF & _color;
+
+	pcl::PointXYZRGB p;
+	p.x = _x;
+	p.y = _y;
+	p.z = _z;
+	p.rgb = Utils::getColor(r, g, b);
+	return p;
+}
+
 pcl::PointXYZRGBNormal PointFactory::createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const uint8_t _r, const uint8_t _g, const uint8_t _b)
 {
 	pcl::PointXYZRGBNormal p;

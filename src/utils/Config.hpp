@@ -7,6 +7,8 @@
 #include <string>
 #include "ExecutionParams.hpp"
 
+#define OUTPUT_FOLDER "./output/"
+
 class Config
 {
 public:
@@ -29,10 +31,19 @@ public:
 		return getInstance()->params;
 	}
 
+	// Returns a boolean value indicating if the debug generation is enabled
+	static bool debugEnabled()
+	{
+		return getInstance()->debug;
+	}
+
 private:
 	// Constructor
 	Config();
 
 	// Instance storing the current execution params loaded from the config file
 	ExecutionParams params;
+
+	// Flag indicating if the debug generation is enabled or not
+	bool debug;
 };

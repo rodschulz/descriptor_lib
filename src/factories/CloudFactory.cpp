@@ -117,21 +117,30 @@ pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createHorizontalPlane(const
 	return cloud;
 }
 
-//pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createSpherePart(const float _angle, const float _centerX, const float _centerY, const float _centerZ, const float _radius)
-//{
-//	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-//	int N = sqrt(1000);
-//
-//	// Set the steps for aprox N points
-//	float stepX = (_maxX - _minX) / N;
-//	float stepY = (_maxY - _minY) / N;
-//
-//	for (float dx = _minX; dx <= _maxX; dx += stepX)
-//		for (float dy = _minY; dy <= _maxY; dy += stepY)
-//			cloud->push_back(PointFactory::createPointNormal(dx, dy, _z, 0, 0, 1));
-//
-//	return cloud;
-//}
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createSphereSection(const float _azimuth, const float _radius, const Eigen::Vector3f &_center, const int _npoints)
+{
+	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
+
+	int N = sqrt(_npoints);
+	float azimuth = _azimuth <= 2 * M_PI ? _azimuth : 2 * M_PI;
+
+	float stepPolar = M_PI / N;
+	float stepAzimuth = azimuth / N;
+
+	for (float theta = 0; theta < azimuth; theta += stepAzimuth) // Theta belongs to [0, 2PI]
+	{
+		for (float phi = 0; phi < M_PI; phi += stepPolar) // Phi belongs to [0, PI]
+		{
+			Eigen::Vector3f point = Eigen::Vector3f(_radius * sin(theta) * cos(phi) + _center.x(),
+								_radius * sin(theta) * sin(phi) + _center.y(),
+								_radius * cos(theta) + _center.z());
+			Eigen::Vector3f normal = (point - _center).normalized();
+			cloud->push_back(PointFactory::createPointNormal(point.x(), point.y(), point.z(), normal.x(), normal.y(), normal.z()));
+		}
+	}
+
+	return cloud;
+}
 
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint32_t _color)
 {

@@ -15,6 +15,7 @@
 
 Config::Config()
 {
+	debug = false;
 }
 
 Config::~Config()
@@ -27,6 +28,8 @@ bool Config::load(const std::string &_filename)
 	try
 	{
 		YAML::Node config = YAML::LoadFile(_filename);
+
+		getInstance()->debug = config["debug"].as<bool>();
 
 		// Execution type
 		getInstance()->params.executionType = ExecutionParams::getExecutionType(config["executionType"].as<std::string>());
