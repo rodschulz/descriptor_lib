@@ -8,6 +8,7 @@
 
 // TODO check if this implementation can be improved in terms of speed
 // TODO check what is done now and check if the opencv's kmeans can be used instead, with different versions of the vectors (for the permutations)
+// TODO try to do something to prevent clusters NaN begin generated (I think those are because empty clusters are being created) => check the average calculation
 
 ClosestPermutationMetric::ClosestPermutationMetric(const int _permutationSize, const bool _useConfidence)
 {

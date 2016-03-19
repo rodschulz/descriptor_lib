@@ -134,7 +134,7 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
 {
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::getColor(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::colorPalette35(0));
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "cloud.pcd", *coloredCloud);
 
 	(*coloredCloud)[_params.targetPoint].rgb = Utils::getColor(255, 0, 0);
@@ -154,7 +154,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 		{
 			char name[100];
 			sprintf(name, OUTPUT_FOLDER "band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::getColor(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::colorPalette35(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
@@ -213,9 +213,9 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
 {
 	// Color the data according to the clusters
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::getColor(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::colorPalette35(0));
 	for (int i = 0; i < _labels.rows; i++)
-		(*colored)[i].rgb = Utils::getColor(_labels.at<int>(i));
+		(*colored)[i].rgb = Utils::colorPalette35(_labels.at<int>(i));
 
 	pcl::io::savePCDFileASCII(_filename, *colored);
 }
@@ -284,6 +284,8 @@ void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionP
 
 void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers)
 {
+	// TODO add extra info when a cache is being saved, maybe parameters used for creation like num iterations, stop, patch size, etc
+
 	std::string destination = _outputFolder + "centers";
 	writeMatrix(destination, _centers);
 }

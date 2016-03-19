@@ -11,6 +11,48 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+// Colors defined to be used for points
+typedef enum PointColor
+{
+	COLOR_FIREBRICK		= 0xB22222,
+	COLOR_RED		= 0xFF0000,
+	COLOR_SALMON		= 0xFA8072,
+	COLOR_ORANGE		= 0xFFA500,
+	COLOR_GOLDEN_ROD	= 0xDAA520,
+	COLOR_OLIVE		= 0x808000,
+	COLOR_KHAKI		= 0xF0E68C,
+	COLOR_YELLOW		= 0xFFFF00,
+	COLOR_DARK_GREEN	= 0x006400,
+	COLOR_GREEN		= 0x008000,
+	COLOR_LIME		= 0x00FF00,
+	COLOR_LIGHT_GREEN	= 0x90EE90,
+	COLOR_DARK_SEA_GREEN	= 0x8FBC8F,
+	COLOR_MEDIUM_AQUA	= 0x66CDAA,
+	COLOR_TEAL		= 0x008080,
+	COLOR_CYAN		= 0x00FFFF,
+	COLOR_TURQUOISE		= 0x40E0D0,
+	COLOR_DODGER_BLUE	= 0x1E90FF,
+	COLOR_SKY_BLUE		= 0x87CEEB,
+	COLOR_NAVY		= 0x000080,
+	COLOR_BLUE		= 0x0000FF,
+	COLOR_BLUE_VIOLET	= 0x8A2BE2,
+	COLOR_SLATE_BLUE	= 0x6A5ACD,
+	COLOR_DARK_MAGENTA	= 0x8B008B,
+	COLOR_PLUM		= 0xDDA0DD,
+	COLOR_MAGENTA		= 0xFF00FF,
+	COLOR_DEEP_PINK		= 0xFF1493,
+	COLOR_HOT_PINK		= 0xFF69B4,
+	COLOR_BEIGE		= 0xF5F5DC,
+	COLOR_BROWN		= 0xA0522D,
+	COLOR_ROSY_BROWN	= 0xBC8F8F,
+	COLOR_SLATE_GRAY	= 0x708090,
+	COLOR_BLACK		= 0x000000,
+	COLOR_GRAY		= 0x808080,
+	COLOR_SILVER		= 0xC0C0C0,
+	COLOR_WHITE		= 0xFFFFFF,
+} PointColor;
+
+// Utils class definition
 class Utils
 {
 public:
@@ -24,7 +66,10 @@ public:
 	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
 
 	// Returns a color from the built-in color pallete (12 colors available)
-	static uint32_t getColor(const int _index);
+	static uint32_t colorPalette12(const int _index);
+
+	// Returns a color from the built-in color pallete (35 colors available)
+	static uint32_t colorPalette35(const int _index);
 
 	// Calculates the Sum of Squared Errors indicator for the given vectors over the given centers, using the given labeling
 	static double getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv::Mat &_labels);

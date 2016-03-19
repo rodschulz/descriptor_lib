@@ -176,7 +176,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 						float ny = rotatedNormal.y();
 						float nz = rotatedNormal.z();
 
-						output->push_back(PointFactory::createPointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Utils::getColor(i)));
+						output->push_back(PointFactory::createPointXYZRGBNormal(p.x(), p.y(), p.z(), nx, ny, nz, 0, Utils::colorPalette35(i)));
 					}
 				}
 			}
