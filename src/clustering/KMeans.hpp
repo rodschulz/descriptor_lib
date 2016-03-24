@@ -6,27 +6,48 @@
 
 #include <opencv2/core/core.hpp>
 #include "Metric.hpp"
+#include "Clustering.hpp"
 
 class KMeans
 {
 public:
-	static void searchClusters(const cv::Mat &_descriptors, const int _clusterNumber, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers, std::vector<double> &_errorCurve);
-	static void stochasticSearchClusters(const cv::Mat &_descriptors, const int _clusterNumber, const int _sampleSize, const Metric &_metric, const int _attempts, const int _maxIterations, const double _threshold, cv::Mat &_labels, cv::Mat &_centers, std::vector<double> &_errorCurve);
+	// Performs the search of clusters using kmeans algorithm
+	static void searchClusters(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold);
 
-//	static bool loadClusters(const std::string _filename, cv::Mat &_centers, cv::Mat &_labels);
-//	static bool saveClusters(const cv::Mat &_centers, const cv::Mat &_labels, const std::string _filename);
+	// Performs the search of clusters using a stochastic version of kmeans algorithm
+	static void stochasticSearchClusters(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold, const int _sampleSize);
 
 	// Calculates the Sum of Squared Errors for the given centers and labels, using the given metric
-	static double getSSE(const cv::Mat &_descriptors, const cv::Mat &_labels, const cv::Mat &_centers, const Metric &_metric);
+	static inline double getSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, const MetricPtr &_metric)
+	{
+		double sse = 0;
+		for (int i = 0; i < _items.rows; i++)
+		{
+			double norm = _metric->distance(_items.row(i), _centers.row(_labels.at<int>(i)));
+			sse += (norm * norm);
+		}
+
+		return sse;
+	}
 
 private:
+	// Constuctor
 	KMeans();
+	// Destructor
 	~KMeans();
 
-	static std::vector<int> getRandomSet(const unsigned int _size, const int _min, const int _max);
-	static bool evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, const Metric &_metric);
-	static void selectStartCenters(const cv::Mat &_descriptors, cv::Mat &_centers);
-	static int findClosestCenter(const cv::Mat &_descriptor, cv::Mat &_centers, const Metric &_metric);
+	// Runs the kmeans algorithm to find clusters in the given data
+	static inline void run(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _threshold, const int _sampleSize = -1);
 
-	static void getSample(const cv::Mat &_descriptors, cv::Mat &_sample);
+	// Updates the possition of the centers according to the given data labels
+	static inline bool updateCenters(std::vector<int> &_itemCount, cv::Mat &_centers, const cv::Mat &_sample, const cv::Mat _labels, const int _ncluster, const double _stopThreshold, const MetricPtr &_metric);
+
+	// Evaluates if the stop condition has been met for the current data
+	static inline bool evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, const MetricPtr &_metric);
+
+	// Finds the closest center to each item
+	static inline int findClosestCenter(const cv::Mat &_items, const cv::Mat &_centers, const MetricPtr &_metric);
+
+	// Retrieves a sample of data from the given items matrix
+	static inline void getSample(const cv::Mat &_items, cv::Mat &_sample);
 };

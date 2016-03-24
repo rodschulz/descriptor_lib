@@ -25,17 +25,20 @@ void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_p
 			break;
 
 		case CLUSTERING_CUSTOM:
-			KMeans::searchClusters(_items, _params.clusters, *metric, _params.attempts, _params.maxIterations, _params.stopThreshold, _results.labels, _results.centers, _results.errorEvolution);
+			KMeans::searchClusters(_results, _items, metric, _params.clusters, _params.attempts, _params.maxIterations, _params.stopThreshold);
 			break;
 
 		case CLUSTERING_STOCHASTIC:
-			KMeans::stochasticSearchClusters(_items, _params.clusters, _items.rows / 10, *metric, _params.attempts, _params.maxIterations, _params.stopThreshold, _results.labels, _results.centers, _results.errorEvolution);
+			KMeans::stochasticSearchClusters(_results, _items, metric, _params.clusters, _params.attempts, _params.maxIterations, _params.stopThreshold, _items.rows / 10);
 			break;
 	}
 }
 
 void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const ExecutionParams &_params, cv::Mat &_labels)
 {
+	// TODO implement a unit test for this method (probably over a syn cloud with some def centers and results)
+
+
 	MetricPtr metric = MetricFactory::createMetric(_params.metric, _params.getSequenceLength(), _params.useConfidence);
 
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
@@ -78,7 +81,7 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams
 		if (params.implementation == CLUSTERING_OPENCV)
 			sse = Utils::getSSE(_items, results.centers, results.labels);
 		else
-			sse = KMeans::getSSE(_items, results.labels, results.centers, *metric);
+			sse = KMeans::getSSE(_items, results.labels, results.centers, metric);
 
 		data << i << " " << sse << "\n";
 	}

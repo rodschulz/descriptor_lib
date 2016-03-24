@@ -10,9 +10,6 @@
 #include "../descriptor/Extractor.hpp"
 #include "../clustering/Metric.hpp"
 
-#define OUTPUT_FOLDER		"./output/"
-#define MATRIX_DIMENSIONS	"dims"
-
 class Writer
 {
 public:
@@ -24,13 +21,22 @@ public:
 	static void writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params);
 	static void writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers);
 
+	// Saves the given cloud as a cache matrix, so it can be used for kmeans clustering
+	static void saveCloudAsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
+
 private:
+	// Constructor
 	Writer();
+	// Destructor
 	~Writer();
 
+	// Writes the given matrix to a file
 	static void writeMatrix(const std::string &_filename, const cv::Mat &_matrix);
+
+	// Generates a GNUPlot script to generate a histogram plot with the information given
 	static void generateHistogramScript(const std::string &_outputFolder, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit);
 
+	// Compares two pairs according to the values of their second element
 	static bool comparePairs(const std::pair<int, int> &_item1, const std::pair<int, int> &_item2)
 	{
 		return _item1.second < _item2.second;

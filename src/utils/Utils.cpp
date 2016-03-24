@@ -17,6 +17,25 @@ int Utils::getRandomNumber(const int _min, const int _max)
 	return dist(generator);
 }
 
+std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min, const int _max)
+{
+	generator.seed(std::rand());
+	boost::random::uniform_int_distribution<> dist(_min, _max);
+
+	std::vector<int> numbers;
+	numbers.reserve(_size);
+
+	std::map<int, bool> used;
+	while (numbers.size() < _size)
+	{
+		int number = dist(generator);
+		if (used.find(number) == used.end())
+			numbers.push_back(number);
+	}
+
+	return numbers;
+}
+
 std::string Utils::num2Hex(const size_t _number)
 {
 	std::stringstream stream;
@@ -48,21 +67,9 @@ uint32_t Utils::colorPalette35(const int _index)
 	///
 	COLOR_RED, COLOR_KHAKI, COLOR_LIME, COLOR_CYAN, COLOR_NAVY, COLOR_DARK_MAGENTA, COLOR_DEEP_PINK, COLOR_SILVER,
 	///
-	COLOR_ORANGE, COLOR_YELLOW, COLOR_LIGHT_GREEN, COLOR_DARK_SEA_GREEN, COLOR_TURQUOISE, COLOR_BLUE, COLOR_HOT_PINK, COLOR_ROSY_BROWN, COLOR_WHITE};
+	COLOR_ORANGE, COLOR_YELLOW, COLOR_LIGHT_GREEN, COLOR_DARK_SEA_GREEN, COLOR_TURQUOISE, COLOR_BLUE, COLOR_HOT_PINK, COLOR_ROSY_BROWN, COLOR_WHITE };
 
 	return palette[_index % 35];
-}
-
-double Utils::getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv::Mat &_labels)
-{
-	double sse = 0;
-	for (int i = 0; i < _vectors.rows; i++)
-	{
-		float norm = cv::norm(_vectors.row(i), _centers.row(_labels.at<int>(i)));
-		sse += (norm * norm);
-	}
-
-	return sse;
 }
 
 std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point)

@@ -8,10 +8,7 @@
 #include <boost/shared_ptr.hpp>
 #include "../utils/ExecutionParams.hpp"
 
-// Forward declaration to define a metric's shared pointer
-class Metric;
-typedef boost::shared_ptr<Metric> MetricPtr;
-
+// Metric class definition
 class Metric
 {
 public:
@@ -37,3 +34,6 @@ protected:
 	// Destructor
 	virtual ~Metric();
 };
+
+// Metric's shared pointer
+typedef boost::shared_ptr<Metric> MetricPtr;

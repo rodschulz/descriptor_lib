@@ -42,6 +42,8 @@ public:
 	// Creates a metric instance according to the given parameters
 	static MetricPtr createMetric(const MetricType &_type, const std::vector<std::string> &_args)
 	{
+		// TODO change this to use a int array for args, so it can be compatible with the other implementation of this method
+
 		MetricPtr metric;
 		switch (_type)
 		{

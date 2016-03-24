@@ -38,5 +38,5 @@ private:
 		}
 	};
 
-	Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
+	inline Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
 };

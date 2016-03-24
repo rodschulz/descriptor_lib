@@ -9,13 +9,22 @@
 #include <opencv2/core/core.hpp>
 #include "../utils/ExecutionParams.hpp"
 
+// Struct grouping the results given by the clustering algorithm
 struct ClusteringResults
 {
 	cv::Mat labels;
 	cv::Mat centers;
 	std::vector<double> errorEvolution;
+
+	void prepare(const int _ncluster, const int _nitems, const int _dim)
+	{
+		centers = cv::Mat::zeros(_ncluster, _dim, CV_32FC1);
+		labels = cv::Mat::zeros(_nitems, 1, CV_32SC1);
+		errorEvolution.clear();
+	}
 };
 
+// Clustering class definition
 class Clustering
 {
 public:

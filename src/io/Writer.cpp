@@ -3,7 +3,6 @@
  * 2015
  */
 #include "Writer.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <math.h>
@@ -15,19 +14,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "../factories/CloudFactory.hpp"
 #include "../utils/Utils.hpp"
+#include "../utils/Config.hpp"
 
+#define MATRIX_DIMENSIONS	"dims"
 #define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"
 #define SCRIPT_SSE_NAME		OUTPUT_FOLDER "ssePlot.script"
 #define HISTOGRAM_DATA_FILE	OUTPUT_FOLDER "histogram.dat"
 #define SSE_DATA_FILE		OUTPUT_FOLDER "sse.dat"
-
-Writer::Writer()
-{
-}
-
-Writer::~Writer()
-{
-}
 
 void Writer::writeHistogram(const std::string &_filename, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
@@ -288,6 +281,19 @@ void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Ma
 
 	std::string destination = _outputFolder + "centers";
 	writeMatrix(destination, _centers);
+}
+
+void Writer::saveCloudAsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+{
+	cv::Mat items = cv::Mat::zeros(_cloud->size(), 3, CV_32FC1);
+	for (size_t i = 0; i < _cloud->size(); i++)
+	{
+		items.at<float>(i, 0) = _cloud->at(i).x;
+		items.at<float>(i, 1) = _cloud->at(i).y;
+		items.at<float>(i, 2) = _cloud->at(i).z;
+	}
+
+	Writer::writeDescriptorsCache(items, _params);
 }
 
 void Writer::writeMatrix(const std::string &_filename, const cv::Mat &_matrix)
