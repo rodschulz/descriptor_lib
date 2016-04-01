@@ -9,7 +9,7 @@
 #include <pcl/io/pcd_io.h>
 #include "clustering/Clustering.hpp"
 #include "clustering/KMeans.hpp"
-#include "clustering/MetricFactory.hpp"
+#include "metrics/MetricFactory.hpp"
 #include "descriptor/Calculator.hpp"
 #include "descriptor/Extractor.hpp"
 #include "descriptor/Hist.hpp"

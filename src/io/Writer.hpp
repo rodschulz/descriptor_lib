@@ -8,7 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include "../descriptor/Hist.hpp"
 #include "../descriptor/Extractor.hpp"
-#include "../clustering/Metric.hpp"
+#include "../metrics/Metric.hpp"
 
 class Writer
 {

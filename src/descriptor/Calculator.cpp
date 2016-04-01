@@ -50,6 +50,8 @@ void Calculator::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::P
 
 std::vector<Hist> Calculator::generateAngleHistograms(const Descriptor &_descriptor, const bool _useProjection)
 {
+	// TODO move this method to the output class, since this is only to generate the histogram generated as output
+
 	std::vector<Hist> histograms = std::vector<Hist>();
 	histograms.reserve(_descriptor.size());
 

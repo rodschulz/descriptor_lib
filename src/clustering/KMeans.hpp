@@ -5,7 +5,7 @@
 #pragma once
 
 #include <opencv2/core/core.hpp>
-#include "Metric.hpp"
+#include "../metrics/Metric.hpp"
 #include "Clustering.hpp"
 
 class KMeans

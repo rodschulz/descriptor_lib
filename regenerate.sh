@@ -31,9 +31,9 @@ fi
 if [ ! -d "./output" ]; then
 	mkdir ./output/
 fi
-if [ ! -d "./cache" ]; then
-	mkdir ./cache/
-fi
+#if [ ! -d "./cache" ]; then
+#s	mkdir ./cache/
+#fi
 
 # Make 
 ./make.sh

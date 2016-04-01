@@ -3,7 +3,7 @@
 debug: false
 
 # execution type (descriptor, clustering or metric)
-executionType: descriptor
+executionType: clustering
 
 ##### execution types #####
 # descriptor calculation execution params 
@@ -31,11 +31,11 @@ clustering:
     # params used only when no labeling is done
     implementation: custom # opencv, custom or stochastic
     metric: closest # closest or euclidean
-    clusters: 5
-    maxIterations: 10
+    clusters: 4
+    maxIterations: 300
     stopThreshold: 0.000001
-    attempts: 5
-    cacheLocation: ./cache/
+    attempts: 3
+    cacheLocation: ../cache/
     useConfidence: false # use confidence when the metric allows it
 
 # metric testcase evaluation params
