@@ -8,12 +8,7 @@ find_package(PCL 1.7 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(Boost 1.54.0 COMPONENTS unit_test_framework REQUIRED)
-
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+find_package(OpenMP REQUIRED)
 
 # Relevant PLC's folders
 include_directories(${PCL_INCLUDE_DIRS})
@@ -44,19 +39,6 @@ file(GLOB TEST_SRC
 	"Test.cpp"
 	"./test/*.hpp"
 	"./test/*.cpp")
-	
-# Target Descriptor
-add_executable(Descriptor ${DESCRIPTOR_SRC})
-target_link_libraries(Descriptor
-			clustering
-			descriptor
-			factories
-			io
-			metrics
-			utils
-			${PCL_LIBRARIES}
-			${YAML_CPP_LIBRARIES}
-			${OpenCV_LIBS})
 
 # Target Test
 add_executable(Test ${TEST_SRC})
@@ -71,3 +53,20 @@ target_link_libraries(Test
 			${PCL_LIBRARIES}
 			${OpenCV_LIBS}
 			${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
+# Set OpenMP flags so Descriptor can be linked
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
+# Target Descriptor
+add_executable(Descriptor ${DESCRIPTOR_SRC})
+target_link_libraries(Descriptor
+			clustering
+			descriptor
+			factories
+			io
+			metrics
+			utils
+			${PCL_LIBRARIES}
+			${YAML_CPP_LIBRARIES}
+			${OpenCV_LIBS})

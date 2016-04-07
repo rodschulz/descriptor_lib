@@ -75,3 +75,25 @@ pcl::PointCloud<pcl::Normal>::Ptr CloudUtils::estimateNormals(const pcl::PointCl
 
 	return normals;
 }
+
+cv::Mat CloudUtils::cloudToMatrix(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const bool _includeNormals)
+{
+	cv::Mat data = cv::Mat::zeros(_cloud->size(), _includeNormals ? 7 : 3, CV_32FC1);
+
+	for (size_t i = 0; i < _cloud->size(); i++)
+	{
+		data.at<float>(i, 0) = _cloud->at(i).x;
+		data.at<float>(i, 1) = _cloud->at(i).y;
+		data.at<float>(i, 2) = _cloud->at(i).z;
+
+		if (_includeNormals)
+		{
+			data.at<float>(i, 3) = _cloud->at(i).normal_x;
+			data.at<float>(i, 4) = _cloud->at(i).normal_y;
+			data.at<float>(i, 5) = _cloud->at(i).normal_z;
+			data.at<float>(i, 6) = _cloud->at(i).curvature;
+		}
+	}
+
+	return data;
+}

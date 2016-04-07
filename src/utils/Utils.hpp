@@ -74,6 +74,9 @@ public:
 	// Returns a color from the built-in color pallete (35 colors available)
 	static uint32_t colorPalette35(const int _index);
 
+	// Generates a pair of arbitrary points in the given plane, both defining a couple of perpendicular vectors when the difference from the plane's origin is used
+	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point);
+
 	// Calculates the Sum of Squared Errors indicator for the given vectors over the given centers, using the given labeling
 	static inline double getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv::Mat &_labels)
 	{
@@ -86,9 +89,6 @@ public:
 
 		return sse;
 	}
-
-	// Generates a pair of arbitrary points in the given plane, both defining a couple of perpendicular vectors when the difference from the plane's origin is used
-	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point);
 
 	// Returns +1 if the sign of the given value is positive, -1 if it's negative, and 0 when it's 0
 	template<typename T> static inline int sign(T val)

@@ -8,6 +8,7 @@
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
 #include "../utils/ExecutionParams.hpp"
+#include "../metrics/MetricFactory.hpp"
 
 // Struct grouping the results given by the clustering algorithm
 struct ClusteringResults
@@ -16,6 +17,7 @@ struct ClusteringResults
 	cv::Mat centers;
 	std::vector<double> errorEvolution;
 
+	// Prepares the current structure to store new results
 	void prepare(const int _ncluster, const int _nitems, const int _dim)
 	{
 		centers = cv::Mat::zeros(_ncluster, _dim, CV_32FC1);
@@ -39,6 +41,14 @@ public:
 
 	// Generates a representation of the clusters
 	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params);
+
+
+	/** Auxiliary methods for useful data generation */
+
+	// Generates a point to point distance matrix
+	static cv::Mat generatePointDistanceMatrix(const cv::Mat &_items, const MetricPtr &_metric);
+	static cv::Mat generatePointDistanceMatrix2(const cv::Mat &_items, const MetricPtr &_metric);
+	static void generatePointDistanceMatrix3(cv::Mat &_distanceMatrix, const cv::Mat &_items, const MetricPtr &_metric);
 
 private:
 	Clustering();

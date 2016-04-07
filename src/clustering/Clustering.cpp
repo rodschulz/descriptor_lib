@@ -7,7 +7,6 @@
 #include <fstream>
 #include "../utils/Utils.hpp"
 #include "../factories/PointFactory.hpp"
-#include "../metrics/MetricFactory.hpp"
 #include "KMeans.hpp"
 
 void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_params, ClusteringResults &_results)
@@ -37,7 +36,6 @@ void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_p
 void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const ExecutionParams &_params, cv::Mat &_labels)
 {
 	// TODO implement a unit test for this method (probably over a syn cloud with some def centers and results)
-
 
 	MetricPtr metric = MetricFactory::createMetric(_params.metric, _params.getSequenceLength(), _params.useConfidence);
 
@@ -187,4 +185,54 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 	}
 
 	return output;
+}
+
+cv::Mat Clustering::generatePointDistanceMatrix(const cv::Mat &_items, const MetricPtr &_metric)
+{
+	cv::Mat distanceMatrix = cv::Mat::zeros(_items.rows, _items.rows, CV_32FC1);
+
+	for (int i = 0; i < _items.rows; i++)
+	{
+		for (int j = 0; j <= i; j++)
+		{
+			float distance = (float) _metric->distance(_items.row(i), _items.row(j));
+			distanceMatrix.at<float>(i, j) = distance;
+			distanceMatrix.at<float>(j, i) = distance;
+		}
+	}
+
+	return distanceMatrix;
+}
+
+cv::Mat Clustering::generatePointDistanceMatrix2(const cv::Mat &_items, const MetricPtr &_metric)
+{
+	cv::Mat distanceMatrix = cv::Mat::zeros(_items.rows, _items.rows, CV_32FC1);
+
+#pragma omp parallel for shared(distanceMatrix)
+	for (int i = 0; i < _items.rows; i++)
+	{
+		for (int j = 0; j <= i; j++)
+		{
+			float distance = (float) _metric->distance(_items.row(i), _items.row(j));
+			distanceMatrix.at<float>(i, j) = distance;
+			distanceMatrix.at<float>(j, i) = distance;
+		}
+	}
+
+	return distanceMatrix;
+}
+
+void Clustering::generatePointDistanceMatrix3(cv::Mat &_distanceMatrix, const cv::Mat &_items, const MetricPtr &_metric)
+{
+	_distanceMatrix = cv::Mat::zeros(_items.rows, _items.rows, CV_32FC1);
+
+	for (int i = 0; i < _items.rows; i++)
+	{
+		for (int j = 0; j <= i; j++)
+		{
+			float distance = (float) _metric->distance(_items.row(i), _items.row(j));
+			_distanceMatrix.at<float>(i, j) = distance;
+			_distanceMatrix.at<float>(j, i) = distance;
+		}
+	}
 }
