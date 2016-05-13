@@ -5,10 +5,17 @@ project(DESCRIPTOR)
 
 # Find required packages
 find_package(PCL 1.7 REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 2.4.9 REQUIRED)
 find_package(yaml-cpp 0.5.2 REQUIRED)
 find_package(Boost 1.46 COMPONENTS unit_test_framework REQUIRED)
 find_package(OpenMP REQUIRED)
+
+# Print information related to OpenCV version
+message(STATUS "Found OpenCV ${OpenCV_VERSION}")
+message(STATUS "OpenCV_INCLUDE_DIRS= ${OpenCV_INCLUDE_DIRS}")
+
+# Relevant OpenCV's folders
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Relevant PLC's folders
 include_directories(${PCL_INCLUDE_DIRS})
