@@ -11,7 +11,6 @@
 
 // Extract the current boost's minor version
 #define BOOST_MINOR_VERSION (BOOST_VERSION %100)
-#pragma message "BOOST_VERSION=" BOOST_PP_STRINGIZE(BOOST_VERSION)
 
 // Include headers and define generator accordingly
 #if BOOST_MINOR_VERSION <= 46
@@ -19,11 +18,9 @@
 	#include <boost/random/variate_generator.hpp>
  	boost::mt19937 generator;
 #else
- 	#warning VERSION_OTHER
 	#include <boost/random/uniform_int_distribution.hpp>
 	boost::random::mt19937 generator;
 #endif
-
 
 int Utils::getRandomNumber(const int _min, const int _max)
 {

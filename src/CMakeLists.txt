@@ -6,8 +6,8 @@ project(DESCRIPTOR)
 # Find required packages
 find_package(PCL 1.7 REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(yaml-cpp 0.5.2 REQUIRED)
+find_package(Boost 1.46 COMPONENTS unit_test_framework REQUIRED)
 find_package(OpenMP REQUIRED)
 
 # Relevant PLC's folders
@@ -25,7 +25,7 @@ set(PCL_BUILD_TYPE Release)
 add_definitions(${PCL_DEFINITIONS})
 add_definitions("-Wall")
 
-# Add subfolders to be compiled
+# Add sub-folders to be compiled
 add_subdirectory(clustering)
 add_subdirectory(descriptor)
 add_subdirectory(factories)
