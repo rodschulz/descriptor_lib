@@ -5,22 +5,50 @@
 #include "Utils.hpp"
 #include <ctime>
 #include <sstream>
+#include <boost/version.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/preprocessor/stringize.hpp>
 
-boost::random::mt19937 generator;
+// Extract the current boost's minor version
+#define BOOST_MINOR_VERSION (BOOST_VERSION %100)
+#pragma message "BOOST_VERSION=" BOOST_PP_STRINGIZE(BOOST_VERSION)
+
+// Include headers and define generator accordingly
+#if BOOST_MINOR_VERSION <= 46
+	#include <boost/random/uniform_int.hpp>
+	#include <boost/random/variate_generator.hpp>
+ 	boost::mt19937 generator;
+#else
+ 	#warning VERSION_OTHER
+	#include <boost/random/uniform_int_distribution.hpp>
+	boost::random::mt19937 generator;
+#endif
+
 
 int Utils::getRandomNumber(const int _min, const int _max)
 {
 	generator.seed(std::time(0));
+
+#if BOOST_MINOR_VERSION <= 46
+	boost::uniform_int<> range(_min, _max);
+    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
+    return dist();
+#else
 	boost::random::uniform_int_distribution<> dist(_min, _max);
 	return dist(generator);
+#endif
 }
 
 std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min, const int _max)
 {
 	generator.seed(std::rand());
+
+#if BOOST_MINOR_VERSION <= 46
+	boost::uniform_int<> range(_min, _max);
+    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
+#else
 	boost::random::uniform_int_distribution<> dist(_min, _max);
+#endif
 
 	std::vector<int> numbers;
 	numbers.reserve(_size);
@@ -28,7 +56,12 @@ std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min,
 	std::map<int, bool> used;
 	while (numbers.size() < _size)
 	{
+#if BOOST_MINOR_VERSION <= 46
+		int number = dist();
+#else
 		int number = dist(generator);
+#endif
+		
 		if (used.find(number) == used.end())
 			numbers.push_back(number);
 	}

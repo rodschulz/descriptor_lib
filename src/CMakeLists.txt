@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 # Project's name
 project(DESCRIPTOR)
@@ -7,7 +7,7 @@ project(DESCRIPTOR)
 find_package(PCL 1.7 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(yaml-cpp REQUIRED)
-find_package(Boost 1.54.0 COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 find_package(OpenMP REQUIRED)
 
 # Relevant PLC's folders
