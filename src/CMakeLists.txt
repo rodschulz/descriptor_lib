@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # Project's name
 project(DESCRIPTOR)
 
+# Add additional path for cmake to find OpenCV
+set(CMAKE_PREFIX_PATH "/opt/ros/hydro/" ${CMAKE_PREFIX_PATH})
+
 # Find required packages
 find_package(PCL 1.7 REQUIRED)
 find_package(OpenCV 2.4.9 REQUIRED)
