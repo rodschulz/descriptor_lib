@@ -8,7 +8,7 @@ set(CMAKE_PREFIX_PATH "/opt/ros/hydro/" ${CMAKE_PREFIX_PATH})
 
 # Find required packages
 find_package(PCL 1.7 REQUIRED)
-find_package(OpenCV 2.4.9 REQUIRED)
+find_package(OpenCV 2.4.8 REQUIRED)
 find_package(yaml-cpp 0.5.2 REQUIRED)
 find_package(Boost 1.46 COMPONENTS unit_test_framework REQUIRED)
 find_package(OpenMP REQUIRED)
