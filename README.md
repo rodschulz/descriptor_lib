@@ -1,2 +1,2 @@
-# 3D GraspDescriptor
-Development of a 3D cloud descriptor focused on the identification of convenient/suitable zones to perform grasping using a robotic manipulator (PR2 arms for example).
+# Grasping Descriptor Library
+This is a library implementing the calculation of a descriptor for clouds of 3D points, focused on using providing enough information to use the descriptor in robotic grasping applications.
