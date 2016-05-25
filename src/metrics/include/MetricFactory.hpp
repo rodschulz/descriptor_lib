@@ -7,7 +7,7 @@
 #include <stdarg.h>
 #include <vector>
 #include <string>
-#include "../utils/ExecutionParams.hpp"
+#include "ExecutionParams.hpp"
 #include "ClosestPermutationMetric.hpp"
 #include "EuclideanMetric.hpp"
 

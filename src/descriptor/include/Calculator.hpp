@@ -5,8 +5,8 @@
 #pragma once
 
 #include <vector>
-#include "../utils/ExecutionParams.hpp"
-#include "../utils/Utils.hpp"
+#include "ExecutionParams.hpp"
+#include "Utils.hpp"
 #include "Extractor.hpp"
 #include "Hist.hpp"
 

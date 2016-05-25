@@ -5,7 +5,7 @@
 #pragma once
 
 #include <pcl/point_types.h>
-#include "../utils/Utils.hpp"
+#include "Utils.hpp"
 
 // Point factory class
 class PointFactory

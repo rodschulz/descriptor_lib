@@ -6,7 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 #include <boost/shared_ptr.hpp>
-#include "../utils/ExecutionParams.hpp"
+#include "ExecutionParams.hpp"
 
 // Metric class definition
 class Metric

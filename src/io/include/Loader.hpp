@@ -8,8 +8,7 @@
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
 #include <string>
-
-#include "../utils/ExecutionParams.hpp"
+#include "ExecutionParams.hpp"
 
 class Loader
 {

@@ -8,8 +8,8 @@
 #include <pcl/common/impl/common.hpp>
 #include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
 #include <boost/algorithm/minmax_element.hpp>
-#include "../utils/Utils.hpp"
-#include "../utils/Config.hpp"
+#include "Utils.hpp"
+#include "Config.hpp"
 
 pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius)
 {

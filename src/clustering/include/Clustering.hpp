@@ -7,8 +7,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
-#include "../utils/ExecutionParams.hpp"
-#include "../metrics/MetricFactory.hpp"
+#include "ExecutionParams.hpp"
+#include "MetricFactory.hpp"
 
 // Struct grouping the results given by the clustering algorithm
 struct ClusteringResults

@@ -5,7 +5,7 @@
 #include "KMeans.hpp"
 #include <limits>
 #include <stdio.h>
-#include "../utils/Utils.hpp"
+#include "Utils.hpp"
 
 template<typename T>
 void DEBUG_print(cv::Mat mat)

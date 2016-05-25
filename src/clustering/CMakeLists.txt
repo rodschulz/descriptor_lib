@@ -1,7 +1,13 @@
 file(GLOB CLUSTERING_SRC
-    "*.h"
-    "*.cpp"
+	"src/*.cpp"
 )
+
+file(GLOB CLUSTERING_INC
+	"include/*.h"
+	"include/*.hpp"
+)
+
+include_directories(include)
 
 SET_SOURCE_FILES_PROPERTIES(
   ${CLUSTERING_SRC}

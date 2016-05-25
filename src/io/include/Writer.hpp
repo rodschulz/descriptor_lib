@@ -6,9 +6,9 @@
 
 #include <string>
 #include <opencv2/core/core.hpp>
-#include "../descriptor/Hist.hpp"
-#include "../descriptor/Extractor.hpp"
-#include "../metrics/Metric.hpp"
+#include "Hist.hpp"
+#include "Extractor.hpp"
+#include "Metric.hpp"
 
 class Writer
 {

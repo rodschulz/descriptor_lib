@@ -5,8 +5,8 @@
 #include "Clustering.hpp"
 #include <string.h>
 #include <fstream>
-#include "../utils/Utils.hpp"
-#include "../factories/PointFactory.hpp"
+#include "Utils.hpp"
+#include "PointFactory.hpp"
 #include "KMeans.hpp"
 
 void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_params, ClusteringResults &_results)

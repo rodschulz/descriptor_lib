@@ -3,11 +3,10 @@
  * 2015
  */
 #include "Loader.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <pcl/io/pcd_io.h>
-#include "../utils/CloudUtils.hpp"
+#include "CloudUtils.hpp"
 
 bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 {

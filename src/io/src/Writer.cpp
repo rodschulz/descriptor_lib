@@ -12,9 +12,9 @@
 #include <pcl/io/pcd_io.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "../factories/CloudFactory.hpp"
-#include "../utils/Utils.hpp"
-#include "../utils/Config.hpp"
+#include "CloudFactory.hpp"
+#include "Utils.hpp"
+#include "Config.hpp"
 
 #define MATRIX_DIMENSIONS	"dims"
 #define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"

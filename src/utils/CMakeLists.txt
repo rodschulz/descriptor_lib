@@ -1,7 +1,13 @@
 file(GLOB UTILS_SRC
-    "*.h"
-    "*.cpp"
+	"src/*.cpp"
 )
+
+file(GLOB UTILS_INC
+	"include/*.h"
+	"include/*.hpp"
+)
+
+include_directories(include)
 
 add_library(utils ${UTILS_SRC})
 target_link_libraries(utils
