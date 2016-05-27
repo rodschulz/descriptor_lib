@@ -16,9 +16,12 @@
 Config::Config()
 {
 	debug = false;
+	targetPoint = -1;
+	normalEstimationRadius = -1;
+
 	descriptorParams = NULL;
 	clusteringParams = NULL;
-	smoothingParams = NULL;
+	cloudSmoothingParams = NULL;
 	syntheticCloudParams = NULL;
 	metricTestingParams = NULL;
 }
@@ -35,6 +38,8 @@ bool Config::load(const std::string &filename_)
 		YAML::Node config = YAML::LoadFile(filename_);
 
 		getInstance()->debug = config["debug"].as<bool>();
+		getInstance()->targetPoint = config["targetPint"] ? config["targetPint"].as<bool>() : -1;
+		getInstance()->normalEstimationRadius = config["normalRadius"] ? config["normalEstimationRadius"].as<double>() : -1;
 
 		if (config["descriptor"])
 		{
@@ -42,7 +47,6 @@ bool Config::load(const std::string &filename_)
 
 			DescriptorParams *params = new DescriptorParams();
 			params->patchSize = descriptorConfig["patchSize"].as<double>();
-			params->normalRadius = descriptorConfig["normalRadius"].as<double>();
 			params->bandNumber = descriptorConfig["bandNumber"].as<int>();
 			params->bandWidth = descriptorConfig["bandWidth"].as<double>();
 			params->bidirectional = descriptorConfig["bidirectional"].as<bool>();
@@ -55,10 +59,33 @@ bool Config::load(const std::string &filename_)
 
 		if (config["clustering"])
 		{
+			YAML::Node clusteringConfig = config["clustering"];
+
+			ClusteringParams *params = new ClusteringParams();
+			params->implementation = ExecutionParams::getClusteringImplementation(clusteringConfig["implementation"].as<std::string>());
+			params->metric = ExecutionParams::getMetricType(clusteringConfig["metric"].as<std::string>());
+			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
+			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
+			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
+			params->attempts = clusteringConfig["attempts"].as<int>();
+			params->cacheLocation = clusteringConfig["cacheLocation"].as<std::string>();
+			params->useConfidence = clusteringConfig["useConfidence"].as<bool>();
+			params->generateElbowCurve = clusteringConfig["generateElbowCurve"].as<bool>();
+			params->generateDistanceMatrix = clusteringConfig["generateDistanceMatrix"].as<bool>();
+
+			getInstance()->clusteringParams = params;
 		}
 
 		if (config["cloudSmoothing"])
 		{
+			YAML::Node smoothingConfig = config["cloudSmoothing"];
+
+			CloudSmoothingParams *params = new CloudSmoothingParams();
+			params->useSmoothing = smoothingConfig["useSmoothing"].as<bool>();
+			params->radius = smoothingConfig["radius"].as<double>();
+			params->sigma = smoothingConfig["sigma"].as<double>();
+
+			getInstance()->cloudSmoothingParams = params;
 		}
 
 		if (config["syntheticCloud"])

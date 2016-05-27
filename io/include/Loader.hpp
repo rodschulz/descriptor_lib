@@ -23,10 +23,9 @@ public:
 	static bool loadCenters(const std::string &_fileLocation, cv::Mat &_centers);
 
 	// Loads a matrix from disk and stores it in the given matrix. Returns true if was successfully loaded, false otherwise
-	static bool loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
+	static bool loadCloud(const std::string &_filename, const double _normalEstimationRadius, const CloudSmoothingParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud);
 
 private:
-
 	Loader();
 	~Loader();
 };

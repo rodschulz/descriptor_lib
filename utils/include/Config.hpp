@@ -5,11 +5,12 @@
 #pragma once
 
 #include <string>
+#include <stdexcept>
 #include "ExecutionParams.hpp"
 
-#define OUTPUT_FOLDER		"./output/"
+#define OUTPUT_FOLDER			"./output/"
 #define CLOUD_FILE_EXTENSION	".pcd"
-#define DEBUG_PREFIX		"DEBUG_"
+#define DEBUG_PREFIX			"DEBUG_"
 
 class Config
 {
@@ -39,11 +40,37 @@ public:
 		return getInstance()->debug;
 	}
 
+	// Returns the normal estimation radius
+	static double getNormalEstimationRadius()
+	{
+		return getInstance()->normalEstimationRadius;
+	}
 
-
+	// Returns the descritor calculation parameters
 	static DescriptorParams getDescriptorParams()
 	{
+		if (getInstance()->descriptorParams == NULL)
+			throw std::runtime_error("ERROR: descriptor params not loaded");
+
 		return *getInstance()->descriptorParams;
+	}
+
+	// Returns the clustering parameters
+	static ClusteringParams getClusteringParams()
+	{
+		if (getInstance()->clusteringParams == NULL)
+			throw std::runtime_error("ERROR: clustering params not loaded");
+
+		return *getInstance()->clusteringParams;
+	}
+
+	// Returns the cloud smoothing parameters
+	static CloudSmoothingParams getCloudSmoothingParams()
+	{
+		if (getInstance()->cloudSmoothingParams == NULL)
+			throw std::runtime_error("ERROR: cloud smoothing params not loaded");
+
+		return *getInstance()->cloudSmoothingParams;
 	}
 
 private:
@@ -51,15 +78,16 @@ private:
 	Config();
 
 	// Instance storing the current execution params loaded from the config file
-	ExecutionParams params;// TODO remove this
+	ExecutionParams params; // TODO remove this
 
 	// Cached params
 	DescriptorParams *descriptorParams;
 	ClusteringParams *clusteringParams;
-	CloudSmoothingParams *smoothingParams;
+	CloudSmoothingParams *cloudSmoothingParams;
 	SyntheticCloudsParams *syntheticCloudParams;
 	MetricTestingParams *metricTestingParams;
 
-	// Flag indicating if the debug generation is enabled or not
-	bool debug;
+	bool debug; // Flag indicating if the debug generation is enabled or not
+	int targetPoint; // Target point
+	double normalEstimationRadius; // Radius used to perform the normal vectors estimation
 };

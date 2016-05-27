@@ -35,7 +35,6 @@ enum SynCloudType
 struct DescriptorParams
 {
 	double patchSize; // Search radius for the KNN search method
-	double normalRadius; // Radius used to perform the normal vectors estimation
 	int bandNumber; // Number of bands to use in the descriptor
 	double bandWidth; // Width of each descriptor's band
 	bool bidirectional; // Indicates if each band has to be analyzed bidirectionally or not
@@ -45,13 +44,12 @@ struct DescriptorParams
 
 	DescriptorParams()
 	{
-		patchSize = 0.2;
-		normalRadius = -1;
-		bandNumber = 8;
-		bandWidth = 0.005;
+		patchSize = 1;
+		bandNumber = 4;
+		bandWidth = 0.05;
 		bidirectional = false;
 		useProjection = false;
-		sequenceBin = 0.005;
+		sequenceBin = 0.05;
 		sequenceStat = STAT_MEAN;
 	}
 };
@@ -65,9 +63,7 @@ struct ClusteringParams
 	double stopThreshold; // Clustering stop threshold
 	int attempts; // Number of attemtps to try when clustering
 	std::string cacheLocation; // Location of the cachefiles
-
 	bool useConfidence; // Use confidence, if the metric allows it
-
 	bool generateElbowCurve; // Flag indicating if an elbow graph has to be generated
 	bool generateDistanceMatrix; // Flag indicating if the distance matrix image has to be generated
 
@@ -77,12 +73,10 @@ struct ClusteringParams
 		metric = METRIC_EUCLIDEAN;
 		clusterNumber = 5;
 		maxIterations = 10000;
-		stopThreshold = 0.001;
+		stopThreshold = 0.1;
 		attempts = 1;
 		cacheLocation = "";
-
 		useConfidence = false;
-
 		generateElbowCurve = false;
 		generateDistanceMatrix = false;
 	}
