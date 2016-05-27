@@ -89,22 +89,23 @@ bool Loader::loadCloud(pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const Exe
 		// Remove NANs
 		CloudUtils::removeNANs(cloudXYZ);
 
+		// TODO fix this!
 		// Apply smoothing
-		switch (_params.smoothingType)
-		{
-			case SMOOTHING_GAUSSIAN:
-				std::cout << "\tApplying gaussian smoothing\n";
-				cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
-				break;
-
-			case SMOOTHING_MLS:
-				std::cout << "\tApplying MLS smoothing\n";
-				cloudXYZ = CloudUtils::MLSSmoothing(cloudXYZ, _params.mlsRadius);
-				break;
-
-			default:
-				break;
-		}
+//		switch (_params.smoothingType)
+//		{
+//			case SMOOTHING_GAUSSIAN:
+//				std::cout << "\tApplying gaussian smoothing\n";
+//				cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, _params.gaussianSigma, _params.gaussianRadius);
+//				break;
+//
+//			case SMOOTHING_MLS:
+//				std::cout << "\tApplying MLS smoothing\n";
+//				cloudXYZ = CloudUtils::MLSSmoothing(cloudXYZ, _params.mlsRadius);
+//				break;
+//
+//			default:
+//				break;
+//		}
 
 		// Estimate normals
 		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, _params.normalEstimationRadius);

@@ -10,7 +10,7 @@
 
 ExecutionParams::ExecutionParams()
 {
-	executionType = EXECUTION_NONE;
+//	executionType = EXECUTION_NONE;
 
 	inputLocation = "";
 	targetPoint = 1000;
@@ -23,12 +23,12 @@ ExecutionParams::ExecutionParams()
 	useProjection = true;
 
 	sequenceBin = 0.01;
-	sequenceStat = STAT_NONE;
+	sequenceStat = STAT_MEAN;
 
 	useSynthetic = false;
-	synCloudType = CLOUD_NONE;
+	synCloudType = CLOUD_HALF_SPHERE;
 
-	smoothingType = SMOOTHING_NONE;
+//	smoothingType = SMOOTHING_NONE;
 	gaussianSigma = 2;
 	gaussianRadius = 0.02;
 	mlsRadius = 0.02;
@@ -39,8 +39,8 @@ ExecutionParams::ExecutionParams()
 	labelData = false;
 	centersLocation = "";
 
-	implementation = CLUSTERING_NONE;
-	metric = METRIC_NONE;
+	implementation = CLUSTERING_OPENCV;
+	metric = METRIC_EUCLIDEAN;
 	clusters = 5;
 	maxIterations = 10000;
 	stopThreshold = 0.001;
@@ -48,20 +48,20 @@ ExecutionParams::ExecutionParams()
 	cacheLocation = "";
 	useConfidence = false;
 
-	targetMetric = METRIC_NONE;
+	targetMetric = METRIC_EUCLIDEAN;
 	metricArgs = std::vector<std::string>();
 }
 
-ExecutionType ExecutionParams::getExecutionType(const std::string &_type)
-{
-	if (boost::iequals(_type, "descriptor"))
-		return EXECUTION_DESCRIPTOR;
-	else if (boost::iequals(_type, "clustering"))
-		return EXECUTION_CLUSTERING;
-	else if (boost::iequals(_type, "metric"))
-		return EXECUTION_METRIC;
-	return EXECUTION_NONE;
-}
+//ExecutionType ExecutionParams::getExecutionType(const std::string &_type)
+//{
+//	if (boost::iequals(_type, "descriptor"))
+//		return EXECUTION_DESCRIPTOR;
+//	else if (boost::iequals(_type, "clustering"))
+//		return EXECUTION_CLUSTERING;
+//	else if (boost::iequals(_type, "metric"))
+//		return EXECUTION_METRIC;
+//	return EXECUTION_NONE;
+//}
 
 SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)
 {
@@ -75,16 +75,10 @@ SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)
 		return CLOUD_HALF_SPHERE;
 	else if (boost::iequals(_type, "plane"))
 		return CLOUD_PLANE;
-	return CLOUD_NONE;
-}
-
-SmoothingType ExecutionParams::getSmoothingType(const std::string &_type)
-{
-	if (boost::iequals(_type, "gaussian"))
-		return SMOOTHING_GAUSSIAN;
-	else if (boost::iequals(_type, "mls"))
-		return SMOOTHING_MLS;
-	return SMOOTHING_NONE;
+	{
+		std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
+		return CLOUD_SPHERE;
+	}
 }
 
 SequenceStat ExecutionParams::getStatType(const std::string &_type)
@@ -93,7 +87,10 @@ SequenceStat ExecutionParams::getStatType(const std::string &_type)
 		return STAT_MEAN;
 	else if (boost::iequals(_type, "median"))
 		return STAT_MEDIAN;
-	return STAT_NONE;
+	{
+		std::cout << "WARNING: wrong stat type, assuming MEAN";
+		return STAT_MEAN;
+	}
 }
 
 ClusteringImplementation ExecutionParams::getClusteringImplementation(const std::string &_type)
@@ -104,7 +101,11 @@ ClusteringImplementation ExecutionParams::getClusteringImplementation(const std:
 		return CLUSTERING_CUSTOM;
 	else if (boost::iequals(_type, "stochastic"))
 		return CLUSTERING_STOCHASTIC;
-	return CLUSTERING_NONE;
+	else
+	{
+		std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
+		return CLUSTERING_OPENCV;
+	}
 }
 
 MetricType ExecutionParams::getMetricType(const std::string &_type)
@@ -113,7 +114,10 @@ MetricType ExecutionParams::getMetricType(const std::string &_type)
 		return METRIC_EUCLIDEAN;
 	else if (boost::iequals(_type, "closest"))
 		return METRIC_CLOSEST_PERMUTATION;
-	return METRIC_NONE;
+	{
+		std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
+		return METRIC_EUCLIDEAN;
+	}
 }
 
 std::string ExecutionParams::getHash() const
@@ -127,21 +131,16 @@ std::string ExecutionParams::getHash() const
 
 	str += "input=" + inputFile;
 	str += "-patchSize=" + boost::lexical_cast<std::string>(patchSize);
-	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius);
+	str += "-normalRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius);
 	str += "-bandNumber=" + boost::lexical_cast<std::string>(bandNumber);
 	str += "-bandWidth=" + boost::lexical_cast<std::string>(bandWidth);
 	str += "-bidirectional=" + boost::lexical_cast<std::string>(bidirectional);
 	str += "-useProjection=" + boost::lexical_cast<std::string>(useProjection);
 	str += "-sequenceBin=" + boost::lexical_cast<std::string>(sequenceBin);
 	str += "-sequenceStat=" + boost::lexical_cast<std::string>(sequenceStat);
-	str += "-smoothingType=" + boost::lexical_cast<std::string>(smoothingType);
-	if (smoothingType == SMOOTHING_GAUSSIAN)
-	{
-		str += "-gaussianSigma=" + boost::lexical_cast<std::string>(gaussianSigma);
-		str += "-gaussianRadius=" + boost::lexical_cast<std::string>(gaussianRadius);
-	}
-	else if (smoothingType == SMOOTHING_MLS)
-		str += "-mlsRadius=" + boost::lexical_cast<std::string>(mlsRadius);
+//	str += "-useSmoothing=" + boost::lexical_cast<std::string>(useSmoothing); //TODO fix this
+//	str += "-smoothingSigma=" + boost::lexical_cast<std::string>(sigma);
+//	str += "-smoothingRadius=" + boost::lexical_cast<std::string>(radius);
 
 	boost::hash<std::string> strHash;
 	return Utils::num2Hex(strHash(str));

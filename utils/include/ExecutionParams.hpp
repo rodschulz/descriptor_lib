@@ -7,50 +7,137 @@
 #include <string>
 #include <vector>
 
-enum ExecutionType
-{
-	EXECUTION_NONE, EXECUTION_DESCRIPTOR, EXECUTION_CLUSTERING, EXECUTION_METRIC
-};
-
-enum SynCloudType
-{
-	CLOUD_NONE, CLOUD_CUBE, CLOUD_CYLINDER, CLOUD_SPHERE, CLOUD_HALF_SPHERE, CLOUD_PLANE
-};
-
-enum SmoothingType
-{
-	SMOOTHING_NONE, SMOOTHING_GAUSSIAN, SMOOTHING_MLS
-};
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Set of enumerations defining some easy-to-read values for some parameters
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 enum SequenceStat
 {
-	STAT_NONE, STAT_MEAN, STAT_MEDIAN
+	STAT_MEAN, STAT_MEDIAN
 };
 
 enum ClusteringImplementation
 {
-	CLUSTERING_NONE, CLUSTERING_OPENCV, CLUSTERING_CUSTOM, CLUSTERING_STOCHASTIC
+	CLUSTERING_OPENCV, CLUSTERING_CUSTOM, CLUSTERING_STOCHASTIC
 };
 
 enum MetricType
 {
-	METRIC_NONE, METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION
+	METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION
 };
+
+enum SynCloudType
+{
+	CLOUD_CUBE, CLOUD_CYLINDER, CLOUD_SPHERE, CLOUD_HALF_SPHERE, CLOUD_PLANE
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Set of structures groupping functionality-related parameters
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct DescriptorParams
+{
+	double patchSize; // Search radius for the KNN search method
+	double normalRadius; // Radius used to perform the normal vectors estimation
+	int bandNumber; // Number of bands to use in the descriptor
+	double bandWidth; // Width of each descriptor's band
+	bool bidirectional; // Indicates if each band has to be analyzed bidirectionally or not
+	bool useProjection; // Indicates if the normal's angle calculation has to be projecting the angles over the band's plane or just use the raw angle
+	double sequenceBin; // Size of the bins used in the sequence construction
+	SequenceStat sequenceStat; // Statistic to use in the sequence calculation
+
+	DescriptorParams()
+	{
+		patchSize = 0.2;
+		normalRadius = -1;
+		bandNumber = 8;
+		bandWidth = 0.005;
+		bidirectional = false;
+		useProjection = false;
+		sequenceBin = 0.005;
+		sequenceStat = STAT_MEAN;
+	}
+};
+
+struct ClusteringParams
+{
+	ClusteringImplementation implementation; // Implementation of clustering to be used
+	MetricType metric; // Type of metric to use in clustering execution
+	int clusterNumber; // Number of clusters used in the clustering test
+	int maxIterations; // Clustering max iterations
+	double stopThreshold; // Clustering stop threshold
+	int attempts; // Number of attemtps to try when clustering
+	std::string cacheLocation; // Location of the cachefiles
+
+	bool useConfidence; // Use confidence, if the metric allows it
+
+	bool generateElbowCurve; // Flag indicating if an elbow graph has to be generated
+	bool generateDistanceMatrix; // Flag indicating if the distance matrix image has to be generated
+
+	ClusteringParams()
+	{
+		implementation = CLUSTERING_OPENCV;
+		metric = METRIC_EUCLIDEAN;
+		clusterNumber = 5;
+		maxIterations = 10000;
+		stopThreshold = 0.001;
+		attempts = 1;
+		cacheLocation = "";
+
+		useConfidence = false;
+
+		generateElbowCurve = false;
+		generateDistanceMatrix = false;
+	}
+};
+
+struct CloudSmoothingParams
+{
+	bool useSmoothing; // Flag indicating if the smoothing has to be performed or not
+	double sigma; // Sigma used for the gaussian smoothning
+	double radius; // Search radius used for the gaussian smoothing
+
+	CloudSmoothingParams()
+	{
+		useSmoothing = false;
+		sigma = 4;
+		radius = 0.005;
+	}
+};
+
+struct SyntheticCloudsParams
+{
+	bool useSynthetic; // Flag indicating if a synthetic cloud has to be generated
+	SynCloudType synCloudType; // Desired synthetic cloud
+
+	SyntheticCloudsParams()
+	{
+		useSynthetic = false;
+		synCloudType = CLOUD_SPHERE;
+	}
+};
+
+struct MetricTestingParams
+{
+};
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//enum ExecutionType
+//{
+//	EXECUTION_NONE, EXECUTION_DESCRIPTOR, EXECUTION_CLUSTERING, EXECUTION_METRIC
+//};
 
 class ExecutionParams
 {
 public:
 	ExecutionParams();
-	~ExecutionParams() {};
+	~ExecutionParams()
+	{
+	}
+	;
 
 	// Returns the execution type associated to the given string
-	static ExecutionType getExecutionType(const std::string &_type);
+//	static ExecutionType getExecutionType(const std::string &_type);
 
 	// Returns the synthetic cloud type associated to the given string
 	static SynCloudType getSynCloudType(const std::string &_type);
-
-	// Returns the cloud smoothing type associated to the given string
-	static SmoothingType getSmoothingType(const std::string &_type);
 
 	// Returns the statistic type associated to the given string
 	static SequenceStat getStatType(const std::string &_type);
@@ -73,7 +160,7 @@ public:
 	// Returns the sequence length of the bands (number of bins) according to the current config
 	int getSequenceLength() const;
 
-	ExecutionType executionType;			// Type of execution to run
+//	ExecutionType executionType;			// Type of execution to run
 
 	std::string inputLocation;			// Location of the input file
 	int targetPoint;				// Target point
@@ -91,7 +178,7 @@ public:
 	bool useSynthetic;				// Flag indicating if a synthetic has to be used
 	SynCloudType synCloudType;			// Desired synthetic cloud
 
-	SmoothingType smoothingType;			// Type of smoothing algorithm to use
+//	SmoothingType smoothingType;			// Type of smoothing algorithm to use
 	double gaussianSigma;				// Sigma used for the gaussian smoothning
 	double gaussianRadius;				// Search radius used for the gaussian smoothing
 	double mlsRadius;				// Search radius used for the mls smoothing
