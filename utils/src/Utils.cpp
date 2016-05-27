@@ -14,13 +14,26 @@
 
 // Include headers and define generator accordingly
 #if BOOST_MINOR_VERSION <= 46
-	#include <boost/random/uniform_int.hpp>
-	#include <boost/random/variate_generator.hpp>
- 	boost::mt19937 generator;
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/variate_generator.hpp>
+boost::mt19937 generator;
 #else
-	#include <boost/random/uniform_int_distribution.hpp>
-	boost::random::mt19937 generator;
+#include <boost/random/uniform_int_distribution.hpp>
+boost::random::mt19937 generator;
 #endif
+
+std::string Utils::getWorkingDirectory()
+{
+	char workingDir[1024];
+	if (getcwd(workingDir, sizeof(workingDir)) == NULL)
+		std::cout << "WARNING: can't get working directory location" << std::endl;
+
+	int len = strlen(workingDir);
+	workingDir[len] = '/';
+	workingDir[len + 1] = '\0';
+
+	return workingDir;
+}
 
 int Utils::getRandomNumber(const int _min, const int _max)
 {
@@ -28,8 +41,8 @@ int Utils::getRandomNumber(const int _min, const int _max)
 
 #if BOOST_MINOR_VERSION <= 46
 	boost::uniform_int<> range(_min, _max);
-    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
-    return dist();
+	boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
+	return dist();
 #else
 	boost::random::uniform_int_distribution<> dist(_min, _max);
 	return dist(generator);
@@ -42,7 +55,7 @@ std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min,
 
 #if BOOST_MINOR_VERSION <= 46
 	boost::uniform_int<> range(_min, _max);
-    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
+	boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
 #else
 	boost::random::uniform_int_distribution<> dist(_min, _max);
 #endif
@@ -58,7 +71,7 @@ std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min,
 #else
 		int number = dist(generator);
 #endif
-		
+
 		if (used.find(number) == used.end())
 			numbers.push_back(number);
 	}
@@ -82,16 +95,14 @@ float Utils::getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
 
 uint32_t Utils::colorPalette12(const int _index)
 {
-	static uint32_t palette[12] =
-	{ 0xa6cee3, 0x1f78b4, 0xb2df8a, 0x33a02c, 0xfb9a99, 0xe31a1c, 0xfdbf6f, 0xff7f00, 0xcab2d6, 0x6a3d9a, 0xffff99, 0xb15928 };
+	static uint32_t palette[12] = { 0xa6cee3, 0x1f78b4, 0xb2df8a, 0x33a02c, 0xfb9a99, 0xe31a1c, 0xfdbf6f, 0xff7f00, 0xcab2d6, 0x6a3d9a, 0xffff99, 0xb15928 };
 
 	return palette[_index % 12];
 }
 
 uint32_t Utils::colorPalette35(const int _index)
 {
-	static uint32_t palette[35] =
-	{ COLOR_FIREBRICK, COLOR_GOLDEN_ROD, COLOR_DARK_GREEN, COLOR_MEDIUM_AQUA, COLOR_DODGER_BLUE, COLOR_BLUE_VIOLET, COLOR_PLUM, COLOR_BEIGE, COLOR_SLATE_GRAY,
+	static uint32_t palette[35] = { COLOR_FIREBRICK, COLOR_GOLDEN_ROD, COLOR_DARK_GREEN, COLOR_MEDIUM_AQUA, COLOR_DODGER_BLUE, COLOR_BLUE_VIOLET, COLOR_PLUM, COLOR_BEIGE, COLOR_SLATE_GRAY,
 	///
 	COLOR_SALMON, COLOR_OLIVE, COLOR_GREEN, COLOR_TEAL, COLOR_SKY_BLUE, COLOR_SLATE_BLUE, COLOR_MAGENTA, COLOR_BROWN, COLOR_GRAY,
 	///

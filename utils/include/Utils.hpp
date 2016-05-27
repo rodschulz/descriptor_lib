@@ -56,6 +56,9 @@ typedef enum PointColor
 class Utils
 {
 public:
+	// Returns the current application's working directory
+	static std::string getWorkingDirectory();
+
 	// Returns a randomly generated integer between the given ranges
 	static int getRandomNumber(const int _min, const int _max);
 
