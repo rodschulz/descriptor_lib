@@ -110,13 +110,15 @@ struct SyntheticCloudsParams
 
 struct MetricTestingParams
 {
+	MetricType metric; // Type of metric to be tested
+	std::vector<std::string> args; // Arguments to initialize the target metric
+
+	MetricTestingParams()
+	{
+		metric = METRIC_EUCLIDEAN;
+	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//enum ExecutionType
-//{
-//	EXECUTION_NONE, EXECUTION_DESCRIPTOR, EXECUTION_CLUSTERING, EXECUTION_METRIC
-//};
 
 class ExecutionParams
 {
