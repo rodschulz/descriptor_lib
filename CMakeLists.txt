@@ -25,7 +25,7 @@ if (NOT PCL_FOUND)
 	find_package(PCL 1.7 REQUIRED)
 
 	if (PCL_FOUND)
-		message(STATUS "${Cyan}\tPCL found version${PCL_VERSION}${ColorReset}")
+		message(STATUS "${Cyan}\tPCL found version ${PCL_VERSION}${ColorReset}")
 		message(STATUS "${Cyan}\tPCL_INCLUDE_DIRS = ${PCL_INCLUDE_DIRS}${ColorReset}")
 
 		# Set the desired build type to use for PCL
