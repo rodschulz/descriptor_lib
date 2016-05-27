@@ -60,8 +60,29 @@ if (NOT yaml-cpp_FOUND)
 	
 	if (yaml-cpp_FOUND)
 		message(STATUS "${Cyan}\tFound yaml-cpp version ${yaml-cpp_VERSION}${ColorReset}")
+
+		# Add include directory
+		include_directories(${YAML_CPP_INCLUDE_DIR})
 	endif()
 endif()
+
+if (NOT Boost_FOUND)
+	message(STATUS "${Yellow}Boost not found yet, searching for package${ColorReset}")
+	find_package(Boost 1.46 REQUIRED)
+
+	if (Boost_FOUND)
+		message(STATUS "${Cyan}\tFound Boost version ${Boost_LIB_VERSION}${ColorReset}")
+		
+		# Add include and linking directories
+		include_directories(${Boost_INCLUDE_DIRS})
+		link_directories(${Boost_LIBRARY_DIRS})
+	endif()
+endif()
+
+# find_package(OpenMP REQUIRED)
+# Set OpenMP flags to be used
+# set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 # Get libraries to include
 file(GLOB lib_directories *)
