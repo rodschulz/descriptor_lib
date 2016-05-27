@@ -25,7 +25,8 @@ if (NOT PCL_FOUND)
 	find_package(PCL 1.7 REQUIRED)
 
 	if (PCL_FOUND)
-		message(STATUS "${Cyan}\tPCL found ${ColorReset}")
+		message(STATUS "${Cyan}\tPCL found version${PCL_VERSION}${ColorReset}")
+		message(STATUS "${Cyan}\tPCL_INCLUDE_DIRS = ${PCL_INCLUDE_DIRS}${ColorReset}")
 
 		# Set the desired build type to use for PCL
 		set(PCL_BUILD_TYPE Release)
@@ -46,7 +47,7 @@ if (NOT OpenCV_FOUND)
 
 	if (OpenCV_FOUND)
 		message(STATUS "${Cyan}\tFound OpenCV version ${OpenCV_VERSION}${ColorReset}")
-		message(STATUS "${Cyan}\tOpenCV_INCLUDE_DIRS= ${OpenCV_INCLUDE_DIRS}${ColorReset}")
+		message(STATUS "${Cyan}\tOpenCV_INCLUDE_DIRS = ${OpenCV_INCLUDE_DIRS}${ColorReset}")
 
 		# Add include directory
 		include_directories(${OpenCV_INCLUDE_DIRS})
@@ -60,6 +61,7 @@ if (NOT yaml-cpp_FOUND)
 	
 	if (yaml-cpp_FOUND)
 		message(STATUS "${Cyan}\tFound yaml-cpp version ${yaml-cpp_VERSION}${ColorReset}")
+		message(STATUS "${Cyan}\tYAML_CPP_INCLUDE_DIR = ${YAML_CPP_INCLUDE_DIR}${ColorReset}")
 
 		# Add include directory
 		include_directories(${YAML_CPP_INCLUDE_DIR})
@@ -72,6 +74,7 @@ if (NOT Boost_FOUND)
 
 	if (Boost_FOUND)
 		message(STATUS "${Cyan}\tFound Boost version ${Boost_LIB_VERSION}${ColorReset}")
+		message(STATUS "${Cyan}\tBoost_INCLUDE_DIRS = ${Boost_INCLUDE_DIRS}${ColorReset}")
 		
 		# Add include and linking directories
 		include_directories(${Boost_INCLUDE_DIRS})
