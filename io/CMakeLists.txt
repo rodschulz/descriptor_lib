@@ -2,11 +2,6 @@ file(GLOB IO_SRC
 	"src/*.cpp"
 )
 
-file(GLOB IO_INC
-	"include/*.h"
-	"include/*.hpp"
-)
-
 include_directories(include)
 
 add_library(io ${IO_SRC})

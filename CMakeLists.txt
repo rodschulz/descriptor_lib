@@ -82,6 +82,19 @@ if (NOT Boost_FOUND)
 	endif()
 endif()
 
+if (NOT OPENSSL_FOUND)
+	message(STATUS "${Yellow}OpenSSL not found yet, searching for package${ColorReset}")
+	find_package(OpenSSL REQUIRED)
+
+	if (OPENSSL_FOUND)
+		message(STATUS "${Cyan}\tFound OpenSSL version ${OPENSSL_VERSION}${ColorReset}")
+		message(STATUS "${Cyan}\tOPENSSL_INCLUDE_DIR = ${OPENSSL_INCLUDE_DIR}${ColorReset}")
+
+		include_directories(${OPENSSL_INCLUDE_DIR})
+		link_directories(${OPENSSL_LIBRARIES})
+	endif()
+endif()
+
 # find_package(OpenMP REQUIRED)
 # Set OpenMP flags to be used
 # set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
