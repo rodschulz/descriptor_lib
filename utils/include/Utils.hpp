@@ -10,6 +10,7 @@
 #include <opencv2/core/core.hpp>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include "ExecutionParams.hpp"
 
 // Colors defined to be used for points
 typedef enum PointColor
@@ -58,6 +59,12 @@ class Utils
 public:
 	// Returns the current application's working directory
 	static std::string getWorkingDirectory();
+
+	// Returns a string with the hex representation of the hash calculated for the current params instance
+	static std::string getCalculationConfigHash(const std::string _inputFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams);
+
+	// Returns the MD5 checksum for the named file
+	static std::string getFileChecksum(const std::string _filename);
 
 	// Returns a randomly generated integer between the given ranges
 	static int getRandomNumber(const int _min, const int _max);

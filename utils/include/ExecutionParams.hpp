@@ -84,7 +84,6 @@ struct ClusteringParams
 	int maxIterations; // Clustering max iterations
 	double stopThreshold; // Clustering stop threshold
 	int attempts; // Number of attemtps to try when clustering
-	std::string cacheLocation; // Location of the cachefiles
 	bool generateElbowCurve; // Flag indicating if an elbow graph has to be generated
 	bool generateDistanceMatrix; // Flag indicating if the distance matrix image has to be generated
 
@@ -96,7 +95,6 @@ struct ClusteringParams
 		maxIterations = 10000;
 		stopThreshold = 0.1;
 		attempts = 1;
-		cacheLocation = "";
 		generateElbowCurve = false;
 		generateDistanceMatrix = false;
 	}
@@ -165,7 +163,7 @@ public:
 	static MetricType getMetricType(const std::string &_type);
 
 	// Returns a string with the hex representation of the hash calculated for the current params instance
-	std::string getHash() const;
+//	static std::string getHash(const std::string _inputFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams) const;
 
 	// Returns the angular range of the bands according to the current config
 //	double getBandsAngularRange() const;

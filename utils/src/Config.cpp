@@ -41,6 +41,7 @@ bool Config::load(const std::string &filename_)
 		getInstance()->debug = config["debug"].as<bool>();
 		getInstance()->targetPoint = config["targetPint"] ? config["targetPint"].as<bool>() : -1;
 		getInstance()->normalEstimationRadius = config["normalRadius"] ? config["normalEstimationRadius"].as<double>() : -1;
+		getInstance()->cacheLocation = config["cacheLocation"] ? config["cacheLocation"].as<std::string>() : "";
 
 		if (config["descriptor"])
 		{
@@ -69,7 +70,6 @@ bool Config::load(const std::string &filename_)
 			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
 			params->attempts = clusteringConfig["attempts"].as<int>();
-			params->cacheLocation = clusteringConfig["cacheLocation"].as<std::string>();
 			params->generateElbowCurve = clusteringConfig["generateElbowCurve"].as<bool>();
 			params->generateDistanceMatrix = clusteringConfig["generateDistanceMatrix"].as<bool>();
 

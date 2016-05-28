@@ -7,6 +7,7 @@
 #include <fstream>
 #include <pcl/io/pcd_io.h>
 #include "CloudUtils.hpp"
+#include "Utils.hpp"
 
 bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 {
@@ -61,9 +62,9 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 	return loadOk;
 }
 
-bool Loader::loadDescriptors(cv::Mat &_descriptors, const ExecutionParams &_params)
+bool Loader::loadDescriptors(const std::string &_cacheLocation, const std::string &_inputFile, const double _normalEstimationRadius, const DescriptorParams &_descritorParams, const CloudSmoothingParams &_smoothingParams, cv::Mat &_descriptors)
 {
-	std::string filename = _params.cacheLocation + _params.getHash();
+	std::string filename = _cacheLocation + Utils::getCalculationConfigHash(_inputFile, _normalEstimationRadius, _descritorParams, _smoothingParams);
 	return loadMatrix(_descriptors, filename);
 }
 

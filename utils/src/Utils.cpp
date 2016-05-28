@@ -8,6 +8,14 @@
 #include <boost/version.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/lexical_cast.hpp>
+#include <openssl/md5.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdio.h>
 
 // Extract the current boost's minor version
 #define BOOST_MINOR_VERSION (BOOST_VERSION %100)
@@ -33,6 +41,62 @@ std::string Utils::getWorkingDirectory()
 	workingDir[len + 1] = '\0';
 
 	return workingDir;
+}
+
+std::string Utils::getCalculationConfigHash(const std::string _inputFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams)
+{
+	std::string MD5 = getFileChecksum(_inputFile);
+
+	// TODO improve this using the file's hash instead of just the file's name
+	std::string filename = _inputFile;
+	if (_inputFile.substr(0, 2).compare("./") == 0)
+		filename = _inputFile.substr(2);
+
+	std::string str = "";
+	str += "input=" + filename;
+	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(_normalEstimationRadius);
+	str += "-patchSize=" + boost::lexical_cast<std::string>(_descriptorParams.patchSize);
+	str += "-bandNumber=" + boost::lexical_cast<std::string>(_descriptorParams.bandNumber);
+	str += "-bandWidth=" + boost::lexical_cast<std::string>(_descriptorParams.bandWidth);
+	str += "-bidirectional=" + boost::lexical_cast<std::string>(_descriptorParams.bidirectional);
+	str += "-useProjection=" + boost::lexical_cast<std::string>(_descriptorParams.useProjection);
+	str += "-sequenceBin=" + boost::lexical_cast<std::string>(_descriptorParams.sequenceBin);
+	str += "-sequenceStat=" + boost::lexical_cast<std::string>(_descriptorParams.sequenceStat);
+	if (_smoothingParams.useSmoothing)
+	{
+		str += "-useSmoothing=" + boost::lexical_cast<std::string>(_smoothingParams.useSmoothing);
+		str += "-smoothingSigma=" + boost::lexical_cast<std::string>(_smoothingParams.sigma);
+		str += "-smoothingRadius=" + boost::lexical_cast<std::string>(_smoothingParams.radius);
+	}
+
+	boost::hash<std::string> strHash;
+	return Utils::num2Hex(strHash(str));
+}
+
+std::string Utils::getFileChecksum(const std::string _filename)
+{
+	int fileDescriptor = open(_filename.c_str(), O_RDONLY);
+	if (fileDescriptor < 0)
+		throw std::runtime_error("ERROR: Unable to open file for MD5 checksum");
+
+	struct stat statbuf;
+	if (fstat(fileDescriptor, &statbuf) < 0)
+		throw std::runtime_error("ERROR: Unable to get file properties for MD5 checksum");
+
+	unsigned long fileSize = statbuf.st_size;
+	char *fileBuffer = (char *) mmap(0, fileSize, PROT_READ, MAP_SHARED, fileDescriptor, 0);
+
+	unsigned char digest[MD5_DIGEST_LENGTH];
+	MD5((unsigned char*) fileBuffer, fileSize, digest);
+	munmap(fileBuffer, fileSize);
+
+	char stringMD5[MD5_DIGEST_LENGTH * 2 + 1];
+	for (int i = 0; i < MD5_DIGEST_LENGTH; i++)
+		sprintf(&stringMD5[i * 2], "%02x", digest[i]);
+
+	close(fileDescriptor);
+
+	return stringMD5;
 }
 
 int Utils::getRandomNumber(const int _min, const int _max)

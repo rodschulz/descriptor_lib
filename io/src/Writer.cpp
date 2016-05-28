@@ -267,12 +267,13 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 
 void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
 {
-	if (!boost::filesystem::exists(_params.cacheLocation))
-		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
-			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
-
-	std::string destination = _params.cacheLocation + _params.getHash();
-	writeMatrix(destination, _descriptors);
+	// TODO fix this
+//	if (!boost::filesystem::exists(_params.cacheLocation))
+//		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
+//			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
+//
+//	std::string destination = _params.cacheLocation + _params.getHash();
+//	writeMatrix(destination, _descriptors);
 }
 
 void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers)

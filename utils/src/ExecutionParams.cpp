@@ -122,31 +122,33 @@ MetricType ExecutionParams::getMetricType(const std::string &_type)
 	}
 }
 
-std::string ExecutionParams::getHash() const
-{
-	std::string str = "";
-
-	std::string inputFile = inputLocation;
-	std::string sdasd = inputLocation.substr(0, 2);
-	if (inputLocation.substr(0, 2).compare("./") == 0)
-		inputFile = inputLocation.substr(2);
-
-	str += "input=" + inputFile;
-	str += "-patchSize=" + boost::lexical_cast<std::string>(patchSize);
-	str += "-normalRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius);
-	str += "-bandNumber=" + boost::lexical_cast<std::string>(bandNumber);
-	str += "-bandWidth=" + boost::lexical_cast<std::string>(bandWidth);
-	str += "-bidirectional=" + boost::lexical_cast<std::string>(bidirectional);
-	str += "-useProjection=" + boost::lexical_cast<std::string>(useProjection);
-	str += "-sequenceBin=" + boost::lexical_cast<std::string>(sequenceBin);
-	str += "-sequenceStat=" + boost::lexical_cast<std::string>(sequenceStat);
-//	str += "-useSmoothing=" + boost::lexical_cast<std::string>(useSmoothing); //TODO fix this
-//	str += "-smoothingSigma=" + boost::lexical_cast<std::string>(sigma);
-//	str += "-smoothingRadius=" + boost::lexical_cast<std::string>(radius);
-
-	boost::hash<std::string> strHash;
-	return Utils::num2Hex(strHash(str));
-}
+//std::string ExecutionParams::getHash(const std::string _inputFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams) const
+//{
+//	// TODO improve this using the file's hash instead of just the file's name
+//	std::string filename = inputLocation;
+//	if (_inputFile.substr(0, 2).compare("./") == 0)
+//		filename = inputLocation.substr(2);
+//
+//	std::string str = "";
+//	str += "input=" + filename;
+//	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(_normalEstimationRadius);
+//	str += "-patchSize=" + boost::lexical_cast<std::string>(_descriptorParams.patchSize);
+//	str += "-bandNumber=" + boost::lexical_cast<std::string>(_descriptorParams.bandNumber);
+//	str += "-bandWidth=" + boost::lexical_cast<std::string>(_descriptorParams.bandWidth);
+//	str += "-bidirectional=" + boost::lexical_cast<std::string>(_descriptorParams.bidirectional);
+//	str += "-useProjection=" + boost::lexical_cast<std::string>(_descriptorParams.useProjection);
+//	str += "-sequenceBin=" + boost::lexical_cast<std::string>(_descriptorParams.sequenceBin);
+//	str += "-sequenceStat=" + boost::lexical_cast<std::string>(_descriptorParams.sequenceStat);
+//	if (_smoothingParams.useSmoothing)
+//	{
+//		str += "-useSmoothing=" + boost::lexical_cast<std::string>(_smoothingParams.useSmoothing);
+//		str += "-smoothingSigma=" + boost::lexical_cast<std::string>(_smoothingParams.sigma);
+//		str += "-smoothingRadius=" + boost::lexical_cast<std::string>(_smoothingParams.radius);
+//	}
+//
+//	boost::hash<std::string> strHash;
+//	return Utils::num2Hex(strHash(str));
+//}
 
 //double ExecutionParams::getBandsAngularRange() const
 //{

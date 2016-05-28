@@ -17,7 +17,7 @@ public:
 	static bool loadMatrix(cv::Mat &_matrix, const std::string &_filename);
 
 	// Loads a descriptors calculation cache. Returns true if was successfully loaded, false otherwise
-	static bool loadDescriptors(cv::Mat &_descriptors, const ExecutionParams &_params);
+	static bool loadDescriptors(const std::string &_cacheLocation, const std::string &_inputFile, const double _normalEstimationRadius, const DescriptorParams &_descritorParams, const CloudSmoothingParams &_smoothingParams, cv::Mat &_descriptors);
 
 	// Loads pre-calculated centers for clustering. Returns true if was successfully loaded, false otherwise
 	static bool loadCenters(const std::string &_fileLocation, cv::Mat &_centers);

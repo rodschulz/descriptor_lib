@@ -46,6 +46,12 @@ public:
 		return getInstance()->normalEstimationRadius;
 	}
 
+	// Returns the normal estimation radius
+	static std::string getCacheDirectory()
+	{
+		return getInstance()->cacheLocation;
+	}
+
 	// Returns the descritor calculation parameters
 	static DescriptorParams getDescriptorParams()
 	{
@@ -90,4 +96,5 @@ private:
 	bool debug; // Flag indicating if the debug generation is enabled or not
 	int targetPoint; // Target point
 	double normalEstimationRadius; // Radius used to perform the normal vectors estimation
+	std::string cacheLocation;
 };
