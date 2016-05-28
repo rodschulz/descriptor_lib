@@ -43,17 +43,10 @@ std::string Utils::getWorkingDirectory()
 	return workingDir;
 }
 
-std::string Utils::getCalculationConfigHash(const std::string _inputFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams)
+std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams)
 {
-	std::string MD5 = getFileChecksum(_inputFile);
-
-	// TODO improve this using the file's hash instead of just the file's name
-	std::string filename = _inputFile;
-	if (_inputFile.substr(0, 2).compare("./") == 0)
-		filename = _inputFile.substr(2);
-
 	std::string str = "";
-	str += "input=" + filename;
+	str += "input=" + getFileChecksum(_inputCloudFile);
 	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(_normalEstimationRadius);
 	str += "-patchSize=" + boost::lexical_cast<std::string>(_descriptorParams.patchSize);
 	str += "-bandNumber=" + boost::lexical_cast<std::string>(_descriptorParams.bandNumber);

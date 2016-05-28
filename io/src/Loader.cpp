@@ -62,9 +62,9 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 	return loadOk;
 }
 
-bool Loader::loadDescriptors(const std::string &_cacheLocation, const std::string &_inputFile, const double _normalEstimationRadius, const DescriptorParams &_descritorParams, const CloudSmoothingParams &_smoothingParams, cv::Mat &_descriptors)
+bool Loader::loadDescriptors(const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descritorParams, const CloudSmoothingParams &_smoothingParams, cv::Mat &_descriptors)
 {
-	std::string filename = _cacheLocation + Utils::getCalculationConfigHash(_inputFile, _normalEstimationRadius, _descritorParams, _smoothingParams);
+	std::string filename = _cacheLocation + Utils::getCalculationConfigHash(_cloudInputFilename, _normalEstimationRadius, _descritorParams, _smoothingParams);
 	return loadMatrix(_descriptors, filename);
 }
 

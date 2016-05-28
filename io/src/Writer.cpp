@@ -16,11 +16,11 @@
 #include "Utils.hpp"
 #include "Config.hpp"
 
-#define MATRIX_DIMENSIONS	"dims"
-#define SCRIPT_HISTOGRAM_NAME	OUTPUT_FOLDER "histogramPlot.script"
-#define SCRIPT_SSE_NAME		OUTPUT_FOLDER "ssePlot.script"
-#define HISTOGRAM_DATA_FILE	OUTPUT_FOLDER "histogram.dat"
-#define SSE_DATA_FILE		OUTPUT_FOLDER "sse.dat"
+#define MATRIX_DIMENSIONS			"dims"
+#define SCRIPT_HISTOGRAM_NAME       OUTPUT_FOLDER "histogramPlot.script"
+#define SCRIPT_SSE_NAME             OUTPUT_FOLDER "ssePlot.script"
+#define HISTOGRAM_DATA_FILE         OUTPUT_FOLDER "histogram.dat"
+#define SSE_DATA_FILE               OUTPUT_FOLDER "sse.dat"
 
 void Writer::writeHistogram(const std::string &_filename, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
@@ -265,15 +265,14 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	cv::imwrite(_outputFolder + "distanceToCenter.png", imageDistToCenter);
 }
 
-void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params)
+void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams)
 {
-	// TODO fix this
-//	if (!boost::filesystem::exists(_params.cacheLocation))
-//		if (system(("mkdir " + _params.cacheLocation).c_str()) != 0)
-//			std::cout << "WARNING: can't create clustering cache folder" << std::endl;
-//
-//	std::string destination = _params.cacheLocation + _params.getHash();
-//	writeMatrix(destination, _descriptors);
+	if (!boost::filesystem::exists(_cacheLocation))
+		if (system(("mkdir " + _cacheLocation).c_str()) != 0)
+			std::cout << "WARNING: can't create cache folder" << std::endl;
+
+	std::string destination = _cacheLocation + Utils::getCalculationConfigHash(_cloudInputFilename, _normalEstimationRadius, _descriptorParams, _smoothingParams);
+	writeMatrix(destination, _descriptors);
 }
 
 void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers)
@@ -284,7 +283,7 @@ void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Ma
 	writeMatrix(destination, _centers);
 }
 
-void Writer::saveCloudAsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+void Writer::saveCloudMatrix(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
 {
 	cv::Mat items = cv::Mat::zeros(_cloud->size(), 3, CV_32FC1);
 	for (size_t i = 0; i < _cloud->size(); i++)
@@ -294,7 +293,7 @@ void Writer::saveCloudAsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_clo
 		items.at<float>(i, 2) = _cloud->at(i).z;
 	}
 
-	Writer::writeDescriptorsCache(items, _params);
+	Writer::writeMatrix(_filename, items);
 }
 
 void Writer::writeMatrix(const std::string &_filename, const cv::Mat &_matrix)

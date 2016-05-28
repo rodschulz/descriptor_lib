@@ -18,11 +18,13 @@ public:
 	static void writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse);
 	static void writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels);
 	static void writeDistanceMatrix(const std::string &_filename, const cv::Mat &_items, const cv::Mat &_centers, const cv::Mat &_labels, const MetricPtr &_metric);
-	static void writeDescriptorsCache(const cv::Mat &_descriptors, const ExecutionParams &_params);
 	static void writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers);
 
-	// Saves the given cloud as a cache matrix, so it can be used for kmeans clustering
-	static void saveCloudAsCache(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
+	// Writes the given descriptor matrix as a cache file
+	static void writeDescriptorsCache(const cv::Mat &_descriptors, const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams);
+
+	// Saves the given cloud as a matrix, so it can be used for kmeans clustering
+	static void saveCloudMatrix(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud);
 
 private:
 	// Constructor
