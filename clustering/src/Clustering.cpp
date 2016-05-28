@@ -9,10 +9,8 @@
 #include "PointFactory.hpp"
 #include "KMeans.hpp"
 
-void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_params, ClusteringResults &_results)
+void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric, ClusteringResults &_results)
 {
-	MetricPtr metric = MetricFactory::createMetric(_params.metric, _params.getSequenceLength(), _params.useConfidence);
-
 	switch (_params.implementation)
 	{
 		default:
@@ -20,24 +18,22 @@ void Clustering::searchClusters(const cv::Mat &_items, const ExecutionParams &_p
 			/* no break */
 
 		case CLUSTERING_OPENCV:
-			cv::kmeans(_items, _params.clusters, _results.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, _params.maxIterations, _params.stopThreshold), _params.attempts, cv::KMEANS_PP_CENTERS, _results.centers);
+			cv::kmeans(_items, _params.clusterNumber, _results.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, _params.maxIterations, _params.stopThreshold), _params.attempts, cv::KMEANS_PP_CENTERS, _results.centers);
 			break;
 
 		case CLUSTERING_CUSTOM:
-			KMeans::searchClusters(_results, _items, metric, _params.clusters, _params.attempts, _params.maxIterations, _params.stopThreshold);
+			KMeans::searchClusters(_results, _items, _metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold);
 			break;
 
 		case CLUSTERING_STOCHASTIC:
-			KMeans::stochasticSearchClusters(_results, _items, metric, _params.clusters, _params.attempts, _params.maxIterations, _params.stopThreshold, _items.rows / 10);
+			KMeans::stochasticSearchClusters(_results, _items, _metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold, _items.rows / 10);
 			break;
 	}
 }
 
-void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const ExecutionParams &_params, cv::Mat &_labels)
+void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const MetricPtr &_metric, cv::Mat &_labels)
 {
 	// TODO implement a unit test for this method (probably over a syn cloud with some def centers and results)
-
-	MetricPtr metric = MetricFactory::createMetric(_params.metric, _params.getSequenceLength(), _params.useConfidence);
 
 	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
 	std::vector<double> distance(_items.rows, std::numeric_limits<double>::max());
@@ -45,7 +41,7 @@ void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const
 	{
 		for (int j = 0; j < _centers.rows; j++)
 		{
-			double dist = metric->distance(_centers.row(j), _items.row(i));
+			double dist = _metric->distance(_centers.row(j), _items.row(i));
 			if (dist < distance[i])
 			{
 				distance[i] = dist;
@@ -55,15 +51,13 @@ void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const
 	}
 }
 
-void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams &_params)
+void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric)
 {
 	std::cout << "*** ELBOW: begining graph generation ***" << std::endl;
 
 	// Clustering params for the graph generation
-	ExecutionParams params = _params;
+	ClusteringParams params = _params;
 	params.attempts = 3;
-
-	MetricPtr metric = MetricFactory::createMetric(params.metric, params.getSequenceLength(), params.useConfidence);
 
 	// Iterate clustering from 2 to 50 centers
 	std::ofstream data;
@@ -73,13 +67,13 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ExecutionParams
 		std::cout << "*** ELBOW: clustering " << i << " centers" << std::endl;
 
 		ClusteringResults results;
-		searchClusters(_items, _params, results);
+		searchClusters(_items, _params, _metric, results);
 
 		double sse;
 		if (params.implementation == CLUSTERING_OPENCV)
 			sse = Utils::getSSE(_items, results.centers, results.labels);
 		else
-			sse = KMeans::getSSE(_items, results.labels, results.centers, metric);
+			sse = KMeans::getSSE(_items, results.labels, results.centers, _metric);
 
 		data << i << " " << sse << "\n";
 	}
@@ -113,7 +107,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 {
 	//TODO improve the representation creating to "bend" the bands according to the mean normal in each bin
 
-	int sequenceLength = _params.getSequenceLength();
+	int sequenceLength = -1; //_params.getSequenceLength(); // TODO fix this
 	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::createPointNormal(0, 0, 0, 0, 0, 0, 0));
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
 
@@ -124,7 +118,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 	}
 
 	// Angular step between bands
-	double bandAngularStep = _params.getBandsAngularStep();
+	double bandAngularStep = -1; //_params.getBandsAngularStep(); // TODO fix this
 
 	// Define reference vectors
 	Eigen::Vector3f referenceNormal = Eigen::Vector3f(1, 0, 0);

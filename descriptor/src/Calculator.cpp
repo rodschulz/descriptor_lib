@@ -10,13 +10,13 @@
 
 using namespace boost::accumulators;
 
-Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params)
+Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, const int _targetPointIndex)
 {
-	pcl::PointNormal target = _cloud->at(_params.targetPoint);
+	pcl::PointNormal target = _cloud->at(_targetPointIndex);
 	return calculateDescriptor(_cloud, _params, target);
 }
 
-Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, const pcl::PointNormal &_target)
+Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, const pcl::PointNormal &_target)
 {
 	// Get target point and surface patch
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _target, _params.patchSize);
@@ -28,7 +28,7 @@ Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNorma
 	return bands;
 }
 
-void Calculator::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors)
+void Calculator::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, cv::Mat &_descriptors)
 {
 	int sequenceSize = _params.getSequenceLength();
 
@@ -71,7 +71,7 @@ std::vector<Hist> Calculator::generateAngleHistograms(const Descriptor &_descrip
 	return histograms;
 }
 
-void Calculator::fillSequences(Descriptor &_descriptor, const ExecutionParams &_params, const double _sequenceStep)
+void Calculator::fillSequences(Descriptor &_descriptor, const DescriptorParams &_params, const double _sequenceStep)
 {
 	double binSize = _params.sequenceBin;
 	int binsNumber = _params.getSequenceLength();

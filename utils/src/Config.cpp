@@ -12,6 +12,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/parse.h>
 
 Config::Config()
 {
@@ -69,7 +70,6 @@ bool Config::load(const std::string &filename_)
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
 			params->attempts = clusteringConfig["attempts"].as<int>();
 			params->cacheLocation = clusteringConfig["cacheLocation"].as<std::string>();
-			params->useConfidence = clusteringConfig["useConfidence"].as<bool>();
 			params->generateElbowCurve = clusteringConfig["generateElbowCurve"].as<bool>();
 			params->generateDistanceMatrix = clusteringConfig["generateDistanceMatrix"].as<bool>();
 

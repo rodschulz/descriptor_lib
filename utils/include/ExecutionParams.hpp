@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <math.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Set of enumerations defining some easy-to-read values for some parameters
@@ -22,7 +23,7 @@ enum ClusteringImplementation
 
 enum MetricType
 {
-	METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION
+	METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION, METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE
 };
 
 enum SynCloudType
@@ -52,6 +53,27 @@ struct DescriptorParams
 		sequenceBin = 0.05;
 		sequenceStat = STAT_MEAN;
 	}
+
+	// Returns sequence's length on each bands (number of bins) according to the current config
+	int getSequenceLength() const
+	{
+		return (bidirectional ? patchSize * 2.0 : patchSize) / sequenceBin;
+	}
+
+	// Returns the angular range of the bands according to the current config
+	double getBandsAngularRange() const
+	{
+		if (bidirectional)
+			return M_PI;
+		else
+			return 2 * M_PI;
+	}
+
+	// Returns the angular step of the bands according to the current config
+	double getBandsAngularStep() const
+	{
+		return getBandsAngularRange() / bandNumber;
+	}
 };
 
 struct ClusteringParams
@@ -63,7 +85,6 @@ struct ClusteringParams
 	double stopThreshold; // Clustering stop threshold
 	int attempts; // Number of attemtps to try when clustering
 	std::string cacheLocation; // Location of the cachefiles
-	bool useConfidence; // Use confidence, if the metric allows it
 	bool generateElbowCurve; // Flag indicating if an elbow graph has to be generated
 	bool generateDistanceMatrix; // Flag indicating if the distance matrix image has to be generated
 
@@ -76,7 +97,6 @@ struct ClusteringParams
 		stopThreshold = 0.1;
 		attempts = 1;
 		cacheLocation = "";
-		useConfidence = false;
 		generateElbowCurve = false;
 		generateDistanceMatrix = false;
 	}
@@ -148,13 +168,13 @@ public:
 	std::string getHash() const;
 
 	// Returns the angular range of the bands according to the current config
-	double getBandsAngularRange() const;
+//	double getBandsAngularRange() const;
 
 	// Returns the angular step of the bands according to the current config
-	double getBandsAngularStep() const;
+//	double getBandsAngularStep() const;
 
 	// Returns the sequence length of the bands (number of bins) according to the current config
-	int getSequenceLength() const;
+//	int getSequenceLength() const;
 
 //	ExecutionType executionType;			// Type of execution to run
 

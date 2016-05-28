@@ -31,13 +31,13 @@ class Clustering
 {
 public:
 	// Performs the search of clusters according to the given parameters
-	static void searchClusters(const cv::Mat &_items, const ExecutionParams &_params, ClusteringResults &_results);
+	static void searchClusters(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric, ClusteringResults &_results);
 
 	// Labels the given data using the given centers
-	static void labelData(const cv::Mat &_items, const cv::Mat &_centers, const ExecutionParams &_params, cv::Mat &_labels);
+	static void labelData(const cv::Mat &_items, const cv::Mat &_centers, const MetricPtr &_metric, cv::Mat &_labels);
 
 	// Generates an elbow graph according to the given params (to evaluate the SSE evolution)
-	static void generateElbowGraph(const cv::Mat &_items, const ExecutionParams &_params);
+	static void generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric);
 
 	// Generates a representation of the clusters
 	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params);

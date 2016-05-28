@@ -17,19 +17,19 @@ class Calculator
 {
 public:
 	// Calculates the descriptor over the given cloud, using the given params
-	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params);
+	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, const int _targetPointIndex);
 
 	// Calculates the descriptor over the given cloud, using the given params
-	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, const pcl::PointNormal &_target);
+	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, const pcl::PointNormal &_target);
 
 	// Calculates the descriptor for each point in the given cloud and fills a matrix with the data
-	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const ExecutionParams &_params, cv::Mat &_descriptors);
+	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, cv::Mat &_descriptors);
 
 	// Generates a vector holding the angular histograms for each band in the given array of bands (descriptor)
 	static std::vector<Hist> generateAngleHistograms(const Descriptor &_descriptor, const bool _useProjection);
 
 	// Calculates the sequence associated to each band in the descriptor
-	static void fillSequences(Descriptor &_descriptor, const ExecutionParams &_params, const double _sequenceStep);
+	static void fillSequences(Descriptor &_descriptor, const DescriptorParams &_params, const double _sequenceStep);
 
 	// Returns a char to build a char sequence, according to the given value and step
 	static inline char getSequenceChar(const double _value, const double _step)

@@ -114,6 +114,8 @@ MetricType ExecutionParams::getMetricType(const std::string &_type)
 		return METRIC_EUCLIDEAN;
 	else if (boost::iequals(_type, "closest"))
 		return METRIC_CLOSEST_PERMUTATION;
+	else if (boost::iequals(_type, "closest_with_confidence"))
+		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
 	{
 		std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
 		return METRIC_EUCLIDEAN;
@@ -146,20 +148,20 @@ std::string ExecutionParams::getHash() const
 	return Utils::num2Hex(strHash(str));
 }
 
-double ExecutionParams::getBandsAngularRange() const
-{
-	if (bidirectional)
-		return M_PI;
-	else
-		return 2 * M_PI;
-}
+//double ExecutionParams::getBandsAngularRange() const
+//{
+//	if (bidirectional)
+//		return M_PI;
+//	else
+//		return 2 * M_PI;
+//}
 
-double ExecutionParams::getBandsAngularStep() const
-{
-	return getBandsAngularRange() / bandNumber;
-}
+//double ExecutionParams::getBandsAngularStep() const
+//{
+//	return getBandsAngularRange() / bandNumber;
+//}
 
-int ExecutionParams::getSequenceLength() const
-{
-	return (bidirectional ? patchSize * 2.0 : patchSize) / sequenceBin;
-}
+//int ExecutionParams::getSequenceLength() const
+//{
+//	return (bidirectional ? patchSize * 2.0 : patchSize) / sequenceBin;
+//}
