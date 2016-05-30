@@ -7,63 +7,44 @@
 #include <stdarg.h>
 #include <vector>
 #include <string>
-#include "ExecutionParams.hpp"
+#include <boost/algorithm/string.hpp>
 #include "ClosestPermutationMetric.hpp"
 #include "EuclideanMetric.hpp"
+#include "Config.hpp"
 
 class MetricFactory
 {
 public:
 	// Creates a metric instance according to the given parameters
-	static MetricPtr createMetric(const MetricType &_type, ...)
+	static MetricPtr createMetric(const MetricType &_type, std::vector<std::string> _args)
 	{
-		MetricPtr metric;
 		switch (_type)
 		{
 			case METRIC_EUCLIDEAN:
-				metric = MetricPtr(new EuclideanMetric());
-				break;
+				return MetricPtr(new EuclideanMetric());
 
 			case METRIC_CLOSEST_PERMUTATION:
 			{
-				va_list argsList;
-				va_start(argsList, _type);
-				metric = MetricPtr(new ClosestPermutationMetric(va_arg(argsList, int), va_arg(argsList, int) == 1));
+				int size = 0;
+
+				// Check if should use the configuration to "calculate" the params or read them
+				if (boost::iequals("conf", _args[1]))
+					size = Config::getDescriptorParams().getSequenceLength();
+				else
+					size = atoi(_args[1].c_str());
+
+				return MetricPtr(new ClosestPermutationMetric(size, false));
 			}
-				break;
 
 			default:
-				metric = MetricPtr();
+				return MetricPtr();
 		}
-
-		return metric;
-	}
-
-	// Creates a metric instance according to the given parameters
-	static MetricPtr createMetric(const MetricType &_type, const std::vector<std::string> &_args)
-	{
-		// TODO change this to use a int array for args, so it can be compatible with the other implementation of this method
-
-		MetricPtr metric;
-		switch (_type)
-		{
-			case METRIC_EUCLIDEAN:
-				metric = MetricPtr(new EuclideanMetric());
-				break;
-
-			case METRIC_CLOSEST_PERMUTATION:
-				metric = MetricPtr(new ClosestPermutationMetric(atoi(_args[0].c_str()), _args[1].compare("true") == 0));
-				break;
-
-			default:
-				metric = MetricPtr();
-		}
-
-		return metric;
 	}
 
 private:
+	// Constructor
 	MetricFactory();
+	// Destructor
 	~MetricFactory();
 };
 

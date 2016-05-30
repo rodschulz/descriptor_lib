@@ -96,5 +96,5 @@ private:
 	bool debug; // Flag indicating if the debug generation is enabled or not
 	int targetPoint; // Target point
 	double normalEstimationRadius; // Radius used to perform the normal vectors estimation
-	std::string cacheLocation;
+	std::string cacheLocation; // Directory where cached calculations are stored
 };

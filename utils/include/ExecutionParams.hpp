@@ -7,6 +7,11 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <boost/shared_ptr.hpp>
+
+// Forward declaration of metric shared pointer
+class Metric;
+typedef boost::shared_ptr<Metric> MetricPtr;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Set of enumerations defining some easy-to-read values for some parameters
@@ -79,7 +84,7 @@ struct DescriptorParams
 struct ClusteringParams
 {
 	ClusteringImplementation implementation; // Implementation of clustering to be used
-	MetricType metric; // Type of metric to use in clustering execution
+	MetricPtr metric; // Metric to use in clustering execution
 	int clusterNumber; // Number of clusters used in the clustering test
 	int maxIterations; // Clustering max iterations
 	double stopThreshold; // Clustering stop threshold
@@ -90,7 +95,7 @@ struct ClusteringParams
 	ClusteringParams()
 	{
 		implementation = CLUSTERING_OPENCV;
-		metric = METRIC_EUCLIDEAN;
+		metric = MetricPtr();
 		clusterNumber = 5;
 		maxIterations = 10000;
 		stopThreshold = 0.1;
@@ -128,12 +133,11 @@ struct SyntheticCloudsParams
 
 struct MetricTestingParams
 {
-	MetricType metric; // Type of metric to be tested
-	std::vector<std::string> args; // Arguments to initialize the target metric
+	MetricPtr metric; // Type of metric to be tested
 
 	MetricTestingParams()
 	{
-		metric = METRIC_EUCLIDEAN;
+		metric = MetricPtr();
 	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////

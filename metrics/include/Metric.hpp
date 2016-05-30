@@ -12,9 +12,6 @@
 class Metric
 {
 public:
-	virtual void load(std::vector<void> ssx);
-
-
 	// Returns the distance between the given vectors, according to the current metric
 	virtual double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const = 0;
 

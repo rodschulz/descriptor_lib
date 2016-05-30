@@ -10,9 +10,13 @@
 class EuclideanMetric: public Metric
 {
 public:
+	// Constructor
 	EuclideanMetric() {}
+
+	// Destructor
 	~EuclideanMetric() {}
 
+	// Returns the distance between the two given vectors according to this metric
 	inline double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
 	{
 		if (_vector1.cols != _vector2.cols || _vector1.rows != _vector2.rows)
@@ -21,6 +25,7 @@ public:
 		return cv::norm(_vector1, _vector2);
 	}
 
+	// Calculates the center of the given set of items, according to this metric
 	inline cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const
 	{
 		_itemsPerCenter = std::vector<int>(_clusterNumber, 0);

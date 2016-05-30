@@ -13,6 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
+#include "MetricFactory.hpp"
 
 Config::Config()
 {
@@ -65,7 +66,8 @@ bool Config::load(const std::string &filename_)
 
 			ClusteringParams *params = new ClusteringParams();
 			params->implementation = ExecutionParams::getClusteringImplementation(clusteringConfig["implementation"].as<std::string>());
-			params->metric = ExecutionParams::getMetricType(clusteringConfig["metric"].as<std::string>());
+			std::vector<std::string> metricDetails = clusteringConfig["metric"].as<std::vector<std::string> >();
+			params->metric = MetricFactory::createMetric(ExecutionParams::getMetricType(metricDetails[0]), metricDetails);
 			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
 			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
@@ -104,13 +106,8 @@ bool Config::load(const std::string &filename_)
 			YAML::Node metricTestConfig = config["metricTesting"];
 
 			MetricTestingParams *params = new MetricTestingParams();
-			params->metric = ExecutionParams::getMetricType(metricTestConfig["metric"].as<std::string>());
-
-			std::vector<std::string> args;
-			std::string str = metricTestConfig["args"].as<std::string>();
-			std::istringstream iss(str.substr(0, str.find_last_of('#')));
-			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(args));
-			params->args = args;
+			std::vector<std::string> metricDetails = metricTestConfig["metric"].as<std::vector<std::string> >();
+			params->metric = MetricFactory::createMetric(ExecutionParams::getMetricType(metricDetails[0]), metricDetails);
 
 			getInstance()->metricTestingParams = params;
 		}
