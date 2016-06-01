@@ -18,7 +18,7 @@ public:
 	static std::vector<BandPtr> getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const DescriptorParams &_params);
 
 	// Extracts the planes going along each band
-	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> generatePlaneClouds(const std::vector<BandPtr> &_bands, const ExecutionParams &_params);
+	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> generatePlaneClouds(const std::vector<BandPtr> &_bands, const DescriptorParams &_params);
 
 private:
 	Extractor();

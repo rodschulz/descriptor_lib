@@ -134,6 +134,18 @@ public:
 		}
 	}
 
+	// Returns the synthetic cloud type associated to the given string
+	static SynCloudType getSynCloudType(const std::string &_type);
+
+	// Returns the statistic type associated to the given string
+	static SequenceStat getStatType(const std::string &_type);
+
+	// Returns the clustering implementation associated to the given string
+	static ClusteringImplementation getClusteringImplementation(const std::string &_type);
+
+	// Returns the metric type associated to the given string
+	static MetricType getMetricType(const std::string &_type);
+
 private:
 	Utils();
 	~Utils();

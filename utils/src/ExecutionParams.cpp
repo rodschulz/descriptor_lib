@@ -8,49 +8,49 @@
 #include <boost/lexical_cast.hpp>
 #include "Utils.hpp"
 
-ExecutionParams::ExecutionParams()
-{
-//	executionType = EXECUTION_NONE;
-
-	inputLocation = "";
-	targetPoint = 1000;
-
-	patchSize = 0.05;
-	normalEstimationRadius = -1;
-	bandNumber = 4;
-	bandWidth = 0.01;
-	bidirectional = true;
-	useProjection = true;
-
-	sequenceBin = 0.01;
-	sequenceStat = STAT_MEAN;
-
-	useSynthetic = false;
-	synCloudType = CLOUD_HALF_SPHERE;
-
-//	smoothingType = SMOOTHING_NONE;
-	gaussianSigma = 2;
-	gaussianRadius = 0.02;
-	mlsRadius = 0.02;
-
-	genElbowCurve = false;
-	genDistanceMatrix = false;
-
-	labelData = false;
-	centersLocation = "";
-
-	implementation = CLUSTERING_OPENCV;
-	metric = METRIC_EUCLIDEAN;
-	clusters = 5;
-	maxIterations = 10000;
-	stopThreshold = 0.001;
-	attempts = 1;
-	cacheLocation = "";
-	useConfidence = false;
-
-	targetMetric = METRIC_EUCLIDEAN;
-	metricArgs = std::vector<std::string>();
-}
+//ExecutionParams::ExecutionParams()
+//{
+////	executionType = EXECUTION_NONE;
+//
+//	inputLocation = "";
+//	targetPoint = 1000;
+//
+//	patchSize = 0.05;
+//	normalEstimationRadius = -1;
+//	bandNumber = 4;
+//	bandWidth = 0.01;
+//	bidirectional = true;
+//	useProjection = true;
+//
+//	sequenceBin = 0.01;
+//	sequenceStat = STAT_MEAN;
+//
+//	useSynthetic = false;
+//	synCloudType = CLOUD_HALF_SPHERE;
+//
+////	smoothingType = SMOOTHING_NONE;
+//	gaussianSigma = 2;
+//	gaussianRadius = 0.02;
+//	mlsRadius = 0.02;
+//
+//	genElbowCurve = false;
+//	genDistanceMatrix = false;
+//
+//	labelData = false;
+//	centersLocation = "";
+//
+//	implementation = CLUSTERING_OPENCV;
+//	metric = METRIC_EUCLIDEAN;
+//	clusters = 5;
+//	maxIterations = 10000;
+//	stopThreshold = 0.001;
+//	attempts = 1;
+//	cacheLocation = "";
+//	useConfidence = false;
+//
+//	targetMetric = METRIC_EUCLIDEAN;
+//	metricArgs = std::vector<std::string>();
+//}
 
 //ExecutionType ExecutionParams::getExecutionType(const std::string &_type)
 //{
@@ -63,64 +63,64 @@ ExecutionParams::ExecutionParams()
 //	return EXECUTION_NONE;
 //}
 
-SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)
-{
-	if (boost::iequals(_type, "cube"))
-		return CLOUD_CUBE;
-	else if (boost::iequals(_type, "cylinder"))
-		return CLOUD_CYLINDER;
-	else if (boost::iequals(_type, "sphere"))
-		return CLOUD_SPHERE;
-	else if (boost::iequals(_type, "half_sphere"))
-		return CLOUD_HALF_SPHERE;
-	else if (boost::iequals(_type, "plane"))
-		return CLOUD_PLANE;
-	{
-		std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
-		return CLOUD_SPHERE;
-	}
-}
-
-SequenceStat ExecutionParams::getStatType(const std::string &_type)
-{
-	if (boost::iequals(_type, "mean"))
-		return STAT_MEAN;
-	else if (boost::iequals(_type, "median"))
-		return STAT_MEDIAN;
-	{
-		std::cout << "WARNING: wrong stat type, assuming MEAN";
-		return STAT_MEAN;
-	}
-}
-
-ClusteringImplementation ExecutionParams::getClusteringImplementation(const std::string &_type)
-{
-	if (boost::iequals(_type, "opencv"))
-		return CLUSTERING_OPENCV;
-	else if (boost::iequals(_type, "custom"))
-		return CLUSTERING_CUSTOM;
-	else if (boost::iequals(_type, "stochastic"))
-		return CLUSTERING_STOCHASTIC;
-	else
-	{
-		std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
-		return CLUSTERING_OPENCV;
-	}
-}
-
-MetricType ExecutionParams::getMetricType(const std::string &_type)
-{
-	if (boost::iequals(_type, "euclidean"))
-		return METRIC_EUCLIDEAN;
-	else if (boost::iequals(_type, "closest"))
-		return METRIC_CLOSEST_PERMUTATION;
-	else if (boost::iequals(_type, "closest_with_confidence"))
-		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
-	{
-		std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
-		return METRIC_EUCLIDEAN;
-	}
-}
+//SynCloudType ExecutionParams::getSynCloudType(const std::string &_type)
+//{
+//	if (boost::iequals(_type, "cube"))
+//		return CLOUD_CUBE;
+//	else if (boost::iequals(_type, "cylinder"))
+//		return CLOUD_CYLINDER;
+//	else if (boost::iequals(_type, "sphere"))
+//		return CLOUD_SPHERE;
+//	else if (boost::iequals(_type, "half_sphere"))
+//		return CLOUD_HALF_SPHERE;
+//	else if (boost::iequals(_type, "plane"))
+//		return CLOUD_PLANE;
+//	{
+//		std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
+//		return CLOUD_SPHERE;
+//	}
+//}
+//
+//SequenceStat ExecutionParams::getStatType(const std::string &_type)
+//{
+//	if (boost::iequals(_type, "mean"))
+//		return STAT_MEAN;
+//	else if (boost::iequals(_type, "median"))
+//		return STAT_MEDIAN;
+//	{
+//		std::cout << "WARNING: wrong stat type, assuming MEAN";
+//		return STAT_MEAN;
+//	}
+//}
+//
+//ClusteringImplementation ExecutionParams::getClusteringImplementation(const std::string &_type)
+//{
+//	if (boost::iequals(_type, "opencv"))
+//		return CLUSTERING_OPENCV;
+//	else if (boost::iequals(_type, "custom"))
+//		return CLUSTERING_CUSTOM;
+//	else if (boost::iequals(_type, "stochastic"))
+//		return CLUSTERING_STOCHASTIC;
+//	else
+//	{
+//		std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
+//		return CLUSTERING_OPENCV;
+//	}
+//}
+//
+//MetricType ExecutionParams::getMetricType(const std::string &_type)
+//{
+//	if (boost::iequals(_type, "euclidean"))
+//		return METRIC_EUCLIDEAN;
+//	else if (boost::iequals(_type, "closest"))
+//		return METRIC_CLOSEST_PERMUTATION;
+//	else if (boost::iequals(_type, "closest_with_confidence"))
+//		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
+//	{
+//		std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
+//		return METRIC_EUCLIDEAN;
+//	}
+//}
 
 //std::string ExecutionParams::getHash(const std::string _inputFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams) const
 //{

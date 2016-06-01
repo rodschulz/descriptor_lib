@@ -120,7 +120,7 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	return bands;
 }
 
-std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClouds(const std::vector<BandPtr> &_bands, const ExecutionParams &_params)
+std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClouds(const std::vector<BandPtr> &_bands, const DescriptorParams &_params)
 {
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes;
 	planes.reserve(_bands.size());

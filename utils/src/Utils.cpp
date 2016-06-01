@@ -186,3 +186,62 @@ std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsIn
 	// Return the axes
 	return std::pair<Eigen::Vector3f, Eigen::Vector3f>(v1, v2);
 }
+
+SynCloudType Utils::getSynCloudType(const std::string &_type)
+{
+	if (boost::iequals(_type, "cube"))
+		return CLOUD_CUBE;
+	else if (boost::iequals(_type, "cylinder"))
+		return CLOUD_CYLINDER;
+	else if (boost::iequals(_type, "sphere"))
+		return CLOUD_SPHERE;
+	else if (boost::iequals(_type, "half_sphere"))
+		return CLOUD_HALF_SPHERE;
+	else if (boost::iequals(_type, "plane"))
+		return CLOUD_PLANE;
+	{
+		std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
+		return CLOUD_SPHERE;
+	}
+}
+
+SequenceStat Utils::getStatType(const std::string &_type)
+{
+	if (boost::iequals(_type, "mean"))
+		return STAT_MEAN;
+	else if (boost::iequals(_type, "median"))
+		return STAT_MEDIAN;
+	{
+		std::cout << "WARNING: wrong stat type, assuming MEAN";
+		return STAT_MEAN;
+	}
+}
+
+ClusteringImplementation Utils::getClusteringImplementation(const std::string &_type)
+{
+	if (boost::iequals(_type, "opencv"))
+		return CLUSTERING_OPENCV;
+	else if (boost::iequals(_type, "custom"))
+		return CLUSTERING_CUSTOM;
+	else if (boost::iequals(_type, "stochastic"))
+		return CLUSTERING_STOCHASTIC;
+	else
+	{
+		std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
+		return CLUSTERING_OPENCV;
+	}
+}
+
+MetricType Utils::getMetricType(const std::string &_type)
+{
+	if (boost::iequals(_type, "euclidean"))
+		return METRIC_EUCLIDEAN;
+	else if (boost::iequals(_type, "closest"))
+		return METRIC_CLOSEST_PERMUTATION;
+	else if (boost::iequals(_type, "closest_with_confidence"))
+		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
+	{
+		std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
+		return METRIC_EUCLIDEAN;
+	}
+}

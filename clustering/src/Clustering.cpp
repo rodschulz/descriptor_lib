@@ -103,7 +103,7 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParam
 	std::cout << "*** ELBOW: graph generation finished ***" << std::endl;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const DescriptorParams &_params)
 {
 	//TODO improve the representation creating to "bend" the bands according to the mean normal in each bin
 

@@ -14,6 +14,7 @@
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
 #include "MetricFactory.hpp"
+#include "Utils.hpp"
 
 Config::Config()
 {
@@ -55,7 +56,7 @@ bool Config::load(const std::string &filename_)
 			params->bidirectional = descriptorConfig["bidirectional"].as<bool>();
 			params->useProjection = descriptorConfig["useProjection"].as<bool>();
 			params->sequenceBin = descriptorConfig["sequenceBin"].as<double>();
-			params->sequenceStat = ExecutionParams::getStatType(descriptorConfig["sequenceStat"].as<std::string>());
+			params->sequenceStat = Utils::getStatType(descriptorConfig["sequenceStat"].as<std::string>());
 
 			getInstance()->descriptorParams = params;
 		}
@@ -65,9 +66,9 @@ bool Config::load(const std::string &filename_)
 			YAML::Node clusteringConfig = config["clustering"];
 
 			ClusteringParams *params = new ClusteringParams();
-			params->implementation = ExecutionParams::getClusteringImplementation(clusteringConfig["implementation"].as<std::string>());
+			params->implementation = Utils::getClusteringImplementation(clusteringConfig["implementation"].as<std::string>());
 			std::vector<std::string> metricDetails = clusteringConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::createMetric(ExecutionParams::getMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::createMetric(Utils::getMetricType(metricDetails[0]), metricDetails);
 			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
 			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
@@ -96,7 +97,7 @@ bool Config::load(const std::string &filename_)
 
 			SyntheticCloudsParams *params = new SyntheticCloudsParams();
 			params->useSynthetic = synthCloudConfig["generateCloud"].as<bool>();
-			params->synCloudType = ExecutionParams::getSynCloudType(synthCloudConfig["type"].as<std::string>());
+			params->synCloudType = Utils::getSynCloudType(synthCloudConfig["type"].as<std::string>());
 
 			getInstance()->syntheticCloudParams = params;
 		}
@@ -107,7 +108,7 @@ bool Config::load(const std::string &filename_)
 
 			MetricTestingParams *params = new MetricTestingParams();
 			std::vector<std::string> metricDetails = metricTestConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::createMetric(ExecutionParams::getMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::createMetric(Utils::getMetricType(metricDetails[0]), metricDetails);
 
 			getInstance()->metricTestingParams = params;
 		}

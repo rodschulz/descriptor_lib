@@ -28,12 +28,6 @@ public:
 	// Loads the configuration file
 	static bool load(const std::string &filename_);
 
-	// Returns the current execution params according to the loaded configuration file
-	static inline ExecutionParams getExecutionParams()
-	{
-		return getInstance()->params;
-	}
-
 	// Returns a boolean value indicating if the debug generation is enabled
 	static bool debugEnabled()
 	{
@@ -83,10 +77,7 @@ private:
 	// Constructor
 	Config();
 
-	// Instance storing the current execution params loaded from the config file
-	ExecutionParams params; // TODO remove this
-
-	// Cached params
+	// Cached config params
 	DescriptorParams *descriptorParams;
 	ClusteringParams *clusteringParams;
 	CloudSmoothingParams *cloudSmoothingParams;

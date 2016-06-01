@@ -125,17 +125,17 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 	output.close();
 }
 
-void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const ExecutionParams &_params)
+void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const DescriptorParams &_params, const int _targetPoint)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::colorPalette35(0));
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "cloud.pcd", *coloredCloud);
 
-	(*coloredCloud)[_params.targetPoint].rgb = Utils::getColor(255, 0, 0);
+	(*coloredCloud)[_targetPoint].rgb = Utils::getColor(255, 0, 0);
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "pointPosition.pcd", *coloredCloud);
 
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(_bands, _params);
 
-	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_params.targetPoint), _params.patchSize);
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_targetPoint), _params.patchSize);
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "patch.pcd", *patch);
 
 	std::ofstream sequences;

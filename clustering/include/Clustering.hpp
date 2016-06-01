@@ -40,7 +40,7 @@ public:
 	static void generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric);
 
 	// Generates a representation of the clusters
-	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const ExecutionParams &_params);
+	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr _cloud, const cv::Mat &_labels, const cv::Mat &_centers, const DescriptorParams &_params);
 
 
 	/** Auxiliary methods for useful data generation */
