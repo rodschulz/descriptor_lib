@@ -53,12 +53,12 @@ struct DescriptorParams
 
 	DescriptorParams()
 	{
-		patchSize = 1;
+		patchSize = 0.05;
 		bandNumber = 4;
-		bandWidth = 0.05;
-		bidirectional = false;
-		useProjection = false;
-		sequenceBin = 0.05;
+		bandWidth = 0.01;
+		bidirectional = true;
+		useProjection = true;
+		sequenceBin = 0.01;
 		sequenceStat = STAT_MEAN;
 	}
 
@@ -104,7 +104,7 @@ struct ClusteringParams
 		metric = MetricPtr();
 		clusterNumber = 5;
 		maxIterations = 10000;
-		stopThreshold = 0.1;
+		stopThreshold = 0.001;
 		attempts = 1;
 		generateElbowCurve = false;
 		generateDistanceMatrix = false;
@@ -123,8 +123,8 @@ struct CloudSmoothingParams
 	CloudSmoothingParams()
 	{
 		useSmoothing = false;
-		sigma = 4;
-		radius = 0.005;
+		sigma = 2;
+		radius = 0.02;
 	}
 };
 

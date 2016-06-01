@@ -70,7 +70,7 @@ endif()
 
 if (NOT Boost_FOUND)
 	message(STATUS "${Yellow}Boost not found yet, searching for package${ColorReset}")
-	find_package(Boost 1.46 REQUIRED)
+	find_package(Boost 1.46 COMPONENTS unit_test_framework REQUIRED)
 
 	if (Boost_FOUND)
 		message(STATUS "${Cyan}\tFound Boost version ${Boost_LIB_VERSION}${ColorReset}")
@@ -90,6 +90,7 @@ if (NOT OPENSSL_FOUND)
 		message(STATUS "${Cyan}\tFound OpenSSL version ${OPENSSL_VERSION}${ColorReset}")
 		message(STATUS "${Cyan}\tOPENSSL_INCLUDE_DIR = ${OPENSSL_INCLUDE_DIR}${ColorReset}")
 
+		# Add include and linking directories
 		include_directories(${OPENSSL_INCLUDE_DIR})
 		link_directories(${OPENSSL_LIBRARIES})
 	endif()

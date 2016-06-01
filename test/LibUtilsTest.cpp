@@ -3,8 +3,8 @@
  * 2016
  */
 #include <boost/test/unit_test.hpp>
-#include "../utils/Utils.hpp"
-#include "../utils/ExecutionParams.hpp"
+#include "Utils.hpp"
+#include "ExecutionParams.hpp"
 
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(Utils_class_suite)
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(signedAngle)
 	BOOST_CHECK_CLOSE(Utils::signedAngle<Eigen::Vector3f>(v1, v2, normal), M_PI, 1E-10);
 }
 
-BOOST_AUTO_TEST_CASE(generatePlaneAxes)
+BOOST_AUTO_TEST_CASE(generatePerpendicularPointsInPlane)
 {
 	Eigen::Vector3f normal = Eigen::Vector3f(1, 1, 0).normalized();
 	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(normal, Eigen::Vector3f(10, 7, 5));
@@ -171,140 +171,170 @@ BOOST_AUTO_TEST_CASE(generatePlaneAxes)
 	BOOST_CHECK_SMALL(axes.second.dot(normal), 1E-20f);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
-/**************************************************/
-
-/**************************************************/
-BOOST_AUTO_TEST_SUITE(ExecParams_class_suite)
-
-BOOST_AUTO_TEST_CASE(constructor)
-{
-	BOOST_CHECK_MESSAGE(sizeof(ExecutionParams) == 200, "ExecutionParams size has changed, check that the new member is being properly initialized in the constructor");
-
-	ExecutionParams params;
-
-	BOOST_CHECK_EQUAL(params.executionType, EXECUTION_NONE);
-	BOOST_CHECK_EQUAL(params.inputLocation, "");
-	BOOST_CHECK_EQUAL(params.targetPoint, 1000);
-
-	BOOST_CHECK_EQUAL(params.patchSize, 0.05);
-	BOOST_CHECK_EQUAL(params.normalEstimationRadius, -1);
-	BOOST_CHECK_EQUAL(params.bandNumber, 4);
-	BOOST_CHECK_EQUAL(params.bandWidth, 0.01);
-	BOOST_CHECK_EQUAL(params.bidirectional, true);
-	BOOST_CHECK_EQUAL(params.useProjection, true);
-
-	BOOST_CHECK_EQUAL(params.sequenceBin, 0.01);
-	BOOST_CHECK_EQUAL(params.sequenceStat, STAT_NONE);
-
-	BOOST_CHECK_EQUAL(params.useSynthetic, false);
-	BOOST_CHECK_EQUAL(params.synCloudType, CLOUD_NONE);
-
-	BOOST_CHECK_EQUAL(params.smoothingType, SMOOTHING_NONE);
-	BOOST_CHECK_EQUAL(params.gaussianSigma, 2);
-	BOOST_CHECK_EQUAL(params.gaussianRadius, 0.02);
-	BOOST_CHECK_EQUAL(params.mlsRadius, 0.02);
-
-	BOOST_CHECK_EQUAL(params.genElbowCurve, false);
-	BOOST_CHECK_EQUAL(params.genDistanceMatrix, false);
-
-	BOOST_CHECK_EQUAL(params.labelData, false);
-	BOOST_CHECK_EQUAL(params.centersLocation, "");
-
-	BOOST_CHECK_EQUAL(params.implementation, CLUSTERING_NONE);
-	BOOST_CHECK_EQUAL(params.metric, METRIC_NONE);
-	BOOST_CHECK_EQUAL(params.clusters, 5);
-	BOOST_CHECK_EQUAL(params.maxIterations, 10000);
-	BOOST_CHECK_EQUAL(params.stopThreshold, 0.001);
-	BOOST_CHECK_EQUAL(params.attempts, 1);
-	BOOST_CHECK_EQUAL(params.cacheLocation, "");
-	BOOST_CHECK_EQUAL(params.useConfidence, false);
-
-	BOOST_CHECK_EQUAL(params.targetMetric, METRIC_NONE);
-	BOOST_CHECK_EQUAL(params.metricArgs.empty(), true);
-}
-
-BOOST_AUTO_TEST_CASE(getExecutionType)
-{
-	BOOST_CHECK_EQUAL(ExecutionParams::getExecutionType("descriptor"), EXECUTION_DESCRIPTOR);
-	BOOST_CHECK_EQUAL(ExecutionParams::getExecutionType("clustering"), EXECUTION_CLUSTERING);
-	BOOST_CHECK_EQUAL(ExecutionParams::getExecutionType("metric"), EXECUTION_METRIC);
-	BOOST_CHECK_EQUAL(ExecutionParams::getExecutionType(""), EXECUTION_NONE);
-}
-
 BOOST_AUTO_TEST_CASE(getSynCloudType)
 {
-	BOOST_CHECK_EQUAL(ExecutionParams::getSynCloudType("cube"), CLOUD_CUBE);
-	BOOST_CHECK_EQUAL(ExecutionParams::getSynCloudType("cylinder"), CLOUD_CYLINDER);
-	BOOST_CHECK_EQUAL(ExecutionParams::getSynCloudType("sphere"), CLOUD_SPHERE);
-	BOOST_CHECK_EQUAL(ExecutionParams::getSynCloudType(""), CLOUD_NONE);
-}
-
-BOOST_AUTO_TEST_CASE(getSmoothingType)
-{
-	BOOST_CHECK_EQUAL(ExecutionParams::getSmoothingType("gaussian"), SMOOTHING_GAUSSIAN);
-	BOOST_CHECK_EQUAL(ExecutionParams::getSmoothingType("mls"), SMOOTHING_MLS);
-	BOOST_CHECK_EQUAL(ExecutionParams::getSmoothingType(""), SMOOTHING_NONE);
+ 	BOOST_CHECK_EQUAL(Utils::getSynCloudType("cube"), CLOUD_CUBE);
+ 	BOOST_CHECK_EQUAL(Utils::getSynCloudType("cylinder"), CLOUD_CYLINDER);
+ 	BOOST_CHECK_EQUAL(Utils::getSynCloudType("sphere"), CLOUD_SPHERE);
 }
 
 BOOST_AUTO_TEST_CASE(getStatType)
 {
-	BOOST_CHECK_EQUAL(ExecutionParams::getStatType("mean"), STAT_MEAN);
-	BOOST_CHECK_EQUAL(ExecutionParams::getStatType("median"), STAT_MEDIAN);
-	BOOST_CHECK_EQUAL(ExecutionParams::getStatType(""), STAT_NONE);
+ 	BOOST_CHECK_EQUAL(Utils::getStatType("mean"), STAT_MEAN);
+ 	BOOST_CHECK_EQUAL(Utils::getStatType("median"), STAT_MEDIAN);
 }
 
 BOOST_AUTO_TEST_CASE(getClusteringImplementation)
 {
-	BOOST_CHECK_EQUAL(ExecutionParams::getClusteringImplementation("opencv"), CLUSTERING_OPENCV);
-	BOOST_CHECK_EQUAL(ExecutionParams::getClusteringImplementation("custom"), CLUSTERING_CUSTOM);
-	BOOST_CHECK_EQUAL(ExecutionParams::getClusteringImplementation("stochastic"), CLUSTERING_STOCHASTIC);
-	BOOST_CHECK_EQUAL(ExecutionParams::getClusteringImplementation(""), CLUSTERING_NONE);
+ 	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("opencv"), CLUSTERING_OPENCV);
+ 	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("custom"), CLUSTERING_CUSTOM);
+ 	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("stochastic"), CLUSTERING_STOCHASTIC);
 }
 
 BOOST_AUTO_TEST_CASE(getMetricType)
 {
-	BOOST_CHECK_EQUAL(ExecutionParams::getMetricType("euclidean"), METRIC_EUCLIDEAN);
-	BOOST_CHECK_EQUAL(ExecutionParams::getMetricType("closest"), METRIC_CLOSEST_PERMUTATION);
-	BOOST_CHECK_EQUAL(ExecutionParams::getMetricType(""), METRIC_NONE);
+	BOOST_CHECK_EQUAL(Utils::getMetricType("euclidean"), METRIC_EUCLIDEAN);
+	BOOST_CHECK_EQUAL(Utils::getMetricType("closest"), METRIC_CLOSEST_PERMUTATION);
 }
 
-BOOST_AUTO_TEST_CASE(getBandsAngularRange)
-{
-	ExecutionParams params;
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
 
-	params.bidirectional = true;
-	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), M_PI);
-	params.bidirectional = false;
-	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), 2 * M_PI);
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(DescriptorParams_class_suite)
+
+BOOST_AUTO_TEST_CASE(constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(DescriptorParams), 48);
+ 	BOOST_CHECK_MESSAGE(sizeof(DescriptorParams) == 48, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
+
+ 	DescriptorParams params;
+
+ 	// 	BOOST_CHECK_EQUAL(params.executionType, EXECUTION_NONE);
+ 	// 	BOOST_CHECK_EQUAL(params.inputLocation, "");
+ 	// 	BOOST_CHECK_EQUAL(params.targetPoint, 1000);
+ 	// 	BOOST_CHECK_EQUAL(params.normalEstimationRadius, -1);
+ 	// 	BOOST_CHECK_EQUAL(params.cacheLocation, "");
+
+ 	BOOST_CHECK_EQUAL(params.patchSize, 0.05);
+ 	BOOST_CHECK_EQUAL(params.bandNumber, 4);
+ 	BOOST_CHECK_EQUAL(params.bandWidth, 0.01);
+ 	BOOST_CHECK_EQUAL(params.bidirectional, true);
+ 	BOOST_CHECK_EQUAL(params.useProjection, true);
+ 	BOOST_CHECK_EQUAL(params.sequenceBin, 0.01);
+ 	BOOST_CHECK_EQUAL(params.sequenceStat, STAT_MEAN);
 }
 
-BOOST_AUTO_TEST_CASE(getBandsAngularStep)
+ BOOST_AUTO_TEST_CASE(getBandsAngularRange)
+ {
+	 DescriptorParams params;
+
+ 	params.bidirectional = true;
+ 	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), M_PI);
+ 	params.bidirectional = false;
+ 	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), 2 * M_PI);
+ }
+
+ BOOST_AUTO_TEST_CASE(getBandsAngularStep)
+ {
+	 DescriptorParams params;
+
+ 	params.bidirectional = true;
+ 	params.bandNumber = 10;
+ 	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 10);
+
+ 	params.bidirectional = false;
+ 	params.bandNumber = 10;
+ 	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 5);
+ }
+
+ BOOST_AUTO_TEST_CASE(getSequenceLength)
+ {
+ 	DescriptorParams params;
+
+ 	params.bidirectional = true;
+ 	params.patchSize = 10;
+ 	params.sequenceBin = 2;
+ 	BOOST_CHECK_EQUAL(params.getSequenceLength(), 10);
+
+ 	params.bidirectional = false;
+ 	params.patchSize = 10;
+ 	params.sequenceBin = 2;
+ 	BOOST_CHECK_EQUAL(params.getSequenceLength(), 5);
+ }
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(ClusteringParams_class_suite)
+
+BOOST_AUTO_TEST_CASE(constructor)
 {
-	ExecutionParams params;
+	BOOST_CHECK_EQUAL(sizeof(ClusteringParams), 48);
+ 	BOOST_CHECK_MESSAGE(sizeof(ClusteringParams) == 48, "ClusteringParams size changed, check that any new member is being properly initialized in the constructor");
 
-	params.bidirectional = true;
-	params.bandNumber = 10;
-	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 10);
+ 	ClusteringParams params;
 
-	params.bidirectional = false;
-	params.bandNumber = 10;
-	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 5);
+ 	BOOST_CHECK_EQUAL(params.implementation, CLUSTERING_OPENCV);
+ 	BOOST_CHECK_EQUAL(params.metric, MetricPtr());
+ 	BOOST_CHECK_EQUAL(params.clusterNumber, 5);
+ 	BOOST_CHECK_EQUAL(params.maxIterations, 10000);
+ 	BOOST_CHECK_EQUAL(params.stopThreshold, 0.001);
+ 	BOOST_CHECK_EQUAL(params.attempts, 1);
+ 	BOOST_CHECK_EQUAL(params.generateElbowCurve, false);
+ 	BOOST_CHECK_EQUAL(params.generateDistanceMatrix, false);
 }
 
-BOOST_AUTO_TEST_CASE(getSequenceLength)
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(CloudSmoothingParams_class_suite)
+
+BOOST_AUTO_TEST_CASE(constructor)
 {
-	ExecutionParams params;
+	BOOST_CHECK_EQUAL(sizeof(CloudSmoothingParams), 24);
+ 	BOOST_CHECK_MESSAGE(sizeof(CloudSmoothingParams) == 24, "CloudSmoothingParams size changed, check that any new member is being properly initialized in the constructor");
 
-	params.bidirectional = true;
-	params.patchSize = 10;
-	params.sequenceBin = 2;
-	BOOST_CHECK_EQUAL(params.getSequenceLength(), 10);
+ 	CloudSmoothingParams params;
 
-	params.bidirectional = false;
-	params.patchSize = 10;
-	params.sequenceBin = 2;
-	BOOST_CHECK_EQUAL(params.getSequenceLength(), 5);
+	BOOST_CHECK_EQUAL(params.useSmoothing, false);
+	BOOST_CHECK_EQUAL(params.sigma, 2);
+	BOOST_CHECK_EQUAL(params.radius, 0.02);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(SyntheticCloudsParams_class_suite)
+
+BOOST_AUTO_TEST_CASE(constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(SyntheticCloudsParams), 8);
+ 	BOOST_CHECK_MESSAGE(sizeof(SyntheticCloudsParams) == 8, "SyntheticCloudsParams size changed, check that any new member is being properly initialized in the constructor");
+
+ 	SyntheticCloudsParams params;
+
+ 	BOOST_CHECK_EQUAL(params.useSynthetic, false);
+ 	BOOST_CHECK_EQUAL(params.synCloudType, CLOUD_SPHERE);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(MetricTestingParams_class_suite)
+
+BOOST_AUTO_TEST_CASE(constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(MetricTestingParams), 16);
+ 	BOOST_CHECK_MESSAGE(sizeof(MetricTestingParams) == 16, "MetricTestingParams size changed, check that any new member is being properly initialized in the constructor");
+
+ 	MetricTestingParams params;
+
+ 	BOOST_CHECK_EQUAL(params.metric, MetricPtr());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

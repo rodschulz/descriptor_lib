@@ -3,9 +3,9 @@
  * 2016
  */
 #include <boost/test/unit_test.hpp>
-#include "../descriptor/Calculator.hpp"
-#include "../descriptor/Extractor.hpp"
-#include "../factories/CloudFactory.hpp"
+#include "Calculator.hpp"
+#include "Extractor.hpp"
+#include "CloudFactory.hpp"
 #include <pcl/io/pcd_io.h>
 
 /**************************************************/
@@ -21,9 +21,10 @@ static bool diffThanZero(const float _value)
 struct ExecParamsFixture {
 	ExecParamsFixture()
 	{
-		params.targetPoint = 100;
+		targetPoint = 100;
+		normalEstimationRadius = -1;
+		
 		params.patchSize = 5;
-		params.normalEstimationRadius = -1;
 		params.bandNumber = 5;
 		params.bandWidth = 1;
 		params.bidirectional = false;
@@ -33,7 +34,9 @@ struct ExecParamsFixture {
 	}
 	~ ExecParamsFixture() {}
 
-	ExecutionParams params;
+	int targetPoint;
+	double normalEstimationRadius;
+	DescriptorParams params;
 };
 /**************************************************/
 
@@ -44,9 +47,9 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, ExecParamsFixture)
 {
 	// Generate cloud
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 20000);
-	pcl::PointNormal point = cloud->at(params.targetPoint);
+	pcl::PointNormal point = cloud->at(targetPoint);
 
-	Descriptor descriptor1 = Calculator::calculateDescriptor(cloud, params);
+	Descriptor descriptor1 = Calculator::calculateDescriptor(cloud, params, targetPoint);
 	Descriptor descriptor2 = Calculator::calculateDescriptor(cloud, params, point);
 
 	// Check sizes
@@ -63,13 +66,13 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, ExecParamsFixture)
 
 BOOST_FIXTURE_TEST_CASE(fillSequences_plane, ExecParamsFixture)
 {
-	params.targetPoint = 10081;
+	targetPoint = 10081;
 
 	// Generate cloud
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 20000);
 
 	// Extract bands
-	pcl::PointNormal point = cloud->at(params.targetPoint);
+	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
 	Calculator::fillSequences(bands, params, M_PI / 18);
 
@@ -87,14 +90,14 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_plane, ExecParamsFixture)
 
 BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, ExecParamsFixture)
 {
-	params.targetPoint = 10577;
+	targetPoint = 10577;
 	params.sequenceBin = 0.5;
 
 	// Generate cloud
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createSphereSection(M_PI, 10, Eigen::Vector3f(0, 0, 0), 20000);
 
 	// Extract bands
-	pcl::PointNormal point = cloud->at(params.targetPoint);
+	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
 	Calculator::fillSequences(bands, params, M_PI / 18);
 
@@ -135,7 +138,7 @@ BOOST_FIXTURE_TEST_CASE(getBands_no_bidirectional, ExecParamsFixture)
 
 	// Generate cloud
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 3000);
-	pcl::PointNormal point = cloud->at(params.targetPoint);
+	pcl::PointNormal point = cloud->at(targetPoint);
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
@@ -166,7 +169,7 @@ BOOST_FIXTURE_TEST_CASE(getBands_bidirectional, ExecParamsFixture)
 
 	// Generate cloud
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 3000);
-	pcl::PointNormal point = cloud->at(params.targetPoint);
+	pcl::PointNormal point = cloud->at(targetPoint);
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
