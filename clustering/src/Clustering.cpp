@@ -9,7 +9,7 @@
 #include "PointFactory.hpp"
 #include "KMeans.hpp"
 
-void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric, ClusteringResults &_results)
+void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_params, ClusteringResults &_results)
 {
 	switch (_params.implementation)
 	{
@@ -22,11 +22,11 @@ void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_
 			break;
 
 		case CLUSTERING_CUSTOM:
-			KMeans::searchClusters(_results, _items, _metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold);
+			KMeans::searchClusters(_results, _items, _params.metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold);
 			break;
 
 		case CLUSTERING_STOCHASTIC:
-			KMeans::stochasticSearchClusters(_results, _items, _metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold, _items.rows / 10);
+			KMeans::stochasticSearchClusters(_results, _items, _params.metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold, _items.rows / 10);
 			break;
 	}
 }
@@ -51,7 +51,7 @@ void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const
 	}
 }
 
-void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params, const MetricPtr &_metric)
+void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params)
 {
 	std::cout << "*** ELBOW: begining graph generation ***" << std::endl;
 
@@ -67,13 +67,13 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParam
 		std::cout << "*** ELBOW: clustering " << i << " centers" << std::endl;
 
 		ClusteringResults results;
-		searchClusters(_items, _params, _metric, results);
+		searchClusters(_items, _params, results);
 
 		double sse;
 		if (params.implementation == CLUSTERING_OPENCV)
 			sse = Utils::getSSE(_items, results.centers, results.labels);
 		else
-			sse = KMeans::getSSE(_items, results.labels, results.centers, _metric);
+			sse = KMeans::getSSE(_items, results.labels, results.centers, _params.metric);
 
 		data << i << " " << sse << "\n";
 	}
@@ -107,7 +107,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 {
 	//TODO improve the representation creating to "bend" the bands according to the mean normal in each bin
 
-	int sequenceLength = -1; //_params.getSequenceLength(); // TODO fix this
+	int sequenceLength = _params.getSequenceLength();
 	std::vector<pcl::PointNormal> locations(_centers.rows, PointFactory::createPointNormal(0, 0, 0, 0, 0, 0, 0));
 	std::vector<int> pointsPerCluster(_centers.rows, 0);
 
@@ -118,7 +118,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 	}
 
 	// Angular step between bands
-	double bandAngularStep = -1; //_params.getBandsAngularStep(); // TODO fix this
+	double bandAngularStep = _params.getBandsAngularStep();
 
 	// Define reference vectors
 	Eigen::Vector3f referenceNormal = Eigen::Vector3f(1, 0, 0);

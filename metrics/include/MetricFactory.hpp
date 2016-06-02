@@ -8,8 +8,9 @@
 #include <vector>
 #include <string>
 #include <boost/algorithm/string.hpp>
-#include "ClosestPermutationMetric.hpp"
 #include "EuclideanMetric.hpp"
+#include "ClosestPermutationMetric.hpp"
+#include "ClosestPermutationWithConfidenceMetric.hpp"
 #include "Config.hpp"
 
 class MetricFactory
@@ -24,6 +25,7 @@ public:
 				return MetricPtr(new EuclideanMetric());
 
 			case METRIC_CLOSEST_PERMUTATION:
+			case METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE:
 			{
 				int size = 0;
 
@@ -33,7 +35,10 @@ public:
 				else
 					size = atoi(_args[1].c_str());
 
-				return MetricPtr(new ClosestPermutationMetric(size, false));
+				if (_type == METRIC_CLOSEST_PERMUTATION)
+					return MetricPtr(new ClosestPermutationMetric(size));
+				else
+					return MetricPtr(new ClosestPermutationWithConfidenceMetric(size));
 			}
 
 			default:
