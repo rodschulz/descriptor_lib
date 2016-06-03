@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(kmeansSearchClusters)
 	data.at<float>(6,0) = 2; data.at<float>(6,1) = -3;
 	data.at<float>(8,0) = 3; data.at<float>(8,1) = -3;
 
-	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN, std::vector<std::string>());
+	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN);
 	ClusteringResults results;
 
 	// Temporarily disable std out printing
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(kmeansSSE)
 	centers.at<float>(1,0) = 2.5; centers.at<float>(1,1) = -3;
 	centers.at<float>(2,0) = 4.2; centers.at<float>(2,1) = 3.2;
 
-	double sse = KMeans::getSSE(data, labels, centers, MetricFactory::createMetric(METRIC_EUCLIDEAN, std::vector<std::string>()));
+	double sse = KMeans::getSSE(data, labels, centers, MetricFactory::createMetric(METRIC_EUCLIDEAN));
 
 	BOOST_CHECK_CLOSE(15.6, sse, 0.1);
 }

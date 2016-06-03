@@ -17,7 +17,7 @@ class MetricFactory
 {
 public:
 	// Creates a metric instance according to the given parameters
-	static MetricPtr createMetric(const MetricType &_type, std::vector<std::string> _args)
+	static MetricPtr createMetric(const MetricType &_type, const std::vector<std::string> _args = std::vector<std::string>())
 	{
 		switch (_type)
 		{

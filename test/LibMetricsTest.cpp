@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_SUITE(MetricFactory_class_suite)
 BOOST_AUTO_TEST_CASE(createMetric)
 {
 	// Creation of Euclidean metric
-	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN, std::vector<std::string>());
+	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN);
 	BOOST_CHECK(metric.get() != NULL);
 
 	EuclideanMetric* euclidean = dynamic_cast<EuclideanMetric*> (metric.get());
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_SUITE(EuclideanMetric_class_suite)
 
 BOOST_AUTO_TEST_CASE(euclideanDistance)
 {
-	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN, std::vector<std::string>());
+	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN);
 
 	cv::Mat vector1 = cv::Mat::ones(3, 1, CV_32FC1);
 	cv::Mat vector2 = cv::Mat::ones(3, 1, CV_32FC1);

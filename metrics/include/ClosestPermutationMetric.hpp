@@ -87,6 +87,12 @@ public:
 		return Permutation(minDistance, minIndex);
 	}
 
+	// Returns the type of the current metric
+	MetricType getType() const
+	{
+		return METRIC_CLOSEST_PERMUTATION;
+	}
+
 private:
 	int permutationSize; // Size of the permutation used by this metric (number of elements moved for each permutation)
 };

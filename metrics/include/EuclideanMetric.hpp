@@ -11,10 +11,14 @@ class EuclideanMetric: public Metric
 {
 public:
 	// Constructor
-	EuclideanMetric() {}
+	EuclideanMetric()
+	{
+	}
 
 	// Destructor
-	~EuclideanMetric() {}
+	~EuclideanMetric()
+	{
+	}
 
 	// Returns the distance between the two given vectors according to this metric
 	inline double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
@@ -45,4 +49,11 @@ public:
 
 		return newCenters;
 	}
+
+	// Returns the type of the current metric
+	MetricType getType() const
+	{
+		return METRIC_EUCLIDEAN;
+	}
+	;
 };

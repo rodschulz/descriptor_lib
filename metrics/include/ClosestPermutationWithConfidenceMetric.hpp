@@ -21,6 +21,12 @@ public:
 	// Returns the central point amongst the given items, according to the given labels
 	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const;
 
+	// Returns the type of the current metric
+	MetricType getType() const
+	{
+		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
+	}
+
 private:
 
 	int permutationSize; // Size of the permutation used by this metric (number of elements moved for each permutation)
