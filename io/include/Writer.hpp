@@ -18,7 +18,9 @@ public:
 	static void writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse);
 	static void writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels);
 	static void writeDistanceMatrix(const std::string &_filename, const cv::Mat &_items, const cv::Mat &_centers, const cv::Mat &_labels, const MetricPtr &_metric);
-	static void writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers);
+
+	// Writes the given centers to a file
+	static void writeClustersCenters(const std::string &_filename, const cv::Mat &_centers, const DescriptorParams &_descriptorParams, const ClusteringParams &_clusteringParams, const CloudSmoothingParams &_smoothingParams);
 
 	// Writes the given descriptor matrix as a cache file
 	static void writeDescriptorsCache(const cv::Mat &_descriptors, const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams);
@@ -33,7 +35,7 @@ private:
 	~Writer();
 
 	// Writes the given matrix to a file
-	static void writeMatrix(const std::string &_filename, const cv::Mat &_matrix);
+	static void writeMatrix(const std::string &_filename, const cv::Mat &_matrix, const std::vector<std::string> &_metadata = std::vector<std::string>());
 
 	// Generates a GNUPlot script to generate a histogram plot with the information given
 	static void generateHistogramScript(const std::string &_outputFolder, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit);

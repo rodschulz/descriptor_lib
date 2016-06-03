@@ -9,6 +9,11 @@
 #include "CloudUtils.hpp"
 #include "Utils.hpp"
 
+enum ReadingState
+{
+	READING_METADATA, READING_DIMENSIONS, READING_DATA
+};
+
 bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 {
 	bool loadOk = true;
@@ -16,7 +21,9 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 
 	try
 	{
-		bool firstLine = true;
+		ReadingState state = READING_METADATA;
+		int metadataLines = -1;
+		int metadataLinesRead = 0;
 		std::string line;
 		std::ifstream cacheFile;
 		cacheFile.open(_filename.c_str(), std::fstream::in);
@@ -31,22 +38,34 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 				std::istringstream iss(line);
 				std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
-				if (firstLine)
+				switch (state)
 				{
-					firstLine = false;
-					int rows = atoi(tokens[1].c_str());
-					int cols = atoi(tokens[2].c_str());
-					_matrix = cv::Mat::zeros(rows, cols, CV_32FC1);
-				}
-				else
-				{
-					loadOk = (int) tokens.size() == _matrix.cols;
-					if (!loadOk)
+					case READING_METADATA:
+						if (metadataLines < 0)
+							metadataLines = atoi(tokens[1].c_str());
+						else
+							// Do somthing with the metadata
+							metadataLinesRead++;
+
+						if (metadataLinesRead >= metadataLines)
+							state = READING_DIMENSIONS;
 						break;
 
-					for (size_t col = 0; col < tokens.size(); col++)
-						_matrix.at<float>(row, col) = (float) atof(tokens[col].c_str());
-					row++;
+					case READING_DIMENSIONS:
+						_matrix = cv::Mat::zeros(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), CV_32FC1);
+						state = READING_DATA;
+						break;
+
+					case READING_DATA:
+						loadOk = (int) tokens.size() == _matrix.cols;
+						if (!loadOk)
+							break;
+
+						for (size_t col = 0; col < tokens.size(); col++)
+							_matrix.at<float>(row, col) = (float) atof(tokens[col].c_str());
+						row++;
+
+						break;
 				}
 			}
 			cacheFile.close();

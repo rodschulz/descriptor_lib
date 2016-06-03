@@ -275,12 +275,14 @@ void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const std::strin
 	writeMatrix(destination, _descriptors);
 }
 
-void Writer::writeClustersCenters(const std::string &_outputFolder, const cv::Mat &_centers)
+void Writer::writeClustersCenters(const std::string &_filename, const cv::Mat &_centers, const DescriptorParams &_descriptorParams, const ClusteringParams &_clusteringParams, const CloudSmoothingParams &_smoothingParams)
 {
-	// TODO add extra info when a cache is being saved, maybe parameters used for creation like num iterations, stop, patch size, etc
+	std::vector<std::string> metadata;
+	metadata.push_back(_descriptorParams.toString());
+	metadata.push_back(_clusteringParams.toString());
+	metadata.push_back(_smoothingParams.toString());
 
-	std::string destination = _outputFolder + "centers";
-	writeMatrix(destination, _centers);
+	writeMatrix(_filename, _centers, metadata);
 }
 
 void Writer::saveCloudMatrix(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
@@ -296,11 +298,19 @@ void Writer::saveCloudMatrix(const std::string &_filename, const pcl::PointCloud
 	Writer::writeMatrix(_filename, items);
 }
 
-void Writer::writeMatrix(const std::string &_filename, const cv::Mat &_matrix)
+void Writer::writeMatrix(const std::string &_filename, const cv::Mat &_matrix, const std::vector<std::string> &_metadata)
 {
 	std::ofstream outputFile;
 	outputFile.open(_filename.c_str(), std::fstream::out);
 
+	// Write metadata header
+	outputFile << "metadata_lines " << _metadata.size() << "\n";
+
+	// Write metadata
+	for (size_t i = 0; i < _metadata.size(); i++)
+		outputFile << _metadata[i] << "\n";
+
+	// Write the matrix actual data
 	outputFile << MATRIX_DIMENSIONS << " " << _matrix.rows << " " << _matrix.cols << "\n";
 	for (int i = 0; i < _matrix.rows; i++)
 	{
