@@ -292,6 +292,14 @@ void Writer::writeClustersCenters(const std::string &_filename, const cv::Mat &_
 	writeMatrix(_filename, _centers, metadata);
 }
 
+void Writer::writeBoW(const std::string &_filename, const cv::Mat &_centers, const ClusteringParams &_clusteringParams)
+{
+	std::vector<std::string> metadata;
+	metadata.push_back(Config::getClusteringParams().toString());
+
+	Writer::writeMatrix(_filename, _centers, metadata);
+}
+
 void Writer::saveCloudMatrix(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
 {
 	cv::Mat items = cv::Mat::zeros(_cloud->size(), 3, CV_32FC1);

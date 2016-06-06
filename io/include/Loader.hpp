@@ -25,6 +25,9 @@ public:
 	// Loads a matrix from disk and stores it in the given matrix. Returns true if was successfully loaded, false otherwise
 	static bool loadCloud(const std::string &_filename, const double _normalEstimationRadius, const CloudSmoothingParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud);
 
+	// Traverses the given directory collecting the data in the data vector
+	static void traverseDirectory(const std::string &_inputDirectory, std::vector<cv::Mat> &_data, std::pair<int, int> &_dimensions);
+
 private:
 	Loader();
 	~Loader();

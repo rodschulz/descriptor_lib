@@ -50,7 +50,7 @@ public:
 	static DescriptorParams getDescriptorParams()
 	{
 		if (getInstance()->descriptorParams == NULL)
-			throw std::runtime_error("ERROR: descriptor params not loaded");
+			throw std::runtime_error("descriptor params not loaded");
 
 		return *getInstance()->descriptorParams;
 	}
@@ -59,7 +59,7 @@ public:
 	static ClusteringParams getClusteringParams()
 	{
 		if (getInstance()->clusteringParams == NULL)
-			throw std::runtime_error("ERROR: clustering params not loaded");
+			throw std::runtime_error("clustering params not loaded");
 
 		return *getInstance()->clusteringParams;
 	}
@@ -68,7 +68,7 @@ public:
 	static CloudSmoothingParams getCloudSmoothingParams()
 	{
 		if (getInstance()->cloudSmoothingParams == NULL)
-			throw std::runtime_error("ERROR: cloud smoothing params not loaded");
+			throw std::runtime_error("cloud smoothing params not loaded");
 
 		return *getInstance()->cloudSmoothingParams;
 	}

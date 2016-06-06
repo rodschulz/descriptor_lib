@@ -117,3 +117,28 @@ bool Loader::loadCloud(const std::string &_filename, const double _normalEstimat
 
 	return loadOk;
 }
+
+void Loader::traverseDirectory(const std::string &_inputDirectory, std::vector<cv::Mat> &_data, std::pair<int, int> &_dimensions)
+{
+	boost::filesystem::path target(_inputDirectory);
+	boost::filesystem::directory_iterator it(target), eod;
+	BOOST_FOREACH(boost::filesystem::path const &filePath, std::make_pair(it, eod))
+	{
+		if (is_regular_file(filePath))
+		{
+			if (boost::iequals(filePath.extension().string(), ".dat"))
+			{
+				std::cout << "Loading: " << filePath.string() << std::endl;
+
+				cv::Mat centers;
+				loadCenters(filePath.string(), centers);
+				_data.push_back(centers);
+
+				_dimensions.first += centers.rows;
+				_dimensions.second = std::max(_dimensions.second, centers.cols);
+			}
+		}
+		else
+			traverseDirectory(filePath.string(), _data, _dimensions);
+	}
+}
