@@ -8,6 +8,7 @@
 #include <math.h>
 #include <sstream>
 #include <stdlib.h>
+#include <cstdlib>
 #include <pcl/pcl_macros.h>
 #include <pcl/io/pcd_io.h>
 #include <opencv2/core/core.hpp>
@@ -272,7 +273,13 @@ void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const std::strin
 			std::cout << "WARNING: can't create cache folder" << std::endl;
 
 	std::string destination = _cacheLocation + Utils::getCalculationConfigHash(_cloudInputFilename, _normalEstimationRadius, _descriptorParams, _smoothingParams);
-	writeMatrix(destination, _descriptors);
+
+	std::vector<std::string> metadata;
+	metadata.push_back("normalEstimationRadius:" + boost::lexical_cast<std::string>(_normalEstimationRadius));
+	metadata.push_back(_descriptorParams.toString());
+	metadata.push_back(_smoothingParams.toString());
+
+	writeMatrix(destination, _descriptors, metadata);
 }
 
 void Writer::writeClustersCenters(const std::string &_filename, const cv::Mat &_centers, const DescriptorParams &_descriptorParams, const ClusteringParams &_clusteringParams, const CloudSmoothingParams &_smoothingParams)
