@@ -55,5 +55,4 @@ public:
 	{
 		return METRIC_EUCLIDEAN;
 	}
-	;
 };
