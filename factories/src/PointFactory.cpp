@@ -13,6 +13,15 @@ pcl::PointXYZ PointFactory::createPointXYZ(const float _x, const float _y, const
 	return p;
 }
 
+pcl::PointXYZ PointFactory::createPointXYZ(const Eigen::Vector3f &data_)
+{
+	pcl::PointXYZ p;
+	p.x = data_.x();
+	p.y = data_.y();
+	p.z = data_.z();
+	return p;
+}
+
 pcl::PointXYZRGB PointFactory::createPointXYZRGB(const float _x, const float _y, const float _z, const float _rgb)
 {
 	pcl::PointXYZRGB p;

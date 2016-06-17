@@ -14,6 +14,9 @@ public:
 	// Creates a point with XYZ coordinates
 	static pcl::PointXYZ createPointXYZ(const float _x, const float _y, const float _z);
 
+	// Creates a point with XYZ coordinates
+	static pcl::PointXYZ createPointXYZ(const Eigen::Vector3f &data_);
+
 	// Creates a point with XYZ coordinates and a RGB color definition associated
 	static pcl::PointXYZRGB createPointXYZRGB(const float _x, const float _y, const float _z, const float _rgb);
 
