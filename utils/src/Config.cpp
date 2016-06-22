@@ -11,8 +11,6 @@
 #include <math.h>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <yaml-cpp/yaml.h>
-#include <yaml-cpp/node/parse.h>
 #include "MetricFactory.hpp"
 #include "Utils.hpp"
 
@@ -39,6 +37,7 @@ bool Config::load(const std::string &filename_)
 	try
 	{
 		YAML::Node config = YAML::LoadFile(filename_);
+		getInstance()->config = config;
 
 		getInstance()->debug = config["debug"].as<bool>();
 		getInstance()->targetPoint = config["targetPint"] ? config["targetPint"].as<bool>() : -1;

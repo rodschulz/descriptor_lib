@@ -7,6 +7,8 @@
 #include <string>
 #include <stdexcept>
 #include "ExecutionParams.hpp"
+#include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/parse.h>
 
 #define OUTPUT_FOLDER			"./output/"
 #define CLOUD_FILE_EXTENSION	".pcd"
@@ -23,6 +25,12 @@ public:
 	{
 		static Config instance = Config();
 		return &instance;
+	}
+
+	// Returns the config root node
+	static YAML::Node get()
+	{
+		return getInstance()->config;
 	}
 
 	// Loads the configuration file
@@ -83,6 +91,7 @@ private:
 	CloudSmoothingParams *cloudSmoothingParams;
 	SyntheticCloudsParams *syntheticCloudParams;
 	MetricTestingParams *metricTestingParams;
+	YAML::Node config;
 
 	bool debug; // Flag indicating if the debug generation is enabled or not
 	int targetPoint; // Target point
