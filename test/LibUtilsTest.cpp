@@ -209,13 +209,6 @@ BOOST_AUTO_TEST_CASE(constructor)
  	BOOST_CHECK_MESSAGE(sizeof(DescriptorParams) == 48, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
 
  	DescriptorParams params;
-
- 	// 	BOOST_CHECK_EQUAL(params.executionType, EXECUTION_NONE);
- 	// 	BOOST_CHECK_EQUAL(params.inputLocation, "");
- 	// 	BOOST_CHECK_EQUAL(params.targetPoint, 1000);
- 	// 	BOOST_CHECK_EQUAL(params.normalEstimationRadius, -1);
- 	// 	BOOST_CHECK_EQUAL(params.cacheLocation, "");
-
  	BOOST_CHECK_EQUAL(params.patchSize, 0.05);
  	BOOST_CHECK_EQUAL(params.bandNumber, 4);
  	BOOST_CHECK_EQUAL(params.bandWidth, 0.01);

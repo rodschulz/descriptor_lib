@@ -13,6 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
+#include <yaml-cpp/node/impl.h>
 #include "MetricFactory.hpp"
 #include "Utils.hpp"
 
