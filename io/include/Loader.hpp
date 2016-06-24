@@ -14,16 +14,16 @@ class Loader
 {
 public:
 	// Loads a matrix from disk and stores it in the given matrix. Returns true if was successfully loaded, false otherwise
-	static bool loadMatrix(cv::Mat &_matrix, const std::string &_filename);
+	static bool loadMatrix(const std::string &filename_, cv::Mat &matrix_, std::map<std::string, std::string> *loadedParams_ = NULL);
 
 	// Loads a descriptors calculation cache. Returns true if was successfully loaded, false otherwise
-	static bool loadDescriptors(const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descritorParams, const CloudSmoothingParams &_smoothingParams, cv::Mat &_descriptors);
+	static bool loadDescriptors(const std::string &cacheLocation_, const std::string &cloudInputFilename_, const double normalEstimationRadius_, const DescriptorParams &descritorParams_, const CloudSmoothingParams &smoothingParams_, cv::Mat &descriptors_);
 
 	// Loads pre-calculated centers for clustering. Returns true if was successfully loaded, false otherwise
-	static bool loadCenters(const std::string &_fileLocation, cv::Mat &_centers);
+	static bool loadCenters(const std::string &filename_, cv::Mat &centers_, std::map<std::string, std::string> *metadata_ = NULL);
 
 	// Loads a matrix from disk and stores it in the given matrix. Returns true if was successfully loaded, false otherwise
-	static bool loadCloud(const std::string &_filename, const double _normalEstimationRadius, const CloudSmoothingParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud);
+	static bool loadCloud(const std::string &filename_, const double normalEstimationRadius_, const CloudSmoothingParams &params_, pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_);
 
 	// Traverses the given directory collecting the data in the data vector
 	static void traverseDirectory(const std::string &_inputDirectory, std::vector<cv::Mat> &_data, std::pair<int, int> &_dimensions);

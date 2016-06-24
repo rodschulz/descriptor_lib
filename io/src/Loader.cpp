@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <pcl/io/pcd_io.h>
+#include <boost/lexical_cast.hpp>
 #include "CloudUtils.hpp"
 #include "Utils.hpp"
 
@@ -14,7 +15,7 @@ enum ReadingState
 	READING_METADATA, READING_DIMENSIONS, READING_DATA
 };
 
-bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
+bool Loader::loadMatrix(const std::string &filename_, cv::Mat &matrix_, std::map<std::string, std::string> *metadata_)
 {
 	bool loadOk = true;
 	size_t row = 0;
@@ -26,7 +27,7 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 		int metadataLinesRead = 0;
 		std::string line;
 		std::ifstream cacheFile;
-		cacheFile.open(_filename.c_str(), std::fstream::in);
+		cacheFile.open(filename_.c_str(), std::fstream::in);
 		if (cacheFile.is_open())
 		{
 			while (getline(cacheFile, line))
@@ -44,25 +45,49 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 						if (metadataLines < 0)
 							metadataLines = atoi(tokens[1].c_str());
 						else
-							// Do somthing with the metadata
+						{
+							if (metadata_ != NULL)
+							{
+								// Parse metadata
+								for (size_t i = 0; i < tokens.size(); i++)
+								{
+									std::vector<std::string> parts;
+									boost::split(parts, tokens[i], boost::is_any_of(":"), boost::token_compress_on);
+									metadata_->operator [](parts[0]) = parts[1];
+								}
+							}
 							metadataLinesRead++;
+						}
 
 						if (metadataLinesRead >= metadataLines)
 							state = READING_DIMENSIONS;
 						break;
 
 					case READING_DIMENSIONS:
-						_matrix = cv::Mat::zeros(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), CV_32FC1);
+						matrix_ = cv::Mat::zeros(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), CV_32FC1);
 						state = READING_DATA;
 						break;
 
 					case READING_DATA:
-						loadOk = (int) tokens.size() == _matrix.cols;
+						loadOk = (int) tokens.size() == matrix_.cols;
 						if (!loadOk)
 							break;
 
 						for (size_t col = 0; col < tokens.size(); col++)
-							_matrix.at<float>(row, col) = (float) atof(tokens[col].c_str());
+						{
+							// Attempt to covert the strings into numbers
+							float value = 0;
+							try
+							{
+								value = boost::lexical_cast<float>(tokens[col]);
+							}
+							catch (boost::bad_lexical_cast ex_)
+							{
+								std::cout << "\tWARNING: NaN found at (row, col) = (" << row << ", " << col << "). Setting to zero." << std::endl;
+							}
+
+							matrix_.at<float>(row, col) = value;
+						}
 						row++;
 
 						break;
@@ -81,22 +106,22 @@ bool Loader::loadMatrix(cv::Mat &_matrix, const std::string &_filename)
 	return loadOk;
 }
 
-bool Loader::loadDescriptors(const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descritorParams, const CloudSmoothingParams &_smoothingParams, cv::Mat &_descriptors)
+bool Loader::loadDescriptors(const std::string &cacheLocation_, const std::string &cloudInputFilename_, const double normalEstimationRadius_, const DescriptorParams &descritorParams_, const CloudSmoothingParams &smoothingParams_, cv::Mat &descriptors_)
 {
-	std::string filename = _cacheLocation + Utils::getCalculationConfigHash(_cloudInputFilename, _normalEstimationRadius, _descritorParams, _smoothingParams);
-	return loadMatrix(_descriptors, filename);
+	std::string filename = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descritorParams_, smoothingParams_);
+	return loadMatrix(filename, descriptors_);
 }
 
-bool Loader::loadCenters(const std::string &_filename, cv::Mat &_centers)
+bool Loader::loadCenters(const std::string &filename_, cv::Mat &centers_, std::map<std::string, std::string> *metadata_)
 {
-	return loadMatrix(_centers, _filename);
+	return loadMatrix(filename_, centers_, metadata_);
 }
 
-bool Loader::loadCloud(const std::string &_filename, const double _normalEstimationRadius, const CloudSmoothingParams &_params, pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
+bool Loader::loadCloud(const std::string &filename_, const double normalEstimationRadius_, const CloudSmoothingParams &params_, pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
 {
 	// Load cartesian data from disk
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ(new pcl::PointCloud<pcl::PointXYZ>());
-	bool loadOk = pcl::io::loadPCDFile<pcl::PointXYZ>(_filename, *cloudXYZ) == 0;
+	bool loadOk = pcl::io::loadPCDFile<pcl::PointXYZ>(filename_, *cloudXYZ) == 0;
 
 	if (loadOk)
 	{
@@ -104,15 +129,15 @@ bool Loader::loadCloud(const std::string &_filename, const double _normalEstimat
 		CloudUtils::removeNANs(cloudXYZ);
 
 		// Apply smoothing
-		if (_params.useSmoothing)
-			cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, _params.sigma, _params.radius);
+		if (params_.useSmoothing)
+			cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, params_.sigma, params_.radius);
 
 		// Estimate normals
-		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, _normalEstimationRadius);
+		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, normalEstimationRadius_);
 
 		// Deliver the cloud
-		_cloud->clear();
-		pcl::concatenateFields(*cloudXYZ, *normals, *_cloud);
+		cloud_->clear();
+		pcl::concatenateFields(*cloudXYZ, *normals, *cloud_);
 	}
 
 	return loadOk;
@@ -122,23 +147,22 @@ void Loader::traverseDirectory(const std::string &_inputDirectory, std::vector<c
 {
 	boost::filesystem::path target(_inputDirectory);
 	boost::filesystem::directory_iterator it(target), eod;
-	BOOST_FOREACH(boost::filesystem::path const &filePath, std::make_pair(it, eod))
+	BOOST_FOREACH(boost::filesystem::path const &filePath, std::make_pair(it, eod)){
+	if (is_regular_file(filePath))
 	{
-		if (is_regular_file(filePath))
+		if (boost::iequals(filePath.extension().string(), ".dat"))
 		{
-			if (boost::iequals(filePath.extension().string(), ".dat"))
-			{
-				std::cout << "Loading: " << filePath.string() << std::endl;
+			std::cout << "Loading: " << filePath.string() << std::endl;
 
-				cv::Mat centers;
-				loadCenters(filePath.string(), centers);
-				_data.push_back(centers);
+			cv::Mat centers;
+			loadCenters(filePath.string(), centers);
+			_data.push_back(centers);
 
-				_dimensions.first += centers.rows;
-				_dimensions.second = std::max(_dimensions.second, centers.cols);
-			}
+			_dimensions.first += centers.rows;
+			_dimensions.second = std::max(_dimensions.second, centers.cols);
 		}
-		else
-			traverseDirectory(filePath.string(), _data, _dimensions);
 	}
+	else
+	traverseDirectory(filePath.string(), _data, _dimensions);
+}
 }
