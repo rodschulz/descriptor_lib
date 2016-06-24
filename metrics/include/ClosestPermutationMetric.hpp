@@ -6,6 +6,7 @@
 
 #include "Metric.hpp"
 #include <stdexcept>
+#include <boost/lexical_cast.hpp>
 
 // Metric measuring the closest distance between two vectors, according to the given permutation size
 class ClosestPermutationMetric: public Metric
@@ -91,6 +92,14 @@ public:
 	MetricType getType() const
 	{
 		return METRIC_CLOSEST_PERMUTATION;
+	}
+
+	// Returns the parameters used to construct the current instance
+	std::vector<std::string> getConstructionParams() const
+	{
+		std::vector<std::string> params;
+		params.push_back(boost::lexical_cast<std::string>(permutationSize));
+		return params;
 	}
 
 private:

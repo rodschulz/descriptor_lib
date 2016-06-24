@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Metric.hpp"
+#include <boost/lexical_cast.hpp>
 
 class ClosestPermutationWithConfidenceMetric: public Metric
 {
@@ -25,6 +26,14 @@ public:
 	MetricType getType() const
 	{
 		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
+	}
+
+	// Returns the parameters used to construct the current instance
+	std::vector<std::string> getConstructionParams() const
+	{
+		std::vector<std::string> params;
+		params.push_back(boost::lexical_cast<std::string>(permutationSize));
+		return params;
 	}
 
 private:

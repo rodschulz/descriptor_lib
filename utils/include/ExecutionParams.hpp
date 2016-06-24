@@ -9,6 +9,7 @@
 #include <math.h>
 #include <sstream>
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include "Metric.hpp"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,16 +125,17 @@ struct ClusteringParams
 	// Returns a string holding the struct's information
 	std::string toString() const
 	{
-		std::stringstream stream;
+		std::ostringstream stream;
 		stream << std::boolalpha
 				<< "implementation:" << clusteringImp[implementation]
-				<< " metric:" << metricType[metric->getType()]
+				<< " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
 				<< " clusterNumber:" << clusterNumber
 				<< " maxIterations:" << maxIterations
 				<< " stopThreshold:" << stopThreshold
 				<< " attempts:" << attempts
 				<< " generateElbowCurve:" << generateElbowCurve
 				<< " generateDistanceMatrix:" << generateDistanceMatrix;
+
 		return stream.str();
 	}
 };
@@ -207,7 +209,7 @@ struct MetricTestingParams
 	std::string toString() const
 	{
 		std::stringstream stream;
-		stream << std::boolalpha << " metric:" << metricType[metric->getType()];
+		stream << std::boolalpha << " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]";
 		return stream.str();
 	}
 };

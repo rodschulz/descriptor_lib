@@ -26,8 +26,8 @@ public:
 	// Returns the type of the current metric
 	virtual MetricType getType() const = 0;
 
-	// Evaluates the current metric according to the given testcase file
-//	static void evaluateMetricCases(const std::string &_resultsFilename, const std::string &_casesFilename, const MetricType &_metricType, const std::vector<std::string> &_args);
+	// Returns the parameters used to construct the current instance
+	virtual std::vector<std::string> getConstructionParams() const = 0;
 
 	// Calculates the central point amongst the given items, according to the given labels
 	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels) const
@@ -38,9 +38,9 @@ public:
 
 protected:
 	// Constructor
-	Metric();
+	Metric(){};
 	// Destructor
-	virtual ~Metric();
+	virtual ~Metric(){};
 };
 
 // Metric's shared pointer

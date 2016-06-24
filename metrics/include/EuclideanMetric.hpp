@@ -55,4 +55,10 @@ public:
 	{
 		return METRIC_EUCLIDEAN;
 	}
+
+	// Returns the parameters used to construct the current instance
+	std::vector<std::string> getConstructionParams() const
+	{
+		return std::vector<std::string>();
+	}
 };
