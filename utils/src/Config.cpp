@@ -40,6 +40,7 @@ bool Config::load(const std::string &filename_)
 	try
 	{
 		YAML::Node config = YAML::LoadFile(filename_);
+		getInstance()->config = config;
 
 		getInstance()->debug = config["debug"].as<bool>();
 		getInstance()->targetPoint = config["targetPint"] ? config["targetPint"].as<bool>() : -1;
