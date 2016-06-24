@@ -96,10 +96,24 @@ if (NOT OPENSSL_FOUND)
 	endif()
 endif()
 
-# find_package(OpenMP REQUIRED)
-# Set OpenMP flags to be used
-# set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+if (NOT OPENMP_FOUND)
+	message(STATUS "${Yellow}OpenMP not found yet, searching for package${ColorReset}")
+	find_package(OpenMP REQUIRED)
+
+	if (OPENMP_FOUND)
+		message(STATUS "${Cyan}\tFound OpenMP${ColorReset}")
+
+		if (${useOpenMP})
+			message(STATUS "${Cyan}\t...flag 'useOpenMP' found, OpenMP enabled${ColorReset}")
+			
+			# Set OpenMP flags to be used
+			set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+			set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+		else()
+			message(STATUS "${Cyan}\t...flag 'useOpenMP' not found, OpenMP disabled${ColorReset}")
+		endif()
+	endif()
+endif()
 
 # Get libraries to include
 file(GLOB lib_directories *)
