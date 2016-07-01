@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 #include "Clustering.hpp"
 #include "KMeans.hpp"
+#include "MetricFactory.hpp"
 
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(Clustering_class_suite)
