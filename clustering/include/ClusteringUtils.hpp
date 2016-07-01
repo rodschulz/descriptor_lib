@@ -33,8 +33,6 @@ public:
 	// Labels the given data using the given centers
 	static inline void labelData(const cv::Mat &items_, const cv::Mat &centers_, const MetricPtr &metric_, cv::Mat &labels_)
 	{
-		// TODO implement a unit test for this method (probably over a syn cloud with some def centers and results)
-
 		labels_ = cv::Mat::zeros(items_.rows, 1, CV_32SC1);
 		std::vector<double> distance(items_.rows, std::numeric_limits<double>::max());
 		for (int i = 0; i < items_.rows; i++)
