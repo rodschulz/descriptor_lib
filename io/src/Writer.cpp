@@ -128,7 +128,7 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const DescriptorParams &_params, const int _targetPoint)
 {
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::colorPalette35(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::palette35(0));
 	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "cloud.pcd", *coloredCloud);
 
 	(*coloredCloud)[_targetPoint].rgb = Utils::getColor(255, 0, 0);
@@ -148,7 +148,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 		{
 			char name[100];
 			sprintf(name, OUTPUT_FOLDER "band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::colorPalette35(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::palette35(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
@@ -207,29 +207,29 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
 {
 	// Color the data according to the clusters
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::colorPalette35(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::palette35(0));
 	for (int i = 0; i < _labels.rows; i++)
 	{
 		switch (_labels.type())
 		{
 			case CV_16U:
-				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<unsigned short>(i));
+				(*colored)[i].rgb = Utils::palette35((int) _labels.at<unsigned short>(i));
 				break;
 
 			case CV_16S:
-				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<short>(i));
+				(*colored)[i].rgb = Utils::palette35((int) _labels.at<short>(i));
 				break;
 
 			case CV_32S:
-				(*colored)[i].rgb = Utils::colorPalette35(_labels.at<int>(i));
+				(*colored)[i].rgb = Utils::palette35(_labels.at<int>(i));
 				break;
 
 			case CV_32F:
-				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<float>(i));
+				(*colored)[i].rgb = Utils::palette35((int) _labels.at<float>(i));
 				break;
 
 			case CV_64F:
-				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<double>(i));
+				(*colored)[i].rgb = Utils::palette35((int) _labels.at<double>(i));
 				break;
 
 			default:

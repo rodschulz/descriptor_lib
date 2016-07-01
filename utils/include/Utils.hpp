@@ -15,43 +15,53 @@
 // Colors defined to be used for points
 typedef enum PointColor
 {
-	COLOR_FIREBRICK = 0xB22222,
-	COLOR_RED = 0xFF0000,
-	COLOR_SALMON = 0xFA8072,
-	COLOR_ORANGE = 0xFFA500,
-	COLOR_GOLDEN_ROD = 0xDAA520,
-	COLOR_OLIVE = 0x808000,
-	COLOR_KHAKI = 0xF0E68C,
-	COLOR_YELLOW = 0xFFFF00,
-	COLOR_DARK_GREEN = 0x006400,
-	COLOR_GREEN = 0x008000,
-	COLOR_LIME = 0x00FF00,
-	COLOR_LIGHT_GREEN = 0x90EE90,
-	COLOR_DARK_SEA_GREEN = 0x8FBC8F,
-	COLOR_MEDIUM_AQUA = 0x66CDAA,
-	COLOR_TEAL = 0x008080,
-	COLOR_CYAN = 0x00FFFF,
-	COLOR_TURQUOISE = 0x40E0D0,
-	COLOR_DODGER_BLUE = 0x1E90FF,
-	COLOR_SKY_BLUE = 0x87CEEB,
-	COLOR_NAVY = 0x000080,
-	COLOR_BLUE = 0x0000FF,
-	COLOR_BLUE_VIOLET = 0x8A2BE2,
-	COLOR_SLATE_BLUE = 0x6A5ACD,
-	COLOR_DARK_MAGENTA = 0x8B008B,
-	COLOR_PLUM = 0xDDA0DD,
-	COLOR_MAGENTA = 0xFF00FF,
-	COLOR_DEEP_PINK = 0xFF1493,
-	COLOR_HOT_PINK = 0xFF69B4,
-	COLOR_BEIGE = 0xF5F5DC,
-	COLOR_BROWN = 0xA0522D,
-	COLOR_ROSY_BROWN = 0xBC8F8F,
-	COLOR_SLATE_GRAY = 0x708090,
-	COLOR_BLACK = 0x000000,
-	COLOR_GRAY = 0x808080,
-	COLOR_SILVER = 0xC0C0C0,
-	COLOR_WHITE = 0xFFFFFF,
+	COLOR_FIREBRICK = 0x00B22222,
+	COLOR_RED = 0x00FF0000,
+	COLOR_SALMON = 0x00FA8072,
+	COLOR_ORANGE = 0x00FFA500,
+	COLOR_GOLDEN_ROD = 0x00DAA520,
+	COLOR_OLIVE = 0x00808000,
+	COLOR_KHAKI = 0x00F0E68C,
+	COLOR_YELLOW = 0x00FFFF00,
+	COLOR_DARK_GREEN = 0x00006400,
+	COLOR_GREEN = 0x00008000,
+	COLOR_LIME = 0x0000FF00,
+	COLOR_LIGHT_GREEN = 0x0090EE90,
+	COLOR_DARK_SEA_GREEN = 0x008FBC8F,
+	COLOR_MEDIUM_AQUA = 0x0066CDAA,
+	COLOR_TEAL = 0x00008080,
+	COLOR_CYAN = 0x0000FFFF,
+	COLOR_TURQUOISE = 0x0040E0D0,
+	COLOR_DODGER_BLUE = 0x001E90FF,
+	COLOR_SKY_BLUE = 0x0087CEEB,
+	COLOR_NAVY = 0x00000080,
+	COLOR_BLUE = 0x000000FF,
+	COLOR_BLUE_VIOLET = 0x008A2BE2,
+	COLOR_SLATE_BLUE = 0x006A5ACD,
+	COLOR_DARK_MAGENTA = 0x008B008B,
+	COLOR_PLUM = 0x00DDA0DD,
+	COLOR_MAGENTA = 0x00FF00FF,
+	COLOR_DEEP_PINK = 0x00FF1493,
+	COLOR_HOT_PINK = 0x00FF69B4,
+	COLOR_BEIGE = 0x00F5F5DC,
+	COLOR_BROWN = 0x00A0522D,
+	COLOR_ROSY_BROWN = 0x00BC8F8F,
+	COLOR_SLATE_GRAY = 0x00708090,
+	COLOR_BLACK = 0x00000000,
+	COLOR_GRAY = 0x00808080,
+	COLOR_SILVER = 0x00C0C0C0,
+	COLOR_WHITE = 0x00FFFFFF,
 } PointColor;
+
+// Color palletes definitions
+static uint32_t colorPalette12[12] = { 0xa6cee3, 0x1f78b4, 0xb2df8a, 0x33a02c, 0xfb9a99, 0xe31a1c, 0xfdbf6f, 0xff7f00, 0xcab2d6, 0x6a3d9a, 0xffff99, 0xb15928 };
+static uint32_t colorPalette35[35] = { COLOR_FIREBRICK, COLOR_GOLDEN_ROD, COLOR_DARK_GREEN, COLOR_MEDIUM_AQUA, COLOR_DODGER_BLUE, COLOR_BLUE_VIOLET, COLOR_PLUM, COLOR_BEIGE, COLOR_SLATE_GRAY,
+///
+COLOR_SALMON, COLOR_OLIVE, COLOR_GREEN, COLOR_TEAL, COLOR_SKY_BLUE, COLOR_SLATE_BLUE, COLOR_MAGENTA, COLOR_BROWN, COLOR_GRAY,
+///
+COLOR_RED, COLOR_KHAKI, COLOR_LIME, COLOR_CYAN, COLOR_NAVY, COLOR_DARK_MAGENTA, COLOR_DEEP_PINK, COLOR_SILVER,
+///
+COLOR_ORANGE, COLOR_YELLOW, COLOR_LIGHT_GREEN, COLOR_DARK_SEA_GREEN, COLOR_TURQUOISE, COLOR_BLUE, COLOR_HOT_PINK, COLOR_ROSY_BROWN, COLOR_WHITE };
 
 // Utils class definition
 class Utils
@@ -76,13 +86,23 @@ public:
 	static std::string num2Hex(const size_t _number);
 
 	// Returns a float representation fo the given RGB color
-	static float getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b);
+	static inline uint32_t getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
+	{
+		uint32_t color = ((0x00 << 24) | (uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
+		return color;
+	}
 
 	// Returns a color from the built-in color pallete (12 colors available)
-	static uint32_t colorPalette12(const int _index);
+	static inline uint32_t palette12(const int _index)
+	{
+		return colorPalette12[_index % 12];
+	}
 
 	// Returns a color from the built-in color pallete (35 colors available)
-	static uint32_t colorPalette35(const int _index);
+	static inline uint32_t palette35(const int _index)
+	{
+		return colorPalette35[_index % 35];
+	}
 
 	// Generates a pair of arbitrary points in the given plane, both defining a couple of perpendicular vectors when the difference from the plane's origin is used
 	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point);

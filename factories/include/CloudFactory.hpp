@@ -23,7 +23,7 @@ public:
 	static pcl::PointCloud<pcl::PointNormal>::Ptr createSphereSection(const float _azimuth, const float _radius, const Eigen::Vector3f &_center, const int _npoints);
 
 	// Creates a cloud colored with the given color
-	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const uint32_t _color);
+	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint32_t color_);
 
 	// Creates a cloud colored with the given color
 	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b);
