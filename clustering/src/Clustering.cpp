@@ -31,26 +31,6 @@ void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_
 	}
 }
 
-void Clustering::labelData(const cv::Mat &_items, const cv::Mat &_centers, const MetricPtr &_metric, cv::Mat &_labels)
-{
-	// TODO implement a unit test for this method (probably over a syn cloud with some def centers and results)
-
-	_labels = cv::Mat::zeros(_items.rows, 1, CV_32SC1);
-	std::vector<double> distance(_items.rows, std::numeric_limits<double>::max());
-	for (int i = 0; i < _items.rows; i++)
-	{
-		for (int j = 0; j < _centers.rows; j++)
-		{
-			double dist = _metric->distance(_centers.row(j), _items.row(i));
-			if (dist < distance[i])
-			{
-				distance[i] = dist;
-				_labels.at<int>(i) = j;
-			}
-		}
-	}
-}
-
 void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params)
 {
 	std::cout << "*** ELBOW: begining graph generation ***" << std::endl;

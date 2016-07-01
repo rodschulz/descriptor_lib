@@ -209,7 +209,33 @@ void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointC
 	// Color the data according to the clusters
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::colorPalette35(0));
 	for (int i = 0; i < _labels.rows; i++)
-		(*colored)[i].rgb = Utils::colorPalette35(_labels.at<int>(i));
+	{
+		switch (_labels.type())
+		{
+			case CV_16U:
+				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<unsigned short>(i));
+				break;
+
+			case CV_16S:
+				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<short>(i));
+				break;
+
+			case CV_32S:
+				(*colored)[i].rgb = Utils::colorPalette35(_labels.at<int>(i));
+				break;
+
+			case CV_32F:
+				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<float>(i));
+				break;
+
+			case CV_64F:
+				(*colored)[i].rgb = Utils::colorPalette35((int) _labels.at<double>(i));
+				break;
+
+			default:
+				std::cout << "WARNING: wrong label type" << std::endl;
+		}
+	}
 
 	pcl::io::savePCDFileASCII(_filename, *colored);
 }

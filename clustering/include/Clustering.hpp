@@ -8,7 +8,7 @@
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
 #include "ExecutionParams.hpp"
-#include "MetricFactory.hpp"
+#include "Metric.hpp"
 
 // Struct grouping the results given by the clustering algorithm
 struct ClusteringResults
@@ -32,9 +32,6 @@ class Clustering
 public:
 	// Performs the search of clusters according to the given parameters
 	static void searchClusters(const cv::Mat &_items, const ClusteringParams &_params, ClusteringResults &_results);
-
-	// Labels the given data using the given centers
-	static void labelData(const cv::Mat &_items, const cv::Mat &_centers, const MetricPtr &_metric, cv::Mat &_labels);
 
 	// Generates an elbow graph according to the given params (to evaluate the SSE evolution)
 	static void generateElbowGraph(const cv::Mat &_items, const ClusteringParams &_params);
