@@ -23,9 +23,9 @@ BOOST_AUTO_TEST_CASE(num2Hex)
 
 BOOST_AUTO_TEST_CASE(getColor)
 {
-	float value = 2.05454233E-38;
-	float color = Utils::getColor(223, 184, 72);
-	BOOST_CHECK_CLOSE(color, value, 1E-35);
+	uint32_t value = 0x00DFB848;
+	uint32_t color = Utils::getColor(223, 184, 72);
+	BOOST_CHECK_EQUAL(color, value);
 }
 
 BOOST_AUTO_TEST_CASE(getSSE)
