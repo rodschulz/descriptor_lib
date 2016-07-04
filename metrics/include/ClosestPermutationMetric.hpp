@@ -31,16 +31,61 @@ public:
 	};
 
 	// Constructor
-	ClosestPermutationMetric(const int _permutationSize);
+	ClosestPermutationMetric(const int permutationSize_)
+	{
+		permutationSize = permutationSize_;
+	}
 
 	// Destructor
-	~ClosestPermutationMetric();
+	~ClosestPermutationMetric()
+	{
+	}
 
 	// Returns the distance between the given vectors, according to the current metric
-	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
+	inline double distance(const cv::Mat &vector1_, const cv::Mat &vector2_) const
+	{
+		return getClosestPermutation(vector1_, vector2_).distance;
+	}
 
 	// Returns the central point amongst the given items, according to the given labels
-	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const;
+	inline cv::Mat calculateCenters(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, std::vector<int> &itemsPerCenter_) const
+	{
+		itemsPerCenter_ = std::vector<int>(clusterNumber_, 0);
+
+		// Matrixes holding the first vector used to compare and the new centers
+		cv::Mat firstVector = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
+		cv::Mat newCenters = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
+
+		// Iterate over labels calculating the
+		std::vector<bool> begin(clusterNumber_, true);
+		for (int i = 0; i < labels_.rows; i++)
+		{
+			int clusterIndex = labels_.at<int>(i);
+
+			// Track if every centroid has got its first element
+			if (begin[clusterIndex])
+			{
+				items_.row(i).copyTo(firstVector.row(clusterIndex));
+				items_.row(i).copyTo(newCenters.row(clusterIndex));
+				begin[clusterIndex] = false;
+			}
+			else
+			{
+				Permutation closestPermutation = getClosestPermutation(firstVector.row(clusterIndex), items_.row(i));
+
+				// Add the row's value to new center
+				newCenters.row(clusterIndex).colRange(0, newCenters.cols - (closestPermutation.index * permutationSize)) += items_.row(i).colRange(closestPermutation.index * permutationSize, newCenters.cols);
+				newCenters.row(clusterIndex).colRange(newCenters.cols - (closestPermutation.index * permutationSize), newCenters.cols) += items_.row(i).colRange(0, closestPermutation.index * permutationSize);
+			}
+
+			itemsPerCenter_[clusterIndex] += 1;
+		}
+
+		for (int i = 0; i < newCenters.rows; i++)
+			newCenters.row(i) /= itemsPerCenter_[i];
+
+		return newCenters;
+	}
 
 	// Returns the closest permutation according to this metric's params
 	inline Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
@@ -102,6 +147,11 @@ public:
 		return params;
 	}
 
-private:
+	// Validates and fixes the given centers, according to the metric's definition
+	inline void validateCenters(cv::Mat &centers_) const
+	{
+	}
+
+protected:
 	int permutationSize; // Size of the permutation used by this metric (number of elements moved for each permutation)
 };

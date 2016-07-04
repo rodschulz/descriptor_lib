@@ -29,6 +29,9 @@ public:
 	// Returns the parameters used to construct the current instance
 	virtual std::vector<std::string> getConstructionParams() const = 0;
 
+	// Validates and fixes the given centers, according to the metric's definition
+	virtual void validateCenters(cv::Mat &centers_) const = 0;
+
 	// Calculates the central point amongst the given items, according to the given labels
 	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels) const
 	{

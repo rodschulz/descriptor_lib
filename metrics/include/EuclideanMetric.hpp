@@ -51,14 +51,19 @@ public:
 	}
 
 	// Returns the type of the current metric
-	MetricType getType() const
+	inline MetricType getType() const
 	{
 		return METRIC_EUCLIDEAN;
 	}
 
 	// Returns the parameters used to construct the current instance
-	std::vector<std::string> getConstructionParams() const
+	inline std::vector<std::string> getConstructionParams() const
 	{
 		return std::vector<std::string>();
+	}
+
+	// Validates and fixes the given centers, according to the metric's definition
+	inline void validateCenters(cv::Mat &centers_) const
+	{
 	}
 };

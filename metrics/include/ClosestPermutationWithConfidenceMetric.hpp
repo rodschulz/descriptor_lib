@@ -4,23 +4,38 @@
  */
 #pragma once
 
-#include "Metric.hpp"
-#include <boost/lexical_cast.hpp>
+#include "ClosestPermutationMetric.hpp"
 
-class ClosestPermutationWithConfidenceMetric: public Metric
+class ClosestPermutationWithConfidenceMetric: public ClosestPermutationMetric
 {
 public:
 	// Constructor
-	ClosestPermutationWithConfidenceMetric(const int _permutationSize);
+	ClosestPermutationWithConfidenceMetric(const int permutationSize_) :
+			ClosestPermutationMetric(permutationSize_)
+	{
+	}
 
 	// Destructor
-	~ClosestPermutationWithConfidenceMetric();
+	~ClosestPermutationWithConfidenceMetric()
+	{
+	}
 
 	// Returns the distance between the given vectors, according to the current metric
-	double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
+	inline double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+	{
+		throw std::runtime_error("Metric not yet implemented");
+	}
 
 	// Returns the central point amongst the given items, according to the given labels
-	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const;
+	inline cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const
+	{
+		throw std::runtime_error("Metric not yet implemented");
+	}
+
+	inline Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+	{
+		throw std::runtime_error("Metric not yet implemented");
+	}
 
 	// Returns the type of the current metric
 	MetricType getType() const
@@ -36,28 +51,8 @@ public:
 		return params;
 	}
 
-private:
-
-	int permutationSize; // Size of the permutation used by this metric (number of elements moved for each permutation)
-
-	struct Permutation
+	// Validates and fixes the given centers, according to the metric's definition
+	void validateCenters(cv::Mat &centers_) const
 	{
-		double distance;
-		double confidence;
-		int index;
-
-		Permutation()
-		{
-			distance = confidence = index = -1;
-		}
-
-		Permutation(const double _distance, double _confidence, int _index)
-		{
-			distance = _distance;
-			confidence = _confidence;
-			index = _index;
-		}
-	};
-
-	inline Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const;
+	}
 };
