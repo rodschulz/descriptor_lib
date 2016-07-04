@@ -6,6 +6,7 @@
 
 #include "Metric.hpp"
 #include <stdexcept>
+#include <iostream>
 #include <boost/lexical_cast.hpp>
 
 // Metric measuring the closest distance between two vectors, according to the given permutation size

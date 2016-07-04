@@ -79,12 +79,12 @@ BOOST_AUTO_TEST_CASE(closestDistance)
 
 	vector1.at<float>(0) = 8;
 	vector2.at<float>(3) = 0;
-	BOOST_CHECK_CLOSE(7.071, metric->distance(vector1, vector2), 0.01);
+	BOOST_CHECK_CLOSE(50, metric->distance(vector1, vector2), 0.01);
 
 	vector1.at<float>(0) = 8;
 	vector2.at<float>(0) = 0;
 	vector2.at<float>(3) = 1;
-	BOOST_CHECK_CLOSE(7.071, metric->distance(vector1, vector2), 0.01);
+	BOOST_CHECK_CLOSE(50, metric->distance(vector1, vector2), 0.01);
 
 	args = std::vector<std::string>();
 	args.push_back("");
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(closestDistance)
 	vector2.at<float>(6) = 0;
 	vector2.at<float>(7) = 0;
 
-	BOOST_CHECK_CLOSE(6.324, metric->distance(vector1, vector2), 0.01);
+	BOOST_CHECK_CLOSE(40, metric->distance(vector1, vector2), 0.01);
 }
 
 BOOST_AUTO_TEST_CASE(closestPermutation)
@@ -128,14 +128,14 @@ BOOST_AUTO_TEST_CASE(closestPermutation)
 	vector1.at<float>(0) = 8;
 	vector2.at<float>(3) = 0;
 	ClosestPermutationMetric::Permutation permutation = metric->getClosestPermutation(vector1, vector2);
-	BOOST_CHECK_CLOSE(7.071, permutation.distance, 0.01);
+	BOOST_CHECK_CLOSE(50, permutation.distance, 0.01);
 	BOOST_CHECK_EQUAL(0, permutation.index);
 
 	vector1.at<float>(0) = 8;
 	vector2.at<float>(0) = 0;
 	vector2.at<float>(3) = 1;
 	permutation = metric->getClosestPermutation(vector1, vector2);
-	BOOST_CHECK_CLOSE(7.071, permutation.distance, 0.01);
+	BOOST_CHECK_CLOSE(50, permutation.distance, 0.01);
 	BOOST_CHECK_EQUAL(1, permutation.index);
 
 	args = std::vector<std::string>();
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(closestPermutation)
 	vector2.at<float>(7) = 0;
 
 	permutation = metric->getClosestPermutation(vector1, vector2);
-	BOOST_CHECK_CLOSE(6.324, permutation.distance, 0.01);
+	BOOST_CHECK_CLOSE(40, permutation.distance, 0.01);
 	BOOST_CHECK_EQUAL(1, permutation.index);
 }
 
