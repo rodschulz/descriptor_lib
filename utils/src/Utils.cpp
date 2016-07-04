@@ -130,7 +130,10 @@ std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min,
 #endif
 
 		if (used.find(number) == used.end())
+		{
+			used[number] = true;
 			numbers.push_back(number);
+		}
 	}
 
 	return numbers;
