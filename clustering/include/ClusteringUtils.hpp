@@ -8,6 +8,7 @@
 #include <opencv2/ml/ml.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <stdio.h>
 #include "Metric.hpp"
 
 // SVM's shared pointer
@@ -30,6 +31,36 @@ private:
 	}
 
 public:
+	// Prints a matrix in a formated way
+	template<typename T>
+	static void print(cv::Mat mat, const int precision_ = 3)
+	{
+		std::string format;
+		if (typeid(T) == typeid(float) || typeid(T) == typeid(double))
+			format = "%." + boost::lexical_cast<std::string>(precision_) + "f";
+		else
+			format = "%d";
+
+		std::cout << "[";
+		for (int i = 0; i < mat.rows; i++)
+		{
+			std::cout << (i == 0 && mat.at<T>(0, 0) < 0 ? "" : " ");
+			for (int j = 0; j < mat.cols; j++)
+			{
+				T num = mat.at<T>(i, j);
+				if (num < 0 || (i == 0 && j == 0))
+					printf(format.c_str(), num);
+				else
+					printf((" " + format).c_str(), num);
+
+				if (j != mat.cols - 1)
+					std::cout << "\t";
+				else
+					std::cout << (i == mat.rows - 1 ? "]" : "") << std::endl;
+			}
+		}
+	}
+
 	// Labels the given data using the given centers
 	static inline void labelData(const cv::Mat &items_, const cv::Mat &centers_, const MetricPtr &metric_, cv::Mat &labels_)
 	{
