@@ -6,7 +6,6 @@ include_directories(include)
 
 add_library(utils ${UTILS_SRC})
 target_link_libraries(utils
-			metrics
 			${OPENSSL_LIBRARIES}
 			${PCL_LIBRARIES}
 			${YAML_CPP_LIBRARIES}

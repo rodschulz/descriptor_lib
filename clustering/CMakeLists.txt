@@ -13,5 +13,4 @@ SET_SOURCE_FILES_PROPERTIES(
 add_library(clustering ${CLUSTERING_SRC})
 target_link_libraries(clustering
 			utils
-			metrics
 			${OpenCV_LIBS})
