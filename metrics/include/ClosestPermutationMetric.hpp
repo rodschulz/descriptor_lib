@@ -118,7 +118,7 @@ public:
 				float x2 = _vector2.at<float>((baseIndex + j) % _vector1.cols);
 				distance += (x1 - x2) * (x1 - x2);
 			}
-			distance = sqrt(distance);
+			//distance = sqrt(distance); // not sqrt calculation just for efficiency
 
 			// Check if the permutation is closer
 			if (distance < minDistance)
@@ -150,6 +150,33 @@ public:
 	// Validates and fixes the given centers, according to the metric's definition
 	inline void validateCenters(cv::Mat &centers_) const
 	{
+		bool valid;
+		do
+		{
+			// Set flag
+			valid = true;
+
+			// Validate centers
+			for (int i = 0; i < centers_.rows && valid; i++)
+			{
+				for (int j = i + 1; j < centers_.rows; j++)
+				{
+					Permutation permutation = getClosestPermutation(centers_.row(i), centers_.row(j));
+					if (permutation.distance < 1e-5)
+					{
+						std::cout << "WARNING: invalid center found, attempting fix" << std::endl;
+
+						// Update centers to make them valid
+						centers_.row(j) *= 3;
+						centers_.row(j) /= 2;
+
+						// Centers have to be revalidated since a change was done
+						valid = false;
+						break;
+					}
+				}
+			}
+		} while (!valid);
 	}
 
 protected:
