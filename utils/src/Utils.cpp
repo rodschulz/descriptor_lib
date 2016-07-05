@@ -7,6 +7,7 @@
 #include <sstream>
 #include <boost/version.hpp>
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/random/lagged_fibonacci.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/functional/hash.hpp>
@@ -23,12 +24,47 @@
 // Include headers and define generator accordingly
 #if BOOST_MINOR_VERSION <= 46
 #include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 boost::mt19937 generator;
 #else
 #include <boost/random/uniform_int_distribution.hpp>
 boost::random::mt19937 generator;
 #endif
+
+template<typename T1, typename Generator, typename NumberType>
+std::vector<T1> generateRandomSet(const unsigned int size_, const T1 min_, const T1 max_, const bool allowRepetition_)
+{
+	generator.seed(std::rand());
+
+#if BOOST_MINOR_VERSION <= 46
+	NumberType range(min_, max_);
+	boost::variate_generator<Generator&, NumberType> dist(generator, range);
+#else
+	Generator dist(_min, _max);
+#endif
+
+	std::vector<T1> numbers;
+	numbers.reserve(size_);
+
+	std::map<T1, bool> used;
+	while (numbers.size() < size_)
+	{
+#if BOOST_MINOR_VERSION <= 46
+		T1 number = dist();
+#else
+		T1 number = dist(generator);
+#endif
+
+		if (allowRepetition_ || used.find(number) == used.end())
+		{
+			used[number] = true;
+			numbers.push_back(number);
+		}
+	}
+
+	return numbers;
+}
 
 std::string Utils::getWorkingDirectory()
 {
@@ -106,37 +142,22 @@ int Utils::getRandomNumber(const int _min, const int _max)
 #endif
 }
 
-std::vector<int> Utils::getRandomArray(const unsigned int _size, const int _min, const int _max)
+std::vector<float> Utils::getRandomRealArray(const unsigned int size_, const float min_, const float max_, const bool allowRepetition_)
 {
-	generator.seed(std::rand());
-
 #if BOOST_MINOR_VERSION <= 46
-	boost::uniform_int<> range(_min, _max);
-	boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
+	return generateRandomSet<float, boost::mt19937, boost::uniform_real<> >(size_, min_, max_, allowRepetition_);
 #else
-	boost::random::uniform_int_distribution<> dist(_min, _max);
+	return generateRandomSet<float, boost::random::uniform_real_distribution<>, void>(size_, min_, max_, allowRepetition_);
 #endif
+}
 
-	std::vector<int> numbers;
-	numbers.reserve(_size);
-
-	std::map<int, bool> used;
-	while (numbers.size() < _size)
-	{
+std::vector<int> Utils::getRandomIntArray(const unsigned int size_, const int min_, const int max_, const bool allowRepetition_)
+{
 #if BOOST_MINOR_VERSION <= 46
-		int number = dist();
+	return generateRandomSet<int, boost::mt19937, boost::uniform_int<> >(size_, min_, max_, allowRepetition_);
 #else
-		int number = dist(generator);
+	return generateRandomSet<int, boost::random::uniform_int_distribution<>, void>(size_, min_, max_, allowRepetition_);
 #endif
-
-		if (used.find(number) == used.end())
-		{
-			used[number] = true;
-			numbers.push_back(number);
-		}
-	}
-
-	return numbers;
 }
 
 std::string Utils::num2Hex(const size_t _number)

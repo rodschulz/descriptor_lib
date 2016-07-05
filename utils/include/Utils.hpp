@@ -79,8 +79,11 @@ public:
 	// Returns a randomly generated integer between the given ranges
 	static int getRandomNumber(const int _min, const int _max);
 
-	// Returns an array with random numbers
-	static std::vector<int> getRandomArray(const unsigned int _size, const int _min, const int _max);
+	// Returns an array with random floats
+	static std::vector<float> getRandomRealArray(const unsigned int size_, const float min_, const float max_, const bool allowRepetition_);
+
+	// Returns an array with random integers
+	static std::vector<int> getRandomIntArray(const unsigned int _size, const int _min, const int _max, const bool allowRepetition_);
 
 	// Returns a string hex representation of the given number
 	static std::string num2Hex(const size_t _number);

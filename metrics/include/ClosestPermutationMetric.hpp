@@ -85,6 +85,8 @@ public:
 		for (int i = 0; i < newCenters.rows; i++)
 			newCenters.row(i) /= itemsPerCenter_[i];
 
+		validateCenters(newCenters);
+
 		return newCenters;
 	}
 

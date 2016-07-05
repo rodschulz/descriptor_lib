@@ -287,7 +287,7 @@ int KMeans::findClosestCenter(const cv::Mat &_vector, const cv::Mat &_centers, c
 
 void KMeans::getSample(const cv::Mat &_items, cv::Mat &_sample)
 {
-	std::vector<int> randomSet = Utils::getRandomArray(_sample.rows, 0, _items.rows - 1);
+	std::vector<int> randomSet = Utils::getRandomIntArray(_sample.rows, 0, _items.rows - 1, false);
 	for (int j = 0; j < _sample.rows; j++)
 		_items.row(randomSet[j]).copyTo(_sample.row(j));
 }
