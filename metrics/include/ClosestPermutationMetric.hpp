@@ -130,7 +130,7 @@ public:
 				float x2 = _vector2.at<float>((baseIndex + j) % _vector1.cols);
 				distance += (x1 - x2) * (x1 - x2);
 			}
-			//distance = sqrt(distance); // not sqrt calculation just for efficiency
+			distance = sqrt(distance);
 
 			// Check if the permutation is closer
 			if (distance < minDistance)

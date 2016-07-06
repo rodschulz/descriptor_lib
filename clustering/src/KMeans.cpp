@@ -18,28 +18,37 @@
 #define DEBUG_PLOT_CENTERS		"plotCenters" DEBUG_DATA_EXT
 #define DEBUG_PLOT_CENTERS_IMG	"plotCentersImg" DEBUG_DATA_EXT
 
-inline std::pair<std::pair<float, float>, std::pair<float, float> > DEBUG_getLimits(const cv::Mat &items_)
+void DEBUG_getLimits(const cv::Mat &items_, std::pair<std::pair<float, float>, std::pair<float, float> > &limits_, std::pair<float, float> &center_)
 {
-	float minx, miny, maxx, maxy;
-	minx = miny = std::numeric_limits<float>::max();
-	maxx = maxy = -std::numeric_limits<float>::max();
+	float minX, minY, maxX, maxY, meanX, meanY;
+	minX = minY = std::numeric_limits<float>::max();
+	maxX = maxY = -std::numeric_limits<float>::max();
+	meanX = meanY = 0;
+
 	for (int i = 0; i < items_.rows; i++)
 	{
-		if (minx > items_.at<float>(i, 0))
-			minx = items_.at<float>(i, 0);
-		if (maxx < items_.at<float>(i, 0))
-			maxx = items_.at<float>(i, 0);
+		float x = items_.at<float>(i, 0);
+		float y = items_.at<float>(i, 1);
 
-		if (miny > items_.at<float>(i, 1))
-			miny = items_.at<float>(i, 1);
-		if (maxy < items_.at<float>(i, 1))
-			maxy = items_.at<float>(i, 1);
+		meanX += x;
+		meanY += y;
+
+		if (minX > x)
+			minX = x;
+		if (maxX < x)
+			maxX = x;
+
+		if (minY > y)
+			minY = y;
+		if (maxY < y)
+			maxY = y;
 	}
 
-	return std::pair<std::pair<float, float>, std::pair<float, float> >(std::pair<float, float>(minx, maxx), std::pair<float, float>(miny, maxy));
+	limits_ = std::pair<std::pair<float, float>, std::pair<float, float> >(std::pair<float, float>(minX, maxX), std::pair<float, float>(minY, maxY));
+	center_ = std::pair<float, float>(meanX / items_.rows, meanY / items_.rows);
 }
 
-void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const cv::Mat &centers_, const cv::Mat &labels_, const std::pair<std::pair<float, float>, std::pair<float, float> > &limits_, const int attempt_)
+void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const cv::Mat &centers_, const cv::Mat &labels_, const std::pair<std::pair<float, float>, std::pair<float, float> > &limits_, const std::pair<float, float> &center_, const int attempt_)
 {
 	static int img = 0;
 	static int lastAttempt = 0;
@@ -47,9 +56,8 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 	bool centerTitles = Config::get()["kmeans"]["centerTitles"].as<bool>(false);
 	bool dataTitles = Config::get()["kmeans"]["dataTitles"].as<bool>(false);
 	bool identityTitle = Config::get()["kmeans"]["identityTitle"].as<bool>(true);
+	bool useCentroid = boost::iequals(Config::get()["kmeans"]["display"].as<std::string>(), "centroid");
 	float displayFactor = Config::get()["kmeans"]["displayFactor"].as<float>(1);
-
-//	static std::pair<float, float> displayCentroid =
 
 	if (lastAttempt != attempt_)
 		img = 0;
@@ -86,19 +94,19 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 		(*it)->close();
 
 	// Prepare limits to plot
-	float minx = limits_.first.first;
-	float maxx = limits_.first.second;
-	float deltax = maxx - minx > 0 ? maxx - minx : 1;
-	float middlex = (minx + maxx) / 2;
-	minx = middlex - deltax * displayFactor;
-	maxx = middlex + deltax * displayFactor;
+	float minX = limits_.first.first;
+	float maxX = limits_.first.second;
+	float deltaX = maxX - minX > 0 ? maxX - minX : 1;
+	float middleX = (useCentroid ? center_.first : (minX + maxX) / 2);
+	minX = middleX - deltaX * displayFactor;
+	maxX = middleX + deltaX * displayFactor;
 
-	float miny = limits_.second.first;
-	float maxy = limits_.second.second;
-	float deltay = maxy - miny > 0 ? maxy - miny : 1;
-	float middley = (miny + maxy) / 2;
-	miny = middley - deltay * displayFactor;
-	maxy = middley + deltay * displayFactor;
+	float minY = limits_.second.first;
+	float maxY = limits_.second.second;
+	float deltaY = maxY - minY > 0 ? maxY - minY : 1;
+	float middleY = (useCentroid ? center_.second : (minY + maxY) / 2);
+	minY = middleY - deltaY * displayFactor;
+	maxY = middleY + deltaY * displayFactor;
 
 	// Generate script
 	std::fstream scriptFile(DEBUG_DIR DEBUG_PLOT_SCRIPT, std::ofstream::out);
@@ -106,8 +114,8 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 	scriptFile << "set xlabel 'x'\n";
 	scriptFile << "set ylabel 'y'\n\n";
 
-	scriptFile << "set xrange [" << minx << ":" << maxx << "]\n";
-	scriptFile << "set yrange [" << miny << ":" << maxy << "]\n";
+	scriptFile << "set xrange [" << minX << ":" << maxX << "]\n";
+	scriptFile << "set yrange [" << minY << ":" << maxY << "]\n";
 	scriptFile << "set grid ytics xtics\n\n";
 
 	scriptFile << "set key outside\n";
@@ -156,10 +164,11 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 	metric_->setDebug(Config::get()["kmeans"]["debugMetric"].as<bool>(false));
 
 	std::pair<std::pair<float, float>, std::pair<float, float> > limits;
+	std::pair<float, float> center;
 	std::fstream itemCountFile, updateLogFile, pointsAssocFile;
 
 	if (debug2D)
-		limits = DEBUG_getLimits(items_);
+		DEBUG_getLimits(items_, limits, center);
 	if (debugKmeans)
 	{
 		itemCountFile.open(DEBUG_DIR "kmeans_itemsPerCluster", std::ofstream::out);
@@ -169,9 +178,8 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 	/***** DEBUG *****/
 
 	results_.prepare(ncluster_, items_.rows, items_.cols);
-	std::vector<int> itemsPerCenter;
-
 	double minSSE = std::numeric_limits<double>::max();
+
 	for (int i = 0; i < attempts_; i++)
 	{
 		std::cout << "\t** attempt " << i << std::endl;
@@ -187,7 +195,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 
 		/***** DEBUG *****/
 		if (debugKmeans)
-			updateLogFile << "Att:" << i << " it:-\n" << centers << "\n\n";
+			updateLogFile << "Att: " << i << " - It: initial_values\n" << centers << "\n" << std::endl;
 		/***** DEBUG *****/
 
 		// Iterate until the desired max iterations
@@ -208,17 +216,19 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			/***** DEBUG *****/
 			if (debugKmeans)
 			{
-				pointsAssocFile << "Att: " << i << " - it: " << j << "\n";
+				pointsAssocFile << "Att: " << i << " - It: " << j << "\n";
 				for (int k = 0; k < sample.rows; k++)
 					pointsAssocFile << k << " " << labels.at<int>(k) << "\n";
+				pointsAssocFile << std::endl;
 
 				std::vector<int> count = itemsPerCluster(ncluster_, labels);
-				itemCountFile << "Att: " << i << " - it: " << j << "\n";
+				itemCountFile << "Att: " << i << " - It: " << j << "\n";
 				for (size_t k = 0; k < count.size(); k++)
 					itemCountFile << "\tcluster " << k << ": " << count[k] << " points\n";
+				itemCountFile << std::endl;
 			}
 			if (debug2D)
-				DEBUG_generateImage("Initial labeling", sample, centers, labels, limits, i);
+				DEBUG_generateImage("Initial labeling", sample, centers, labels, limits, center, i);
 			/***** DEBUG *****/
 
 			// Store SSE evolution
@@ -233,9 +243,9 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 
 			/***** DEBUG *****/
 			if (debugKmeans)
-				updateLogFile << "Att:" << i << " it:" << j << "\n" << centers << "\n\n";
+				updateLogFile << "Att: " << i << " - It: " << j << " (after_update)\n" << centers << "\n" << std::endl;
 			if (debug2D)
-				DEBUG_generateImage("Updated centers", sample, centers, labels, limits, i);
+				DEBUG_generateImage("Updated centers", sample, centers, labels, limits, center, i);
 			/***** DEBUG *****/
 		}
 
@@ -245,13 +255,13 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 		/***** DEBUG *****/
 		if (debugKmeans)
 		{
-			updateLogFile << "Final state - Att:" << i << " it:-\n" << centers << "\n\n";
+			updateLogFile << "Att: " << i << " - It: final_state\n" << centers << "\n\n";
 			itemCountFile.close();
 			updateLogFile.close();
 			pointsAssocFile.close();
 		}
 		if (debug2D)
-			DEBUG_generateImage("Final state", sample, centers, labels, limits, i);
+			DEBUG_generateImage("Final state", sample, centers, labels, limits, center, i);
 		/***** DEBUG *****/
 
 		if (sse < minSSE)
@@ -261,16 +271,27 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			centers.copyTo(results_.centers);
 			results_.errorEvolution = sseCurve;
 
-			// Update the control variables
-			itemsPerCenter = itemCount;
+			// Update the control variable
 			minSSE = sse;
 		}
 	}
 
-	// Print a short report of the results
+	// Print a report of the results
 	std::cout << "KMeans finished -- SSE: " << minSSE << "\n";
-	for (size_t i = 0; i < itemsPerCenter.size(); i++)
-		std::cout << "\tcluster " << i << ": " << itemsPerCenter[i] << " points\n";
+	std::vector<int> zeroPointClusters;
+
+	std::vector<int> itemCount = itemsPerCluster(ncluster_, results_.labels);
+	for (size_t i = 0; i < itemCount.size(); i++)
+	{
+		if (itemCount[i] == 0)
+			zeroPointClusters.push_back(i);
+		std::cout << "\tcluster " << i << ": " << itemCount[i] << " points\n";
+	}
+
+	// Report zero point clusters
+	std::cout << zeroPointClusters.size() << " clusters with no points" << std::endl;
+	for (size_t i = 0; i < zeroPointClusters.size(); i++)
+		std::cout << "\tcluster " << zeroPointClusters[i] << ": 0 points\n";
 }
 
 bool KMeans::updateCenters(std::vector<int> &_itemCount, cv::Mat &_centers, const cv::Mat &_sample, const cv::Mat _labels, const int _ncluster, const double _stopThreshold, const MetricPtr &_metric)
