@@ -50,4 +50,13 @@ private:
 
 	// Retrieves a sample of data from the given items matrix
 	static inline void getSample(const cv::Mat &_items, cv::Mat &_sample);
+
+	// Counts the number of items per centers according to the given labeling
+	static inline std::vector<int> itemsPerCluster(const int clusterNumber_, const cv::Mat &labels_)
+	{
+		 std::vector<int> count(clusterNumber_, 0);
+		 for (int i = 0; i < labels_.rows; i++)
+			 count[labels_.at<int>(i)]++;
+		 return count;
+	}
 };

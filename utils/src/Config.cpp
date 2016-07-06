@@ -42,10 +42,10 @@ bool Config::load(const std::string &filename_)
 		YAML::Node config = YAML::LoadFile(filename_);
 		getInstance()->config = config;
 
-		getInstance()->debug = config["debug"] ? config["debug"].as<bool>() : false;
-		getInstance()->targetPoint = config["targetPint"] ? config["targetPint"].as<bool>() : -1;
-		getInstance()->normalEstimationRadius = config["normalRadius"] ? config["normalEstimationRadius"].as<double>() : -1;
-		getInstance()->cacheLocation = config["cacheLocation"] ? config["cacheLocation"].as<std::string>() : "";
+		getInstance()->debug = config["debug"].as<bool>(false);
+		getInstance()->targetPoint = config["targetPoint"].as<bool>(-1);
+		getInstance()->normalEstimationRadius = config["normalEstimationRadius"].as<double>(-1);
+		getInstance()->cacheLocation = config["cacheLocation"].as<std::string>("");
 
 		if (config["descriptor"])
 		{

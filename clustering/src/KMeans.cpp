@@ -12,8 +12,6 @@
 #include "ClusteringUtils.hpp"
 
 /********** DEBUG DATA GENERATION METHODS **********/
-#define DEBUG_CENTER_TITLE		false
-#define DEBUG_FOLDER			"./output/"
 #define DEBUG_DATA_EXT			".dat"
 #define DEBUG_PLOT_SCRIPT		"plot.script"
 #define DEBUG_PLOT_DATA			"plotItems"
@@ -46,12 +44,19 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 	static int img = 0;
 	static int lastAttempt = 0;
 
+	bool centerTitles = Config::get()["kmeans"]["centerTitles"].as<bool>(false);
+	bool dataTitles = Config::get()["kmeans"]["dataTitles"].as<bool>(false);
+	bool identityTitle = Config::get()["kmeans"]["identityTitle"].as<bool>(true);
+	float displayFactor = Config::get()["kmeans"]["displayFactor"].as<float>(1);
+
+//	static std::pair<float, float> displayCentroid =
+
 	if (lastAttempt != attempt_)
 		img = 0;
 
 	// Write centers to file
-	std::fstream centersFile(DEBUG_FOLDER DEBUG_PLOT_CENTERS, std::ofstream::out);
-	std::fstream centersImgFile(DEBUG_FOLDER DEBUG_PLOT_CENTERS_IMG, std::ofstream::out);
+	std::fstream centersFile(DEBUG_DIR DEBUG_PLOT_CENTERS, std::ofstream::out);
+	std::fstream centersImgFile(DEBUG_DIR DEBUG_PLOT_CENTERS_IMG, std::ofstream::out);
 	for (int i = 0; i < centers_.rows; i++)
 	{
 		centersFile << std::fixed << std::setprecision(6) << centers_.at<float>(i, 0) << " " << centers_.at<float>(i, 1) << "\t";
@@ -67,7 +72,7 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 	std::vector<std::fstream *> files;
 	files.reserve(centers_.rows);
 	for (int i = 0; i < centers_.rows; i++)
-		files.push_back(new std::fstream(((std::string) DEBUG_FOLDER DEBUG_PLOT_DATA + boost::lexical_cast<std::string>(i) + DEBUG_DATA_EXT).c_str(), std::ofstream::out));
+		files.push_back(new std::fstream(((std::string) DEBUG_DIR DEBUG_PLOT_DATA + boost::lexical_cast<std::string>(i) + DEBUG_DATA_EXT).c_str(), std::ofstream::out));
 
 	// Write data to files
 	for (int i = 0; i < items_.rows; i++)
@@ -81,7 +86,6 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 		(*it)->close();
 
 	// Prepare limits to plot
-	float displayFactor = 1.25;
 	float minx = limits_.first.first;
 	float maxx = limits_.first.second;
 	float deltax = maxx - minx > 0 ? maxx - minx : 1;
@@ -97,7 +101,7 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 	maxy = middley + deltay * displayFactor;
 
 	// Generate script
-	std::fstream scriptFile(DEBUG_FOLDER DEBUG_PLOT_SCRIPT, std::ofstream::out);
+	std::fstream scriptFile(DEBUG_DIR DEBUG_PLOT_SCRIPT, std::ofstream::out);
 	scriptFile << "set title '" << title_ << " - img:" << img << " - att:" << attempt_ << "'\n";
 	scriptFile << "set xlabel 'x'\n";
 	scriptFile << "set ylabel 'y'\n\n";
@@ -108,24 +112,24 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 
 	scriptFile << "set key outside\n";
 	scriptFile << "set terminal pngcairo dashed size 1280,720 enhanced font 'Verdana,9'\n";
-	scriptFile << "set output '" DEBUG_FOLDER << std::setfill('0') << std::setw(2) << attempt_ << "_" << std::setw(4) << img << ".png'\n\n";
+	scriptFile << "set output '" DEBUG_DIR << std::setfill('0') << std::setw(2) << attempt_ << "_" << std::setw(4) << img << ".png'\n\n";
 
 	scriptFile << "plot \\\n";
-	scriptFile << "x title 'Identity' lt 2 lc rgb 'black', \\\n";
+	scriptFile << "x " << (identityTitle ? "title 'Identity'" : "notitle") << " lt 2 lc rgb 'black', \\\n";
 
 	for (int i = 0; i < centers_.rows; i++)
 		if (nPerCenter[i] > 0)
-			scriptFile << "'" DEBUG_FOLDER DEBUG_PLOT_DATA << i << DEBUG_DATA_EXT "' using 1:2 title 'cluster " << i << "' pt 7 ps 1 lc rgb '#" << Utils::num2Hex(Utils::palette35(i)) << "', \\\n";
+			scriptFile << "'" DEBUG_DIR DEBUG_PLOT_DATA << i << DEBUG_DATA_EXT << "' using 1:2 " << (dataTitles ? "title 'cluster " + boost::lexical_cast<std::string>(i) + "'" : "notitle") << " pt 7 ps 1 lc rgb '#" << Utils::num2Hex(Utils::palette35(i)) << "', \\\n";
 
 	for (int i = 0; i < centers_.rows; i++)
-		scriptFile << "'" DEBUG_FOLDER DEBUG_PLOT_CENTERS "' using " << (2 * i) + 1 << ":" << (2 * i) + 2 << (DEBUG_CENTER_TITLE ? " title 'center " + boost::lexical_cast<std::string>(i) + "'" : "notitle") << " pt 2 ps 2 lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette35(i)) << "', \\\n";
+		scriptFile << "'" DEBUG_DIR DEBUG_PLOT_CENTERS "' using " << (2 * i) + 1 << ":" << (2 * i) + 2 << " " << (centerTitles ? "title 'center " + boost::lexical_cast<std::string>(i) + "'" : "notitle") << " pt 2 ps 2 lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette35(i)) << "', \\\n";
 
 	for (int i = 0; i < centers_.rows; i++)
-		scriptFile << "'" DEBUG_FOLDER DEBUG_PLOT_CENTERS_IMG "' using " << (2 * i) + 1 << ":" << (2 * i) + 2 << (DEBUG_CENTER_TITLE ? " title 'center " + boost::lexical_cast<std::string>(i) + "'" : "notitle") << " pt 1 ps 2 lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette35(i)) << "'" << (i == centers_.rows - 1 ? "" : ", \\") << "\n";
+		scriptFile << "'" DEBUG_DIR DEBUG_PLOT_CENTERS_IMG "' using " << (2 * i) + 1 << ":" << (2 * i) + 2 << " " << (centerTitles ? "title 'center " + boost::lexical_cast<std::string>(i) + "'" : "notitle") << " pt 1 ps 2 lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette35(i)) << "'" << (i == centers_.rows - 1 ? "" : ", \\") << "\n";
 
 	scriptFile.close();
 
-	std::string cmd = "gnuplot " DEBUG_FOLDER DEBUG_PLOT_SCRIPT;
+	std::string cmd = "gnuplot " DEBUG_DIR DEBUG_PLOT_SCRIPT;
 	if (system(cmd.c_str()) != 0)
 		std::cout << "WARNING, bad return for command: " << cmd << "\n";
 
@@ -146,11 +150,23 @@ void KMeans::stochasticSearchClusters(ClusteringResults &_results, const cv::Mat
 
 void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const MetricPtr &metric_, const int ncluster_, const int attempts_, const int maxIterations_, const double stopThreshold_, const int sampleSize_)
 {
-	bool debug = Config::debugEnabled() && items_.cols == 2;
-	std::pair<std::pair<float, float>, std::pair<float, float> > limits;
+	/***** DEBUG *****/
+	bool debugKmeans = Config::get()["kmeans"]["debugAlgorith"].as<bool>(false);
+	bool debug2D = debugKmeans && items_.cols == 2;
+	metric_->setDebug(Config::get()["kmeans"]["debugMetric"].as<bool>(false));
 
-	if (debug)
+	std::pair<std::pair<float, float>, std::pair<float, float> > limits;
+	std::fstream itemCountFile, updateLogFile, pointsAssocFile;
+
+	if (debug2D)
 		limits = DEBUG_getLimits(items_);
+	if (debugKmeans)
+	{
+		itemCountFile.open(DEBUG_DIR "kmeans_itemsPerCluster", std::ofstream::out);
+		updateLogFile.open(DEBUG_DIR "kmeans_updateCentersLog", std::ofstream::out);
+		pointsAssocFile.open(DEBUG_DIR "kmeans_pointsAssociation", std::ofstream::out);
+	}
+	/***** DEBUG *****/
 
 	results_.prepare(ncluster_, items_.rows, items_.cols);
 	std::vector<int> itemsPerCenter;
@@ -169,8 +185,10 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 		getSample(items_, centers);
 		metric_->validateCenters(centers);
 
-		//if (debug)
-		//	ClusteringUtils::print<float>(centers);
+		/***** DEBUG *****/
+		if (debugKmeans)
+			updateLogFile << "Att:" << i << " it:-\n" << centers << "\n\n";
+		/***** DEBUG *****/
 
 		// Iterate until the desired max iterations
 		std::vector<int> itemCount;
@@ -187,11 +205,21 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			for (int k = 0; k < sample.rows; k++)
 				labels.at<int>(k) = findClosestCenter(sample.row(k), centers, metric_);
 
-			if (debug)
+			/***** DEBUG *****/
+			if (debugKmeans)
 			{
-				//ClusteringUtils::print<int>(labels);
-				DEBUG_generateImage("Initial labeling", sample, centers, labels, limits, i);
+				pointsAssocFile << "Att: " << i << " - it: " << j << "\n";
+				for (int k = 0; k < sample.rows; k++)
+					pointsAssocFile << k << " " << labels.at<int>(k) << "\n";
+
+				std::vector<int> count = itemsPerCluster(ncluster_, labels);
+				itemCountFile << "Att: " << i << " - it: " << j << "\n";
+				for (size_t k = 0; k < count.size(); k++)
+					itemCountFile << "\tcluster " << k << ": " << count[k] << " points\n";
 			}
+			if (debug2D)
+				DEBUG_generateImage("Initial labeling", sample, centers, labels, limits, i);
+			/***** DEBUG *****/
 
 			// Store SSE evolution
 			sseCurve.push_back(KMeans::getSSE(items_, labels, centers, metric_));
@@ -203,18 +231,28 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 				break;
 			}
 
-			if (debug)
-			{
-				//ClusteringUtils::print<float>(centers);
+			/***** DEBUG *****/
+			if (debugKmeans)
+				updateLogFile << "Att:" << i << " it:" << j << "\n" << centers << "\n\n";
+			if (debug2D)
 				DEBUG_generateImage("Updated centers", sample, centers, labels, limits, i);
-			}
+			/***** DEBUG *****/
 		}
 
 		double sse = KMeans::getSSE(items_, labels, centers, metric_);
 		std::cout << "\tSSE: " << std::fixed << sse << std::endl;
 
-		if (debug)
+		/***** DEBUG *****/
+		if (debugKmeans)
+		{
+			updateLogFile << "Final state - Att:" << i << " it:-\n" << centers << "\n\n";
+			itemCountFile.close();
+			updateLogFile.close();
+			pointsAssocFile.close();
+		}
+		if (debug2D)
 			DEBUG_generateImage("Final state", sample, centers, labels, limits, i);
+		/***** DEBUG *****/
 
 		if (sse < minSSE)
 		{
@@ -263,18 +301,11 @@ int KMeans::findClosestCenter(const cv::Mat &_vector, const cv::Mat &_centers, c
 {
 	int closestCenter = -1;
 
-	//std::cout << "vector\n";
-	//ClusteringUtils::print<float>(_vector);
-
 	// Find the closest centroid for the current descriptor
 	double minDist = std::numeric_limits<double>::max();
 	for (int i = 0; i < _centers.rows; i++)
 	{
 		double distance = _metric->distance(_vector, _centers.row(i));
-
-		//std::cout << "center (d=" << distance << ")\n";
-		//ClusteringUtils::print<float>(_centers.row(i));
-
 		if (distance < minDist)
 		{
 			minDist = distance;

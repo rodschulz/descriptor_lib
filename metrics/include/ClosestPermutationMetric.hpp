@@ -82,6 +82,15 @@ public:
 			itemsPerCenter_[clusterIndex] += 1;
 		}
 
+		/***** DEBUG *****/
+		if (debugEnabled)
+		{
+			for (int i = 0; i < newCenters.rows; i++)
+				if (itemsPerCenter_[i] == 0)
+					std::cout << "Zero!!" << std::endl;
+		}
+		/***** DEBUG *****/
+
 		for (int i = 0; i < newCenters.rows; i++)
 			newCenters.row(i) /= itemsPerCenter_[i];
 
@@ -164,10 +173,17 @@ public:
 			{
 				for (int j = i + 1; j < centers_.rows; j++)
 				{
+					// If there's an image center, then the closest permutarion should be quite close
 					Permutation permutation = getClosestPermutation(centers_.row(i), centers_.row(j));
+
+					/***** DEBUG *****/
+					if (debugEnabled && permutation.distance < 1)
+						std::cout << i << "-" << j << ": " << permutation.distance << std::endl;
+					/***** DEBUG *****/
+
 					if (permutation.distance < 1e-5)
 					{
-						std::cout << "WARNING: invalid center found, attempting fix" << std::endl;
+						std::cout << "WARNING: image centers (" << i << "-" << j << "), attempting fix" << std::endl;
 
 						// Update centers to make them valid
 						centers_.row(j) *= 3;

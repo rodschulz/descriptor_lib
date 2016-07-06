@@ -167,7 +167,7 @@ void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_pla
 			}
 		}
 	}
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *targetPlane);
+	pcl::io::savePCDFileASCII(OUTPUT_DIR DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *targetPlane);
 }
 
 void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line, const float _limit, const std::string &_filename, const PointColor &_color)
@@ -181,7 +181,7 @@ void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float,
 		lineCloud->push_back(PointFactory::createPointXYZRGB(point.x(), point.y(), point.z(), _color));
 	}
 
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *lineCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_DIR DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *lineCloud);
 }
 
 std::pair<float, float> Extractor::DEBUG_getDebugGenerationLimit(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)

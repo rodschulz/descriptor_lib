@@ -11,7 +11,7 @@ enum MetricType
 {
 	METRIC_EUCLIDEAN, METRIC_CLOSEST_PERMUTATION, METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE
 };
-static std::string metricType[] = {BOOST_STRINGIZE(METRIC_EUCLIDEAN), BOOST_STRINGIZE(METRIC_CLOSEST_PERMUTATION), BOOST_STRINGIZE(METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE)};
+static std::string metricType[] = { BOOST_STRINGIZE(METRIC_EUCLIDEAN), BOOST_STRINGIZE(METRIC_CLOSEST_PERMUTATION), BOOST_STRINGIZE(METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE) };
 
 // Metric class definition
 class Metric
@@ -39,11 +39,24 @@ public:
 		return calculateCenters(_clusterNumber, _items, _labels, itemCount);
 	}
 
+	// Enables/disabled the debug generation
+	void setDebug(const bool &status_)
+	{
+		debugEnabled = status_;
+	}
+
 protected:
 	// Constructor
-	Metric(){};
+	Metric()
+	{
+		debugEnabled = false;
+	}
 	// Destructor
-	virtual ~Metric(){};
+	virtual ~Metric()
+	{
+	}
+	// Debug generation flag
+	bool debugEnabled;
 };
 
 // Metric's shared pointer

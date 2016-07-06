@@ -18,10 +18,10 @@
 #include "Config.hpp"
 
 #define MATRIX_DIMENSIONS			"dims"
-#define SCRIPT_HISTOGRAM_NAME       OUTPUT_FOLDER "histogramPlot.script"
-#define SCRIPT_SSE_NAME             OUTPUT_FOLDER "ssePlot.script"
-#define HISTOGRAM_DATA_FILE         OUTPUT_FOLDER "histogram.dat"
-#define SSE_DATA_FILE               OUTPUT_FOLDER "sse.dat"
+#define SCRIPT_HISTOGRAM_NAME       OUTPUT_DIR "histogramPlot.script"
+#define SCRIPT_SSE_NAME             OUTPUT_DIR "ssePlot.script"
+#define HISTOGRAM_DATA_FILE         OUTPUT_DIR "histogram.dat"
+#define SSE_DATA_FILE               OUTPUT_DIR "sse.dat"
 
 void Writer::writeHistogram(const std::string &_filename, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
@@ -117,7 +117,7 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 	output << "set style data linespoints\n\n";
 
 	output << "set term png\n";
-	output << "set output '" << OUTPUT_FOLDER << _filename << ".png'\n\n";
+	output << "set output '" << OUTPUT_DIR << _filename << ".png'\n\n";
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)
@@ -129,30 +129,30 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const DescriptorParams &_params, const int _targetPoint)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::palette35(0));
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "cloud.pcd", *coloredCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_DIR "cloud.pcd", *coloredCloud);
 
 	(*coloredCloud)[_targetPoint].rgb = Utils::getColor(255, 0, 0);
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "pointPosition.pcd", *coloredCloud);
+	pcl::io::savePCDFileASCII(OUTPUT_DIR "pointPosition.pcd", *coloredCloud);
 
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(_bands, _params);
 
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_targetPoint), _params.patchSize);
-	pcl::io::savePCDFileASCII(OUTPUT_FOLDER "patch.pcd", *patch);
+	pcl::io::savePCDFileASCII(OUTPUT_DIR "patch.pcd", *patch);
 
 	std::ofstream sequences;
-	sequences.open(OUTPUT_FOLDER "sequences", std::fstream::out);
+	sequences.open(OUTPUT_DIR "sequences", std::fstream::out);
 
 	for (size_t i = 0; i < _bands.size(); i++)
 	{
 		if (!_bands[i]->data->empty())
 		{
 			char name[100];
-			sprintf(name, OUTPUT_FOLDER "band%d.pcd", (int) i);
+			sprintf(name, OUTPUT_DIR "band%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::palette35(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
-			sprintf(name, OUTPUT_FOLDER "planeBand%d.pcd", (int) i);
+			sprintf(name, OUTPUT_DIR "planeBand%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *planes[i]);
 		}
 	}
@@ -191,7 +191,7 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 	plotScript << "set style data linespoints\n\n";
 
 	plotScript << "set term png\n";
-	plotScript << "set output '" << OUTPUT_FOLDER << _filename << ".png'\n\n";
+	plotScript << "set output '" << OUTPUT_DIR << _filename << ".png'\n\n";
 
 	plotScript << "plot '" << SSE_DATA_FILE << "' using 1:2 title 'SSE'\n";
 

@@ -10,7 +10,8 @@
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
 
-#define OUTPUT_FOLDER			"./output/"
+#define OUTPUT_DIR			"./output/"
+#define DEBUG_DIR			"./debug/"
 #define CLOUD_FILE_EXTENSION	".pcd"
 #define DEBUG_PREFIX			"DEBUG_"
 
