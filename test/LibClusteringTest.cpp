@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(kmeansSSE)
 	centers.at<float>(1,0) = 2.5; centers.at<float>(1,1) = -3;
 	centers.at<float>(2,0) = 4.2; centers.at<float>(2,1) = 3.2;
 
-	double sse = KMeans::getSSE(data, labels, centers, MetricFactory::createMetric(METRIC_EUCLIDEAN));
+	double sse = ClusteringUtils::getSSE(data, labels, centers, MetricFactory::createMetric(METRIC_EUCLIDEAN));
 
 	BOOST_CHECK_CLOSE(15.6, sse, 0.1);
 }

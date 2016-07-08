@@ -10,26 +10,13 @@
 #include <boost/lexical_cast.hpp>
 #include <stdio.h>
 #include "Metric.hpp"
+#include "Utils.hpp"
 
 // SVM's shared pointer
 typedef boost::shared_ptr<CvSVM> CvSVMPtr;
 
 class ClusteringUtils
 {
-private:
-	// Generates a permutation of the given matrix
-	static inline void generatePermutation(const cv::Mat &matrix_, const int permutationSize_, const int permutationNumber_, cv::Mat &permutation_)
-	{
-		int begin = permutationNumber_ * permutationSize_;
-		int end = matrix_.cols;
-		matrix_.colRange(begin, end).copyTo(permutation_.colRange(0, end - begin));
-
-		begin = 0;
-		end = permutationNumber_ * permutationSize_;
-		if (end - begin > 0)
-			matrix_.colRange(begin, end).copyTo(permutation_.colRange(permutation_.cols - (end - begin), permutation_.cols));
-	}
-
 public:
 	// Prints a matrix in a formated way
 	template<typename T>
@@ -59,6 +46,19 @@ public:
 					std::cout << (i == mat.rows - 1 ? "]" : "") << std::endl;
 			}
 		}
+	}
+
+	// Generates a permutation of the given matrix
+	static inline void generatePermutation(const cv::Mat &matrix_, const int permutationSize_, const int permutationNumber_, cv::Mat &permutation_)
+	{
+		int begin = permutationNumber_ * permutationSize_;
+		int end = matrix_.cols;
+		matrix_.colRange(begin, end).copyTo(permutation_.colRange(0, end - begin));
+
+		begin = 0;
+		end = permutationNumber_ * permutationSize_;
+		if (end - begin > 0)
+			matrix_.colRange(begin, end).copyTo(permutation_.colRange(permutation_.cols - (end - begin), permutation_.cols));
 	}
 
 	// Labels the given data using the given centers
@@ -128,5 +128,45 @@ public:
 		svm->train(trainingData, labels, cv::Mat(), cv::Mat(), svmParams);
 
 		return svm;
+	}
+
+	// Calculates the Sum of Squared Errors for the given centers and labels, using the given metric
+	static inline double getSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, const MetricPtr &_metric)
+	{
+		double sse = 0;
+		for (int i = 0; i < _items.rows; i++)
+		{
+			double norm = _metric->distance(_items.row(i), _centers.row(_labels.at<int>(i)));
+			sse += (norm * norm);
+		}
+
+		return sse;
+	}
+
+	// Retrieves a sample of data from the given items matrix
+	static inline void getSampleItems(const cv::Mat &_items, cv::Mat &_sample)
+	{
+		std::vector<int> randomSet = Utils::getRandomIntArray(_sample.rows, 0, _items.rows - 1, false);
+		for (int j = 0; j < _sample.rows; j++)
+			_items.row(randomSet[j]).copyTo(_sample.row(j));
+	}
+
+	// Counts the number of items per centers according to the given labeling
+	static inline std::vector<int> itemsPerCluster(const int clusterNumber_, const cv::Mat &labels_)
+	{
+		std::vector<int> count(clusterNumber_, 0);
+		for (int i = 0; i < labels_.rows; i++)
+			count[labels_.at<int>(i)]++;
+		return count;
+	}
+
+	// Evaluates if the stop condition has been met for the current data
+	static inline bool evaluateStopCondition(const cv::Mat &oldCenters_, const cv::Mat &newCenters_, const double stopThreshold_, const MetricPtr &metric_)
+	{
+		bool thresholdReached = true;
+		for (int k = 0; k < oldCenters_.rows && thresholdReached; k++)
+			thresholdReached = thresholdReached && (metric_->distance(oldCenters_.row(k), newCenters_.row(k)) < stopThreshold_);
+
+		return thresholdReached;
 	}
 };

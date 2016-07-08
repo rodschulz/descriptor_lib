@@ -218,10 +218,12 @@ ClusteringImplementation Utils::getClusteringImplementation(const std::string &_
 {
 	if (boost::iequals(_type, "opencv"))
 		return CLUSTERING_OPENCV;
-	else if (boost::iequals(_type, "custom"))
-		return CLUSTERING_CUSTOM;
+	else if (boost::iequals(_type, "kmeans"))
+		return CLUSTERING_KMEANS;
 	else if (boost::iequals(_type, "stochastic"))
 		return CLUSTERING_STOCHASTIC;
+	else if (boost::iequals(_type, "kmedoids"))
+		return CLUSTERING_KMEDOIDS;
 	else
 	{
 		std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";

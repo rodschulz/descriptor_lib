@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(getStatType)
 BOOST_AUTO_TEST_CASE(getClusteringImplementation)
 {
  	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("opencv"), CLUSTERING_OPENCV);
- 	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("custom"), CLUSTERING_CUSTOM);
+ 	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("custom"), CLUSTERING_KMEANS);
  	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("stochastic"), CLUSTERING_STOCHASTIC);
 }
 

@@ -143,7 +143,6 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 
 	img++;
 }
-
 /********** DEBUG DATA GENERATION METHODS **********/
 
 void KMeans::searchClusters(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold)
@@ -187,10 +186,10 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 		cv::Mat centers = cv::Mat::zeros(ncluster_, items_.cols, CV_32FC1);
 		cv::Mat sample = sampleSize_ == -1 ? items_ : cv::Mat::zeros(sampleSize_, items_.cols, CV_32SC1);
 		cv::Mat labels = cv::Mat::zeros(sample.rows, 1, CV_32SC1);
-		std::vector<double> sseCurve;
+		std::vector<double> errorCurve;
 
 		// Select some of the elements as the initial centers
-		getSample(items_, centers);
+		ClusteringUtils::getSampleItems(items_, centers);
 		metric_->validateMeans(centers);
 
 		/***** DEBUG *****/
@@ -206,7 +205,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 
 			// Select sample points (if needed)
 			if (sampleSize_ != -1)
-				getSample(items_, sample);
+				ClusteringUtils::getSampleItems(items_, sample);
 
 			// Set labels
 			for (int k = 0; k < sample.rows; k++)
@@ -220,7 +219,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 					pointsAssocFile << k << "\t" << labels.at<int>(k) << "\t" << metric_->distance(sample.row(k), centers.row(labels.at<int>(k))) << "\n";
 				pointsAssocFile << std::endl;
 
-				std::vector<int> count = itemsPerCluster(ncluster_, labels);
+				std::vector<int> count = ClusteringUtils::itemsPerCluster(ncluster_, labels);
 				itemCountFile << "Att: " << i << " - It: " << j << "\n";
 				for (size_t k = 0; k < count.size(); k++)
 					itemCountFile << "\tcluster " << k << ": " << count[k] << " points\n";
@@ -231,7 +230,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			/***** DEBUG *****/
 
 			// Store SSE evolution
-			sseCurve.push_back(KMeans::getSSE(items_, labels, centers, metric_));
+			errorCurve.push_back(ClusteringUtils::getSSE(items_, labels, centers, metric_));
 
 			// Updated centers and check if to stop
 			if (updateCenters(centers, sample, labels, stopThreshold_, metric_))
@@ -248,8 +247,9 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			/***** DEBUG *****/
 		}
 
-		double sse = KMeans::getSSE(items_, labels, centers, metric_);
-		std::cout << "\tSSE: " << std::fixed << sse << std::endl;
+		double error = ClusteringUtils::getSSE(items_, labels, centers, metric_);
+		errorCurve.push_back(error);
+		std::cout << "\tSSE: " << std::fixed << error << std::endl;
 
 		/***** DEBUG *****/
 		if (debugKmeans)
@@ -263,15 +263,15 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			DEBUG_generateImage("Final state", sample, centers, labels, limits, center, i);
 		/***** DEBUG *****/
 
-		if (sse < minSSE)
+		if (error < minSSE)
 		{
 			// Update the results
 			labels.copyTo(results_.labels);
 			centers.copyTo(results_.centers);
-			results_.errorEvolution = sseCurve;
+			results_.errorEvolution = errorCurve;
 
 			// Update the control variable
-			minSSE = sse;
+			minSSE = error;
 		}
 	}
 
@@ -279,7 +279,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 	std::cout << "KMeans finished -- SSE: " << minSSE << "\n";
 	std::vector<int> zeroPointClusters;
 
-	std::vector<int> itemCount = itemsPerCluster(ncluster_, results_.labels);
+	std::vector<int> itemCount = ClusteringUtils::itemsPerCluster(ncluster_, results_.labels);
 	for (size_t i = 0; i < itemCount.size(); i++)
 	{
 		if (itemCount[i] == 0)
@@ -299,7 +299,7 @@ bool KMeans::updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::
 	cv::Mat newCenters = metric_->calculateMeans(centers_.rows, sample_, labels_, centers_);
 
 	// Check if the "displacement" threshold was reached
-	bool stop = evaluateStopCondition(centers_, newCenters, stopThreshold_, metric_);
+	bool stop = ClusteringUtils::evaluateStopCondition(centers_, newCenters, stopThreshold_, metric_);
 
 	// Update centers
 	newCenters.copyTo(centers_);
@@ -308,24 +308,15 @@ bool KMeans::updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::
 	return stop;
 }
 
-bool KMeans::evaluateStopCondition(const cv::Mat &oldCenters_, const cv::Mat &newCenters_, const double stopThreshold_, const MetricPtr &metric_)
-{
-	bool thresholdReached = true;
-	for (int k = 0; k < oldCenters_.rows && thresholdReached; k++)
-		thresholdReached = thresholdReached && (metric_->distance(oldCenters_.row(k), newCenters_.row(k)) < stopThreshold_);
-
-	return thresholdReached;
-}
-
-int KMeans::findClosestCenter(const cv::Mat &_vector, const cv::Mat &_centers, const MetricPtr &_metric)
+int KMeans::findClosestCenter(const cv::Mat &vector_, const cv::Mat &centers_, const MetricPtr &metric_)
 {
 	int closestCenter = -1;
 
 	// Find the closest centroid for the current descriptor
 	double minDist = std::numeric_limits<double>::max();
-	for (int i = 0; i < _centers.rows; i++)
+	for (int i = 0; i < centers_.rows; i++)
 	{
-		double distance = _metric->distance(_vector, _centers.row(i));
+		double distance = metric_->distance(vector_, centers_.row(i));
 		if (distance < minDist)
 		{
 			minDist = distance;
@@ -334,11 +325,4 @@ int KMeans::findClosestCenter(const cv::Mat &_vector, const cv::Mat &_centers, c
 	}
 
 	return closestCenter;
-}
-
-void KMeans::getSample(const cv::Mat &_items, cv::Mat &_sample)
-{
-	std::vector<int> randomSet = Utils::getRandomIntArray(_sample.rows, 0, _items.rows - 1, false);
-	for (int j = 0; j < _sample.rows; j++)
-		_items.row(randomSet[j]).copyTo(_sample.row(j));
 }

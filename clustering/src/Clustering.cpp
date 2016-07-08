@@ -8,6 +8,8 @@
 #include "Utils.hpp"
 #include "PointFactory.hpp"
 #include "KMeans.hpp"
+#include "KMedoids.hpp"
+#include "ClusteringUtils.hpp"
 
 void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_params, ClusteringResults &_results)
 {
@@ -21,12 +23,16 @@ void Clustering::searchClusters(const cv::Mat &_items, const ClusteringParams &_
 			cv::kmeans(_items, _params.clusterNumber, _results.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, _params.maxIterations, _params.stopThreshold), _params.attempts, cv::KMEANS_PP_CENTERS, _results.centers);
 			break;
 
-		case CLUSTERING_CUSTOM:
+		case CLUSTERING_KMEANS:
 			KMeans::searchClusters(_results, _items, _params.metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold);
 			break;
 
 		case CLUSTERING_STOCHASTIC:
 			KMeans::stochasticSearchClusters(_results, _items, _params.metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold, _items.rows / 10);
+			break;
+
+		case CLUSTERING_KMEDOIDS:
+			KMedoids::searchClusters(_results, _items, _params.metric, _params.clusterNumber, _params.attempts, _params.maxIterations, _params.stopThreshold);
 			break;
 	}
 }
@@ -53,7 +59,7 @@ void Clustering::generateElbowGraph(const cv::Mat &_items, const ClusteringParam
 		if (params.implementation == CLUSTERING_OPENCV)
 			sse = Utils::getSSE(_items, results.centers, results.labels);
 		else
-			sse = KMeans::getSSE(_items, results.labels, results.centers, _params.metric);
+			sse = ClusteringUtils::getSSE(_items, results.labels, results.centers, _params.metric);
 
 		data << i << " " << sse << "\n";
 	}
