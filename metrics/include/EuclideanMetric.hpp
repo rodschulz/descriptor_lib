@@ -21,31 +21,31 @@ public:
 	}
 
 	// Returns the distance between the two given vectors according to this metric
-	inline double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+	inline double distance(const cv::Mat &vector1_, const cv::Mat &vector2_) const
 	{
-		if (_vector1.cols != _vector2.cols || _vector1.rows != _vector2.rows)
+		if (vector1_.cols != vector2_.cols || vector1_.rows != vector2_.rows)
 			throw std::runtime_error("Invalid matrix dimensions in distance");
 
-		return cv::norm(_vector1, _vector2);
+		return cv::norm(vector1_, vector2_);
 	}
 
 	// Calculates the center of the given set of items, according to this metric
-	inline cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const
+	inline cv::Mat calculateMeans(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMeans_ = cv::Mat()) const
 	{
-		_itemsPerCenter = std::vector<int>(_clusterNumber, 0);
-		cv::Mat newCenters = cv::Mat::zeros(_clusterNumber, _items.cols, CV_32FC1);
+		std::vector<int> itemCount = std::vector<int>(clusterNumber_, 0);
+		cv::Mat newCenters = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
 
 		// Iterate over labels calculating the
-		for (int i = 0; i < _labels.rows; i++)
+		for (int i = 0; i < labels_.rows; i++)
 		{
-			int clusterIndex = _labels.at<int>(i);
+			int clusterIndex = labels_.at<int>(i);
 
-			newCenters.row(clusterIndex) += _items.row(i);
-			_itemsPerCenter[clusterIndex] += 1;
+			newCenters.row(clusterIndex) += items_.row(i);
+			itemCount[clusterIndex] += 1;
 		}
 
 		for (int i = 0; i < newCenters.rows; i++)
-			newCenters.row(i) /= _itemsPerCenter[i];
+			newCenters.row(i) /= itemCount[i];
 
 		return newCenters;
 	}
@@ -62,8 +62,8 @@ public:
 		return std::vector<std::string>();
 	}
 
-	// Validates and fixes the given centers, according to the metric's definition
-	inline void validateCenters(cv::Mat &centers_) const
+	// Validates and fixes the given means, according to the metric's definition
+	inline void validateMeans(cv::Mat &means_) const
 	{
 	}
 };

@@ -40,10 +40,10 @@ private:
 	static inline void run(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _threshold, const int _sampleSize = -1);
 
 	// Updates the possition of the centers according to the given data labels
-	static inline bool updateCenters(std::vector<int> &_itemCount, cv::Mat &_centers, const cv::Mat &_sample, const cv::Mat _labels, const int _ncluster, const double _stopThreshold, const MetricPtr &_metric);
+	static inline bool updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::Mat labels_, const double stopThreshold_, const MetricPtr &metric_);
 
 	// Evaluates if the stop condition has been met for the current data
-	static inline bool evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, const MetricPtr &_metric);
+	static inline bool evaluateStopCondition(const cv::Mat &oldCenters_, const cv::Mat &newCenters_, const double stopThreshold_, const MetricPtr &metric_);
 
 	// Finds the closest center to each item
 	static inline int findClosestCenter(const cv::Mat &_items, const cv::Mat &_centers, const MetricPtr &_metric);

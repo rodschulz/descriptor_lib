@@ -191,7 +191,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 
 		// Select some of the elements as the initial centers
 		getSample(items_, centers);
-		metric_->validateCenters(centers);
+		metric_->validateMeans(centers);
 
 		/***** DEBUG *****/
 		if (debugKmeans)
@@ -199,7 +199,6 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 		/***** DEBUG *****/
 
 		// Iterate until the desired max iterations
-		std::vector<int> itemCount;
 		for (int j = 0; j < maxIterations_; j++)
 		{
 			if (j % 50 == 0)
@@ -218,7 +217,7 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 			{
 				pointsAssocFile << "Att: " << i << " - It: " << j << "\n";
 				for (int k = 0; k < sample.rows; k++)
-					pointsAssocFile << k << " " << labels.at<int>(k) << "\n";
+					pointsAssocFile << k << "\t" << labels.at<int>(k) << "\t" << metric_->distance(sample.row(k), centers.row(labels.at<int>(k))) << "\n";
 				pointsAssocFile << std::endl;
 
 				std::vector<int> count = itemsPerCluster(ncluster_, labels);
@@ -228,14 +227,14 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 				itemCountFile << std::endl;
 			}
 			if (debug2D)
-				DEBUG_generateImage("Initial labeling", sample, centers, labels, limits, center, i);
+				DEBUG_generateImage("Data labeling", sample, centers, labels, limits, center, i);
 			/***** DEBUG *****/
 
 			// Store SSE evolution
 			sseCurve.push_back(KMeans::getSSE(items_, labels, centers, metric_));
 
 			// Updated centers and check if to stop
-			if (updateCenters(itemCount, centers, sample, labels, ncluster_, stopThreshold_, metric_))
+			if (updateCenters(centers, sample, labels, stopThreshold_, metric_))
 			{
 				std::cout << "\tthreshold reached --> [attempt: " << i << " - iteration: " << j << "]" << std::endl;
 				break;
@@ -294,26 +293,26 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 		std::cout << "\tcluster " << zeroPointClusters[i] << ": 0 points\n";
 }
 
-bool KMeans::updateCenters(std::vector<int> &_itemCount, cv::Mat &_centers, const cv::Mat &_sample, const cv::Mat _labels, const int _ncluster, const double _stopThreshold, const MetricPtr &_metric)
+bool KMeans::updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::Mat labels_, const double stopThreshold_, const MetricPtr &metric_)
 {
 	// Calculate updated positions for the centers
-	cv::Mat newCenters = _metric->calculateCenters(_ncluster, _sample, _labels, _itemCount);
+	cv::Mat newCenters = metric_->calculateMeans(centers_.rows, sample_, labels_, centers_);
 
 	// Check if the "displacement" threshold was reached
-	bool stop = evaluateStopCondition(_centers, newCenters, _stopThreshold, _metric);
+	bool stop = evaluateStopCondition(centers_, newCenters, stopThreshold_, metric_);
 
 	// Update centers
-	newCenters.copyTo(_centers);
+	newCenters.copyTo(centers_);
 
 	// Return the stop
 	return stop;
 }
 
-bool KMeans::evaluateStopCondition(const cv::Mat &_oldCenters, const cv::Mat &_newCenters, const double _threshold, const MetricPtr &_metric)
+bool KMeans::evaluateStopCondition(const cv::Mat &oldCenters_, const cv::Mat &newCenters_, const double stopThreshold_, const MetricPtr &metric_)
 {
 	bool thresholdReached = true;
-	for (int k = 0; k < _oldCenters.rows && thresholdReached; k++)
-		thresholdReached = thresholdReached && (_metric->distance(_oldCenters.row(k), _newCenters.row(k)) < _threshold);
+	for (int k = 0; k < oldCenters_.rows && thresholdReached; k++)
+		thresholdReached = thresholdReached && (metric_->distance(oldCenters_.row(k), newCenters_.row(k)) < stopThreshold_);
 
 	return thresholdReached;
 }

@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+#include "Utils.hpp"
 
 // Metric measuring the closest distance between two vectors, according to the given permutation size
 class ClosestPermutationMetric: public Metric
@@ -49,69 +50,72 @@ public:
 	}
 
 	// Returns the central point amongst the given items, according to the given labels
-	inline cv::Mat calculateCenters(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, std::vector<int> &itemsPerCenter_) const
+	inline cv::Mat calculateMeans(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMeans_ = cv::Mat()) const
 	{
-		itemsPerCenter_ = std::vector<int>(clusterNumber_, 0);
+		std::vector<int> itemCount = std::vector<int>(clusterNumber_, 0);
 
-		// Matrixes holding the first vector used to compare and the new centers
-		cv::Mat firstVector = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
-		cv::Mat newCenters = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
-
-		// Iterate over labels calculating the
-		std::vector<bool> begin(clusterNumber_, true);
+		cv::Mat newMeans = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
 		for (int i = 0; i < labels_.rows; i++)
 		{
-			int clusterIndex = labels_.at<int>(i);
+			int cluster = labels_.at<int>(i);
+			Permutation closest = getClosestPermutation(currentMeans_.row(cluster), items_.row(i));
 
-			// Track if every centroid has got its first element
-			if (begin[clusterIndex])
-			{
-				items_.row(i).copyTo(firstVector.row(clusterIndex));
-				items_.row(i).copyTo(newCenters.row(clusterIndex));
-				begin[clusterIndex] = false;
-			}
-			else
-			{
-				Permutation closestPermutation = getClosestPermutation(firstVector.row(clusterIndex), items_.row(i));
+			// Add the row's value to new center
+			newMeans.row(cluster).colRange(0, newMeans.cols - (closest.index * permutationSize)) += items_.row(i).colRange(closest.index * permutationSize, newMeans.cols);
+			newMeans.row(cluster).colRange(newMeans.cols - (closest.index * permutationSize), newMeans.cols) += items_.row(i).colRange(0, closest.index * permutationSize);
 
-				// Add the row's value to new center
-				newCenters.row(clusterIndex).colRange(0, newCenters.cols - (closestPermutation.index * permutationSize)) += items_.row(i).colRange(closestPermutation.index * permutationSize, newCenters.cols);
-				newCenters.row(clusterIndex).colRange(newCenters.cols - (closestPermutation.index * permutationSize), newCenters.cols) += items_.row(i).colRange(0, closestPermutation.index * permutationSize);
-			}
-
-			itemsPerCenter_[clusterIndex] += 1;
+			itemCount[cluster] += 1;
 		}
 
 		/***** DEBUG *****/
 		if (debugEnabled)
 		{
-			for (int i = 0; i < newCenters.rows; i++)
-				if (itemsPerCenter_[i] == 0)
+			for (int i = 0; i < newMeans.rows; i++)
+				if (itemCount[i] == 0)
 					std::cout << "Zero!!" << std::endl;
 		}
 		/***** DEBUG *****/
 
-		for (int i = 0; i < newCenters.rows; i++)
-			newCenters.row(i) /= itemsPerCenter_[i];
+		for (int i = 0; i < newMeans.rows; i++)
+		{
+			if (itemCount[i] != 0)
+				newMeans.row(i) /= itemCount[i];
+			else
+			{
+				int newCentroid = Utils::getRandomNumber(0, items_.rows);
+				items_.row(newCentroid).copyTo(newMeans.row(i));
+			}
+		}
 
-		validateCenters(newCenters);
+		validateMeans(newMeans);
 
-		return newCenters;
+		return newMeans;
 	}
 
-	// Returns the closest permutation according to this metric's params
-	inline Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+	// Returns the medoid point of the given items, according to the given labels
+	inline cv::Mat calculateMedoids(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMedoids_ = cv::Mat())
+	{
+		cv::Mat newMedoids = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
+		for (int i = 0; i < labels_.rows; i++)
+		{
+		}
+
+		return newMedoids;
+	}
+
+	// Returns the closest permutation of vector2 with respect to vector1, according to this metric's params
+	inline Permutation getClosestPermutation(const cv::Mat &vector1_, const cv::Mat &vector2_) const
 	{
 		// Check if dimensions match
-		if (_vector1.cols != _vector2.cols || _vector1.rows != _vector2.rows)
+		if (vector1_.cols != vector2_.cols || vector1_.rows != vector2_.rows)
 			throw std::runtime_error("Invalid matrix dimensions in distance");
 
 		// Check if dimensions match
-		if (_vector1.cols % permutationSize != 0 && _vector2.cols % permutationSize != 0)
+		if (vector1_.cols % permutationSize != 0 && vector2_.cols % permutationSize != 0)
 			throw std::runtime_error("Permutation size incompatible with vector lenghts");
 
 		// Check dimensions are right (row vectors expected)
-		if (_vector1.cols == 1 || _vector2.cols == 1)
+		if (vector1_.cols == 1 || vector2_.cols == 1)
 			throw std::runtime_error("Column vectors are not supported, only row vectors");
 
 		// Results
@@ -120,14 +124,14 @@ public:
 
 		// Iterate over every possible permutation
 		double distance = 0;
-		int permutationNumber = std::floor(_vector1.cols / permutationSize);
+		int permutationNumber = std::floor(vector1_.cols / permutationSize);
 		for (int i = 0; i < permutationNumber; i++)
 		{
 			int baseIndex = i * permutationSize;
-			for (int j = 0; j < _vector1.cols; j++)
+			for (int j = 0; j < vector1_.cols; j++)
 			{
-				float x1 = _vector1.at<float>(j);
-				float x2 = _vector2.at<float>((baseIndex + j) % _vector1.cols);
+				float x1 = vector1_.at<float>(j);
+				float x2 = vector2_.at<float>((baseIndex + j) % vector1_.cols);
 				distance += (x1 - x2) * (x1 - x2);
 			}
 			distance = sqrt(distance);
@@ -159,8 +163,8 @@ public:
 		return params;
 	}
 
-	// Validates and fixes the given centers, according to the metric's definition
-	inline void validateCenters(cv::Mat &centers_) const
+	// Validates and fixes the given means, according to the metric's definition
+	inline void validateMeans(cv::Mat &means_) const
 	{
 		bool valid;
 		do
@@ -169,12 +173,12 @@ public:
 			valid = true;
 
 			// Validate centers
-			for (int i = 0; i < centers_.rows && valid; i++)
+			for (int i = 0; i < means_.rows && valid; i++)
 			{
-				for (int j = i + 1; j < centers_.rows; j++)
+				for (int j = i + 1; j < means_.rows; j++)
 				{
 					// If there's an image center, then the closest permutarion should be quite close
-					Permutation permutation = getClosestPermutation(centers_.row(i), centers_.row(j));
+					Permutation permutation = getClosestPermutation(means_.row(i), means_.row(j));
 
 					/***** DEBUG *****/
 					if (debugEnabled && permutation.distance < 1)
@@ -186,8 +190,8 @@ public:
 						std::cout << "WARNING: image centers (" << i << "-" << j << "), attempting fix" << std::endl;
 
 						// Update centers to make them valid
-						centers_.row(j) *= 3;
-						centers_.row(j) /= 2;
+						means_.row(j) *= 3;
+						means_.row(j) /= 2;
 
 						// Centers have to be revalidated since a change was done
 						valid = false;

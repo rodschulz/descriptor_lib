@@ -20,8 +20,11 @@ public:
 	// Returns the distance between the given vectors, according to the current metric
 	virtual double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const = 0;
 
-	// Returns the central point amongst the given items, according to the given labels
-	virtual cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const = 0;
+	// Returns the mean point amongst the given items, according to the given labels
+	virtual cv::Mat calculateMeans(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMeans_ = cv::Mat()) const = 0;
+
+	// Returns the medoid point of the given items, according to the given labels
+//	virtual cv::Mat calculateMedoids(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMedoids = cv::Mat());
 
 	// Returns the type of the current metric
 	virtual MetricType getType() const = 0;
@@ -29,15 +32,8 @@ public:
 	// Returns the parameters used to construct the current instance
 	virtual std::vector<std::string> getConstructionParams() const = 0;
 
-	// Validates and fixes the given centers, according to the metric's definition
-	virtual void validateCenters(cv::Mat &centers_) const = 0;
-
-	// Calculates the central point amongst the given items, according to the given labels
-	cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels) const
-	{
-		std::vector<int> itemCount;
-		return calculateCenters(_clusterNumber, _items, _labels, itemCount);
-	}
+	// Validates and fixes the given means, according to the metric's definition
+	virtual void validateMeans(cv::Mat &means_) const = 0;
 
 	// Enables/disabled the debug generation
 	void setDebug(const bool &status_)
@@ -55,6 +51,7 @@ protected:
 	virtual ~Metric()
 	{
 	}
+
 	// Debug generation flag
 	bool debugEnabled;
 };

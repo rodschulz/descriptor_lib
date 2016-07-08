@@ -27,7 +27,7 @@ public:
 	}
 
 	// Returns the central point amongst the given items, according to the given labels
-	inline cv::Mat calculateCenters(const int _clusterNumber, const cv::Mat &_items, const cv::Mat &_labels, std::vector<int> &_itemsPerCenter) const
+	inline cv::Mat calculateMeans(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMeans_ = cv::Mat()) const
 	{
 		throw std::runtime_error("Metric not yet implemented");
 	}
@@ -51,8 +51,8 @@ public:
 		return params;
 	}
 
-	// Validates and fixes the given centers, according to the metric's definition
-	void validateCenters(cv::Mat &centers_) const
+	// Validates and fixes the given means, according to the metric's definition
+	void validateMeans(cv::Mat &means_) const
 	{
 	}
 };
