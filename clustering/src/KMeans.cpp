@@ -158,7 +158,7 @@ void KMeans::stochasticSearchClusters(ClusteringResults &_results, const cv::Mat
 void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const MetricPtr &metric_, const int ncluster_, const int attempts_, const int maxIterations_, const double stopThreshold_, const int sampleSize_)
 {
 	/***** DEBUG *****/
-	bool debugKmeans = Config::get()["kmeans"]["debugAlgorith"].as<bool>(false);
+	bool debugKmeans = Config::get()["kmeans"]["debugAlgorithm"].as<bool>(false);
 	bool debug2D = debugKmeans && items_.cols == 2;
 	metric_->setDebug(Config::get()["kmeans"]["debugMetric"].as<bool>(false));
 
