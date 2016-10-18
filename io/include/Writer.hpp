@@ -23,7 +23,7 @@ public:
 	static void writeClustersCenters(const std::string &_filename, const cv::Mat &_centers, const DescriptorParams &_descriptorParams, const ClusteringParams &_clusteringParams, const CloudSmoothingParams &_smoothingParams);
 
 	// Writes the given BoW matrix to file
-	static void writeBoW(const std::string &_filename, const cv::Mat &_centers, const ClusteringParams &_clusteringParams);
+	static void writeBoW(const std::string &filename_, const cv::Mat &centers_, const ClusteringParams &clusteringParams_, const int nbands_, const int nbins_, const bool bidirectional_);
 
 	// Writes the given descriptor matrix as a cache file
 	static void writeDescriptorsCache(const cv::Mat &_descriptors, const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams);

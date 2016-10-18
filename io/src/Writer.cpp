@@ -23,7 +23,7 @@
 #define HISTOGRAM_DATA_FILE         OUTPUT_DIR "histogram.dat"
 #define SSE_DATA_FILE               OUTPUT_DIR "sse.dat"
 
-void Writer::writeHistogram(const std::string &_filename, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
+void Writer::writeHistogram(const std::string &filename_, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
 {
 	if (!_histograms.empty())
 	{
@@ -72,7 +72,7 @@ void Writer::writeHistogram(const std::string &_filename, const std::string &_hi
 		double step = dimension == ANGLE ? RAD2DEG(_binSize) : _binSize;
 		double lower = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
 		double upper = dimension == ANGLE ? RAD2DEG(_upperBound) : _upperBound;
-		generateHistogramScript(_filename, _histogramTitle, _histograms.size(), step, lower, upper);
+		generateHistogramScript(filename_, _histogramTitle, _histograms.size(), step, lower, upper);
 
 		// Generate data file
 		std::ofstream output;
@@ -89,7 +89,7 @@ void Writer::writeHistogram(const std::string &_filename, const std::string &_hi
 	}
 }
 
-void Writer::generateHistogramScript(const std::string &_filename, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
+void Writer::generateHistogramScript(const std::string &filename_, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
 {
 	std::ofstream output;
 	output.open(SCRIPT_HISTOGRAM_NAME, std::fstream::out);
@@ -117,7 +117,7 @@ void Writer::generateHistogramScript(const std::string &_filename, const std::st
 	output << "set style data linespoints\n\n";
 
 	output << "set term png\n";
-	output << "set output '" << OUTPUT_DIR << _filename << ".png'\n\n";
+	output << "set output '" << OUTPUT_DIR << filename_ << ".png'\n\n";
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)
@@ -164,7 +164,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, DEG2RAD(20), -limit, limit);
 }
 
-void Writer::writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse)
+void Writer::writePlotSSE(const std::string &filename_, const std::string &_plotTitle, const std::vector<double> &_sse)
 {
 	if (_sse.empty())
 	{
@@ -191,7 +191,7 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 	plotScript << "set style data linespoints\n\n";
 
 	plotScript << "set term png\n";
-	plotScript << "set output '" << OUTPUT_DIR << _filename << ".png'\n\n";
+	plotScript << "set output '" << OUTPUT_DIR << filename_ << ".png'\n\n";
 
 	plotScript << "plot '" << SSE_DATA_FILE << "' using 1:2 title 'SSE'\n";
 
@@ -204,7 +204,7 @@ void Writer::writePlotSSE(const std::string &_filename, const std::string &_plot
 		std::cout << "WARNING, bad return for command: " << cmd << "\n";
 }
 
-void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
+void Writer::writeClusteredCloud(const std::string &filename_, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
 {
 	// Color the data according to the clusters
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::palette35(0));
@@ -213,37 +213,37 @@ void Writer::writeClusteredCloud(const std::string &_filename, const pcl::PointC
 		int index = 0;
 		switch (_labels.type())
 		{
-			case CV_16U:
-				 index = (int) _labels.at<unsigned short>(i);
-				break;
+		case CV_16U:
+			index = (int) _labels.at<unsigned short>(i);
+			break;
 
-			case CV_16S:
-				index = (int) _labels.at<short>(i);
-				break;
+		case CV_16S:
+			index = (int) _labels.at<short>(i);
+			break;
 
-			case CV_32S:
-				index = _labels.at<int>(i);
-				break;
+		case CV_32S:
+			index = _labels.at<int>(i);
+			break;
 
-			case CV_32F:
-				index = (int) _labels.at<float>(i);
-				break;
+		case CV_32F:
+			index = (int) _labels.at<float>(i);
+			break;
 
-			case CV_64F:
-				index  = (int) _labels.at<double>(i);
-				break;
+		case CV_64F:
+			index  = (int) _labels.at<double>(i);
+			break;
 
-			default:
-				std::cout << "WARNING: wrong label type" << std::endl;
+		default:
+			std::cout << "WARNING: wrong label type" << std::endl;
 		}
 
 		(*colored)[i].rgba = Utils::palette35(index);
 	}
 
-	pcl::io::savePCDFileASCII(_filename, *colored);
+	pcl::io::savePCDFileASCII(filename_, *colored);
 }
 
-void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat &_items, const cv::Mat &_centers, const cv::Mat &_labels, const MetricPtr &_metric)
+void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat &_items, const cv::Mat &centers_, const cv::Mat &_labels, const MetricPtr &_metric)
 {
 	std::vector<std::pair<int, int> > data; // fist=index - second=cluster
 	for (int i = 0; i < _labels.rows; i++)
@@ -273,13 +273,13 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	// Generate a matrix of distances to the centers
 	int pixels = 40;
 	float maxDistanceToCenter = 0;
-	cv::Mat distToCenters = cv::Mat::zeros(_items.rows, _centers.rows * pixels, CV_32FC1);
+	cv::Mat distToCenters = cv::Mat::zeros(_items.rows, centers_.rows * pixels, CV_32FC1);
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index = data[i].first;
-		for (int j = 0; j < _centers.rows; j++)
+		for (int j = 0; j < centers_.rows; j++)
 		{
-			float distance = (float) _metric->distance(_items.row(index), _centers.row(j));
+			float distance = (float) _metric->distance(_items.row(index), centers_.row(j));
 			distToCenters.row(i).colRange(j * pixels, (j + 1) * pixels) = distance;
 			maxDistanceToCenter = distance > maxDistanceToCenter ? distance : maxDistanceToCenter;
 		}
@@ -311,25 +311,28 @@ void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const std::strin
 	writeMatrix(destination, _descriptors, metadata);
 }
 
-void Writer::writeClustersCenters(const std::string &_filename, const cv::Mat &_centers, const DescriptorParams &_descriptorParams, const ClusteringParams &_clusteringParams, const CloudSmoothingParams &_smoothingParams)
+void Writer::writeClustersCenters(const std::string &filename_, const cv::Mat &centers_, const DescriptorParams &_descriptorParams, const ClusteringParams &clusteringParams_, const CloudSmoothingParams &_smoothingParams)
 {
 	std::vector<std::string> metadata;
 	metadata.push_back(_descriptorParams.toString());
-	metadata.push_back(_clusteringParams.toString());
+	metadata.push_back(clusteringParams_.toString());
 	metadata.push_back(_smoothingParams.toString());
 
-	writeMatrix(_filename, _centers, metadata);
+	writeMatrix(filename_, centers_, metadata);
 }
 
-void Writer::writeBoW(const std::string &_filename, const cv::Mat &_centers, const ClusteringParams &_clusteringParams)
+void Writer::writeBoW(const std::string &filename_, const cv::Mat &centers_, const ClusteringParams &clusteringParams_, const int nbands_, const int nbins_, const bool bidirectional_)
 {
-	std::vector<std::string> metadata;
-	metadata.push_back(Config::getClusteringParams().toString());
+	std::string str = "bandNumber: " + boost::lexical_cast<std::string>(nbands_) + " binNumber: " + boost::lexical_cast<std::string>(nbins_) + " bidirectional: " + boost::lexical_cast<std::string>(bidirectional_);
 
-	Writer::writeMatrix(_filename, _centers, metadata);
+	std::vector<std::string> metadata;
+	metadata.push_back(clusteringParams_.toString());
+	metadata.push_back(str);
+
+	Writer::writeMatrix(filename_, centers_, metadata);
 }
 
-void Writer::saveCloudMatrix(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
+void Writer::saveCloudMatrix(const std::string &filename_, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
 {
 	cv::Mat items = cv::Mat::zeros(_cloud->size(), 3, CV_32FC1);
 	for (size_t i = 0; i < _cloud->size(); i++)
@@ -339,13 +342,13 @@ void Writer::saveCloudMatrix(const std::string &_filename, const pcl::PointCloud
 		items.at<float>(i, 2) = _cloud->at(i).z;
 	}
 
-	Writer::writeMatrix(_filename, items);
+	Writer::writeMatrix(filename_, items);
 }
 
-void Writer::writeMatrix(const std::string &_filename, const cv::Mat &_matrix, const std::vector<std::string> &_metadata)
+void Writer::writeMatrix(const std::string &filename_, const cv::Mat &_matrix, const std::vector<std::string> &_metadata)
 {
 	std::ofstream outputFile;
-	outputFile.open(_filename.c_str(), std::fstream::out);
+	outputFile.open(filename_.c_str(), std::fstream::out);
 
 	// Write metadata header
 	outputFile << "metadata_lines " << _metadata.size() << "\n";

@@ -41,56 +41,56 @@ bool Loader::loadMatrix(const std::string &filename_, cv::Mat &matrix_, std::map
 
 				switch (state)
 				{
-					case READING_METADATA:
-						if (metadataLines < 0)
-							metadataLines = atoi(tokens[1].c_str());
-						else
+				case READING_METADATA:
+					if (metadataLines < 0)
+						metadataLines = atoi(tokens[1].c_str());
+					else
+					{
+						if (metadata_ != NULL)
 						{
-							if (metadata_ != NULL)
+							// Parse metadata
+							for (size_t i = 0; i < tokens.size(); i++)
 							{
-								// Parse metadata
-								for (size_t i = 0; i < tokens.size(); i++)
-								{
-									std::vector<std::string> parts;
-									boost::split(parts, tokens[i], boost::is_any_of(":"), boost::token_compress_on);
-									metadata_->operator [](parts[0]) = parts[1];
-								}
+								std::vector<std::string> parts;
+								boost::split(parts, tokens[i], boost::is_any_of(":"), boost::token_compress_on);
+								metadata_->operator [](parts[0]) = parts[1];
 							}
-							metadataLinesRead++;
+						}
+						metadataLinesRead++;
+					}
+
+					if (metadataLinesRead >= metadataLines)
+						state = READING_DIMENSIONS;
+					break;
+
+				case READING_DIMENSIONS:
+					matrix_ = cv::Mat::zeros(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), CV_32FC1);
+					state = READING_DATA;
+					break;
+
+				case READING_DATA:
+					loadOk = (int) tokens.size() == matrix_.cols;
+					if (!loadOk)
+						break;
+
+					for (size_t col = 0; col < tokens.size(); col++)
+					{
+						// Attempt to covert the strings into numbers
+						float value = 0;
+						try
+						{
+							value = boost::lexical_cast<float>(tokens[col]);
+						}
+						catch (boost::bad_lexical_cast ex_)
+						{
+							std::cout << "\tWARNING: NaN found at (row, col) = (" << row << ", " << col << "). Setting to zero." << std::endl;
 						}
 
-						if (metadataLinesRead >= metadataLines)
-							state = READING_DIMENSIONS;
-						break;
+						matrix_.at<float>(row, col) = value;
+					}
+					row++;
 
-					case READING_DIMENSIONS:
-						matrix_ = cv::Mat::zeros(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()), CV_32FC1);
-						state = READING_DATA;
-						break;
-
-					case READING_DATA:
-						loadOk = (int) tokens.size() == matrix_.cols;
-						if (!loadOk)
-							break;
-
-						for (size_t col = 0; col < tokens.size(); col++)
-						{
-							// Attempt to covert the strings into numbers
-							float value = 0;
-							try
-							{
-								value = boost::lexical_cast<float>(tokens[col]);
-							}
-							catch (boost::bad_lexical_cast ex_)
-							{
-								std::cout << "\tWARNING: NaN found at (row, col) = (" << row << ", " << col << "). Setting to zero." << std::endl;
-							}
-
-							matrix_.at<float>(row, col) = value;
-						}
-						row++;
-
-						break;
+					break;
 				}
 			}
 			cacheFile.close();
@@ -143,26 +143,31 @@ bool Loader::loadCloud(const std::string &filename_, const double normalEstimati
 	return loadOk;
 }
 
-void Loader::traverseDirectory(const std::string &_inputDirectory, std::vector<cv::Mat> &_data, std::pair<int, int> &_dimensions)
+void Loader::traverseDirectory(const std::string &inputDirectory_, std::vector<std::pair<cv::Mat, std::map<std::string, std::string> > > &data_, std::pair<int, int> &dimensions_)
 {
-	boost::filesystem::path target(_inputDirectory);
+	boost::filesystem::path target(inputDirectory_);
 	boost::filesystem::directory_iterator it(target), eod;
-	BOOST_FOREACH(boost::filesystem::path const &filePath, std::make_pair(it, eod)){
-	if (is_regular_file(filePath))
+	BOOST_FOREACH(boost::filesystem::path const & filePath, std::make_pair(it, eod))
 	{
-		if (boost::iequals(filePath.extension().string(), ".dat"))
+		if (is_regular_file(filePath))
 		{
-			std::cout << "Loading: " << filePath.string() << std::endl;
+			if (boost::iequals(filePath.extension().string(), ".dat"))
+			{
+				std::cout << "Loading: " << filePath.string() << std::endl;
 
-			cv::Mat centers;
-			loadCenters(filePath.string(), centers);
-			_data.push_back(centers);
-
-			_dimensions.first += centers.rows;
-			_dimensions.second = std::max(_dimensions.second, centers.cols);
+				cv::Mat centers;
+				std::map<std::string, std::string> metadata;
+				if (loadCenters(filePath.string(), centers, &metadata))
+				{
+					data_.push_back(std::make_pair(centers, metadata));
+					dimensions_.first += centers.rows;
+					dimensions_.second = std::max(dimensions_.second, centers.cols);
+				}
+				else
+					std::cout << "...failed, skipping to next file" << std::endl;
+			}
 		}
+		else
+			traverseDirectory(filePath.string(), data_, dimensions_);
 	}
-	else
-	traverseDirectory(filePath.string(), _data, _dimensions);
-}
 }
