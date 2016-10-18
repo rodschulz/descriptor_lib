@@ -323,7 +323,7 @@ void Writer::writeClustersCenters(const std::string &filename_, const cv::Mat &c
 
 void Writer::writeBoW(const std::string &filename_, const cv::Mat &centers_, const ClusteringParams &clusteringParams_, const int nbands_, const int nbins_, const bool bidirectional_)
 {
-	std::string str = "bandNumber: " + boost::lexical_cast<std::string>(nbands_) + " binNumber: " + boost::lexical_cast<std::string>(nbins_) + " bidirectional: " + boost::lexical_cast<std::string>(bidirectional_);
+	std::string str = "bandNumber: " + boost::lexical_cast<std::string>(nbands_) + " binNumber: " + boost::lexical_cast<std::string>(nbins_) + " bidirectional: " + (bidirectional_ ? "true" : "false");
 
 	std::vector<std::string> metadata;
 	metadata.push_back(clusteringParams_.toString());
