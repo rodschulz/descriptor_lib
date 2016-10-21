@@ -1,6 +1,6 @@
 /**
  * Author: rodrigo
- * 2016     
+ * 2016
  */
 #pragma once
 
@@ -86,8 +86,8 @@ public:
 		classifier_->predict(items_, labels_);
 	}
 
-	// Prepares the clasificator for the labeling process
-	static CvSVMPtr prepareClasificator(const cv::Mat &centers_, const std::map<std::string, std::string> &centersParams_)
+	// Prepares the classificator for the labeling process
+	static CvSVMPtr prepareClassificator(const cv::Mat &centers_, const std::map<std::string, std::string> &centersParams_)
 	{
 		std::vector<std::string> params;
 		std::string metricParams = centersParams_.at("metric");
