@@ -41,7 +41,7 @@ public:
 		return index > 0 ? 'A' + (index - 1) : 'a' - (index + 1);
 	}
 
-	// Calculares the angle between the two given vectors
+	// Calculates the angle between the two given vectors
 	static inline double calculateAngle(const Eigen::Vector3f &_vector1, const Eigen::Vector3f &_vector2, const Eigen::Hyperplane<float, 3> &_plane, const bool _useProjection)
 	{
 		Eigen::Vector3f v2 = _useProjection ? _plane.projection(_vector2).normalized() : _vector2;
