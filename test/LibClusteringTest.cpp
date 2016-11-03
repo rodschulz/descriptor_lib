@@ -20,32 +20,43 @@ BOOST_AUTO_TEST_CASE(labelDataMetric)
 {
 	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
 	// Center 2
-	data.at<float>(0,0) = 4; data.at<float>(0,1) = 3;
-	data.at<float>(3,0) = 3; data.at<float>(3,1) = 3;
-	data.at<float>(5,0) = 4; data.at<float>(5,1) = 2;
-	data.at<float>(7,0) = 5; data.at<float>(7,1) = 4;
-	data.at<float>(10,0) = 5; data.at<float>(10,1) = 4;
+	data.at<float>(0, 0) = 4;
+	data.at<float>(0, 1) = 3;
+	data.at<float>(3, 0) = 3;
+	data.at<float>(3, 1) = 3;
+	data.at<float>(5, 0) = 4;
+	data.at<float>(5, 1) = 2;
+	data.at<float>(7, 0) = 5;
+	data.at<float>(7, 1) = 4;
+	data.at<float>(10, 0) = 5;
+	data.at<float>(10, 1) = 4;
 
 	// Center 0
-	data.at<float>(1,0) = -1; data.at<float>(1,1) = 2;
-	data.at<float>(2,0) = -2; data.at<float>(2,1) = 1;
-	data.at<float>(9,0) = -2; data.at<float>(9,1) = 2;
-	data.at<float>(4,0) = -4; data.at<float>(4,1) = 4;
+	data.at<float>(1, 0) = -1;
+	data.at<float>(1, 1) = 2;
+	data.at<float>(2, 0) = -2;
+	data.at<float>(2, 1) = 1;
+	data.at<float>(9, 0) = -2;
+	data.at<float>(9, 1) = 2;
+	data.at<float>(4, 0) = -4;
+	data.at<float>(4, 1) = 4;
 
 	// Center 1
-	data.at<float>(6,0) = 2; data.at<float>(6,1) = -3;
-	data.at<float>(8,0) = 3; data.at<float>(8,1) = -3;
+	data.at<float>(6, 0) = 2;
+	data.at<float>(6, 1) = -3;
+	data.at<float>(8, 0) = 3;
+	data.at<float>(8, 1) = -3;
 
 	// Centers for labeling
 	cv::Mat centers = cv::Mat::zeros(3, 2, CV_32FC1);
-	centers.at<float>(0,0) = -2.25;
-	centers.at<float>(0,1) = 2.25;
+	centers.at<float>(0, 0) = -2.25;
+	centers.at<float>(0, 1) = 2.25;
 
-	centers.at<float>(1,0) = 2.5;
-	centers.at<float>(1,1) = -3;
+	centers.at<float>(1, 0) = 2.5;
+	centers.at<float>(1, 1) = -3;
 
-	centers.at<float>(2,0) = 4.2;
-	centers.at<float>(2,1) = 3.2;
+	centers.at<float>(2, 0) = 4.2;
+	centers.at<float>(2, 1) = 3.2;
 
 	cv::Mat labels;
 	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN, std::vector<std::string>());
@@ -68,36 +79,47 @@ BOOST_AUTO_TEST_CASE(labelDataSVM)
 {
 	// Centers for labeling
 	cv::Mat center = cv::Mat::zeros(3, 2, CV_32FC1);
-	center.at<float>(0,0) = -2.25;
-	center.at<float>(0,1) = 2.25;
+	center.at<float>(0, 0) = -2.25;
+	center.at<float>(0, 1) = 2.25;
 
-	center.at<float>(1,0) = 2.5;
-	center.at<float>(1,1) = -3;
+	center.at<float>(1, 0) = 2.5;
+	center.at<float>(1, 1) = -3;
 
-	center.at<float>(2,0) = 4.2;
-	center.at<float>(2,1) = 3.2;
+	center.at<float>(2, 0) = 4.2;
+	center.at<float>(2, 1) = 3.2;
 
 	std::map<std::string, std::string> metadata;
 	metadata["metric"] = metricType[METRIC_EUCLIDEAN];
-	CvSVMPtr svm = ClusteringUtils::prepareClasificator(center, metadata);
+	CvSVMPtr svm = ClusteringUtils::prepareClassificator(center, metadata);
 
 	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
 	// Center 2
-	data.at<float>(0,0) = 4; data.at<float>(0,1) = 3;
-	data.at<float>(3,0) = 3; data.at<float>(3,1) = 3;
-	data.at<float>(5,0) = 4; data.at<float>(5,1) = 2;
-	data.at<float>(7,0) = 5; data.at<float>(7,1) = 4;
-	data.at<float>(10,0) = 5; data.at<float>(10,1) = 4;
+	data.at<float>(0, 0) = 4;
+	data.at<float>(0, 1) = 3;
+	data.at<float>(3, 0) = 3;
+	data.at<float>(3, 1) = 3;
+	data.at<float>(5, 0) = 4;
+	data.at<float>(5, 1) = 2;
+	data.at<float>(7, 0) = 5;
+	data.at<float>(7, 1) = 4;
+	data.at<float>(10, 0) = 5;
+	data.at<float>(10, 1) = 4;
 
 	// Center 0
-	data.at<float>(1,0) = -1; data.at<float>(1,1) = 2;
-	data.at<float>(2,0) = -2; data.at<float>(2,1) = 1;
-	data.at<float>(9,0) = -2; data.at<float>(9,1) = 2;
-	data.at<float>(4,0) = -4; data.at<float>(4,1) = 4;
+	data.at<float>(1, 0) = -1;
+	data.at<float>(1, 1) = 2;
+	data.at<float>(2, 0) = -2;
+	data.at<float>(2, 1) = 1;
+	data.at<float>(9, 0) = -2;
+	data.at<float>(9, 1) = 2;
+	data.at<float>(4, 0) = -4;
+	data.at<float>(4, 1) = 4;
 
 	// Center 1
-	data.at<float>(6,0) = 2; data.at<float>(6,1) = -3;
-	data.at<float>(8,0) = 3; data.at<float>(8,1) = -3;
+	data.at<float>(6, 0) = 2;
+	data.at<float>(6, 1) = -3;
+	data.at<float>(8, 0) = 3;
+	data.at<float>(8, 1) = -3;
 
 	cv::Mat labels;
 	ClusteringUtils::labelData(data, svm, labels);
@@ -125,21 +147,32 @@ BOOST_AUTO_TEST_CASE(kmeansSearchClusters)
 {
 	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
 	// Center 2
-	data.at<float>(0,0) = 4; data.at<float>(0,1) = 3;
-	data.at<float>(3,0) = 3; data.at<float>(3,1) = 3;
-	data.at<float>(5,0) = 4; data.at<float>(5,1) = 2;
-	data.at<float>(7,0) = 5; data.at<float>(7,1) = 4;
-	data.at<float>(10,0) = 5; data.at<float>(10,1) = 4;
+	data.at<float>(0, 0) = 4;
+	data.at<float>(0, 1) = 3;
+	data.at<float>(3, 0) = 3;
+	data.at<float>(3, 1) = 3;
+	data.at<float>(5, 0) = 4;
+	data.at<float>(5, 1) = 2;
+	data.at<float>(7, 0) = 5;
+	data.at<float>(7, 1) = 4;
+	data.at<float>(10, 0) = 5;
+	data.at<float>(10, 1) = 4;
 
 	// Center 0
-	data.at<float>(1,0) = -1; data.at<float>(1,1) = 2;
-	data.at<float>(2,0) = -2; data.at<float>(2,1) = 1;
-	data.at<float>(9,0) = -2; data.at<float>(9,1) = 2;
-	data.at<float>(4,0) = -4; data.at<float>(4,1) = 4;
+	data.at<float>(1, 0) = -1;
+	data.at<float>(1, 1) = 2;
+	data.at<float>(2, 0) = -2;
+	data.at<float>(2, 1) = 1;
+	data.at<float>(9, 0) = -2;
+	data.at<float>(9, 1) = 2;
+	data.at<float>(4, 0) = -4;
+	data.at<float>(4, 1) = 4;
 
 	// Center 1
-	data.at<float>(6,0) = 2; data.at<float>(6,1) = -3;
-	data.at<float>(8,0) = 3; data.at<float>(8,1) = -3;
+	data.at<float>(6, 0) = 2;
+	data.at<float>(6, 1) = -3;
+	data.at<float>(8, 0) = 3;
+	data.at<float>(8, 1) = -3;
 
 	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN);
 	ClusteringResults results;
@@ -154,20 +187,20 @@ BOOST_AUTO_TEST_CASE(kmeansSearchClusters)
 	cv::Mat1i index;
 	cv::sortIdx(firstCol, index, cv::SORT_EVERY_COLUMN + cv::SORT_ASCENDING);
 	cv::Mat centers (results.centers.rows, results.centers.cols, results.centers.type());
-	for(int i = 0; i < centers.rows; i++)
-		results.centers.row(i).copyTo(centers.row(index(0,i)));
+	for (int i = 0; i < centers.rows; i++)
+		results.centers.row(i).copyTo(centers.row(index(0, i)));
 
-	BOOST_CHECK_CLOSE(centers.row(0).at<float>(0,0), -2.25, 0.1);
-	BOOST_CHECK_CLOSE(centers.row(0).at<float>(0,1), 2.25, 0.1);
-	BOOST_CHECK_CLOSE(centers.row(1).at<float>(0,0), 2.5, 0.1);
-	BOOST_CHECK_CLOSE(centers.row(1).at<float>(0,1), -3, 0.1);
-	BOOST_CHECK_CLOSE(centers.row(2).at<float>(0,0), 4.2, 0.1);
-	BOOST_CHECK_CLOSE(centers.row(2).at<float>(0,1), 3.2, 0.1);
+	BOOST_CHECK_CLOSE(centers.row(0).at<float>(0, 0), -2.25, 0.1);
+	BOOST_CHECK_CLOSE(centers.row(0).at<float>(0, 1), 2.25, 0.1);
+	BOOST_CHECK_CLOSE(centers.row(1).at<float>(0, 0), 2.5, 0.1);
+	BOOST_CHECK_CLOSE(centers.row(1).at<float>(0, 1), -3, 0.1);
+	BOOST_CHECK_CLOSE(centers.row(2).at<float>(0, 0), 4.2, 0.1);
+	BOOST_CHECK_CLOSE(centers.row(2).at<float>(0, 1), 3.2, 0.1);
 
 	// Sort labels
 	std::vector<int> itemCount(results.centers.rows);
 	std::vector<int> newLabels(results.labels.rows);
-	for(int i = 0; i < results.labels.rows; i++)
+	for (int i = 0; i < results.labels.rows; i++)
 	{
 		itemCount[index(0, results.labels.at<int>(0, i))]++;
 		newLabels[i] = index(0, results.labels.at<int>(0, i));
@@ -196,21 +229,32 @@ BOOST_AUTO_TEST_CASE(kmeansSSE)
 {
 	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
 	// Center 2
-	data.at<float>(0,0) = 4; data.at<float>(0,1) = 3;
-	data.at<float>(3,0) = 3; data.at<float>(3,1) = 3;
-	data.at<float>(5,0) = 4; data.at<float>(5,1) = 2;
-	data.at<float>(7,0) = 5; data.at<float>(7,1) = 4;
-	data.at<float>(10,0) = 5; data.at<float>(10,1) = 4;
+	data.at<float>(0, 0) = 4;
+	data.at<float>(0, 1) = 3;
+	data.at<float>(3, 0) = 3;
+	data.at<float>(3, 1) = 3;
+	data.at<float>(5, 0) = 4;
+	data.at<float>(5, 1) = 2;
+	data.at<float>(7, 0) = 5;
+	data.at<float>(7, 1) = 4;
+	data.at<float>(10, 0) = 5;
+	data.at<float>(10, 1) = 4;
 
 	// Center 0
-	data.at<float>(1,0) = -1; data.at<float>(1,1) = 2;
-	data.at<float>(2,0) = -2; data.at<float>(2,1) = 1;
-	data.at<float>(9,0) = -2; data.at<float>(9,1) = 2;
-	data.at<float>(4,0) = -4; data.at<float>(4,1) = 4;
+	data.at<float>(1, 0) = -1;
+	data.at<float>(1, 1) = 2;
+	data.at<float>(2, 0) = -2;
+	data.at<float>(2, 1) = 1;
+	data.at<float>(9, 0) = -2;
+	data.at<float>(9, 1) = 2;
+	data.at<float>(4, 0) = -4;
+	data.at<float>(4, 1) = 4;
 
 	// Center 1
-	data.at<float>(6,0) = 2; data.at<float>(6,1) = -3;
-	data.at<float>(8,0) = 3; data.at<float>(8,1) = -3;
+	data.at<float>(6, 0) = 2;
+	data.at<float>(6, 1) = -3;
+	data.at<float>(8, 0) = 3;
+	data.at<float>(8, 1) = -3;
 
 	// 2 0 0 2 0 2 1 2 1 0 2
 	cv::Mat labels = cv::Mat::zeros(11, 1, CV_32SC1);
@@ -227,9 +271,12 @@ BOOST_AUTO_TEST_CASE(kmeansSSE)
 	labels.at<int>(10) = 2;
 
 	cv::Mat centers = cv::Mat::zeros(3, 2, CV_32FC1);
-	centers.at<float>(0,0) = -2.25; centers.at<float>(0,1) = 2.25;
-	centers.at<float>(1,0) = 2.5; centers.at<float>(1,1) = -3;
-	centers.at<float>(2,0) = 4.2; centers.at<float>(2,1) = 3.2;
+	centers.at<float>(0, 0) = -2.25;
+	centers.at<float>(0, 1) = 2.25;
+	centers.at<float>(1, 0) = 2.5;
+	centers.at<float>(1, 1) = -3;
+	centers.at<float>(2, 0) = 4.2;
+	centers.at<float>(2, 1) = 3.2;
 
 	double sse = ClusteringUtils::getSSE(data, labels, centers, MetricFactory::createMetric(METRIC_EUCLIDEAN));
 
