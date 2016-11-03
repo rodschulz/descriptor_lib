@@ -43,6 +43,12 @@ public:
 		return getInstance()->debug;
 	}
 
+	// Returns the target point for descriptor evaluation
+	static double getTargetPoint()
+	{
+		return getInstance()->targetPoint;
+	}
+
 	// Returns the normal estimation radius
 	static double getNormalEstimationRadius()
 	{
