@@ -82,6 +82,24 @@ public:
 		return *getInstance()->cloudSmoothingParams;
 	}
 
+	// Returns the cloud smoothing parameters
+	static SyntheticCloudsParams getSyntheticCloudParams()
+	{
+		if (getInstance()->syntheticCloudParams == NULL)
+			throw std::runtime_error("synthetic cloud params not loaded");
+
+		return *getInstance()->syntheticCloudParams;
+	}
+
+	// Returns the cloud smoothing parameters
+	static MetricTestingParams getMetricTestingParams()
+	{
+		if (getInstance()->metricTestingParams == NULL)
+			throw std::runtime_error("metric testing params not loaded");
+
+		return *getInstance()->metricTestingParams;
+	}
+
 private:
 	// Constructor
 	Config();
