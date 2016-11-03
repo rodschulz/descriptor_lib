@@ -121,7 +121,9 @@ void Writer::generateHistogramScript(const std::string &filename_, const std::st
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)
-		output << "'" << HISTOGRAM_DATA_FILE << "' using 1:" << i + 2 << " title 'Band " << i << "', \\\n";
+		output << "'" << HISTOGRAM_DATA_FILE
+			   << "' using 1:" << i + 2 << " title 'Band "
+			   << i << (i == _bandsNumber - 1 ? "'\n" : "', \\\n") ;
 
 	output.close();
 }
