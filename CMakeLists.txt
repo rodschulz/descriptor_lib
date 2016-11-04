@@ -1,6 +1,9 @@
 # Required version
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
+## Print the current build config used
+message(STATUS "${Green}...BUILDING TYPE: '${CMAKE_BUILD_TYPE}'${ColorReset}")
+
 # Colors defined for message
 if(NOT WIN32)
 	string(ASCII 27 Esc)
