@@ -13,10 +13,19 @@
 class Writer
 {
 public:
+	// Generates an image holding with the angle histogram for the given histogram vector
 	static void writeHistogram(const std::string &_filename, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound = -1, const double _upperBound = -1);
+
+	// Generates a set of output files from the given data
 	static void writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const DescriptorParams &_params, const int _targetPoint);
+
+	// Generates a SSE plot
 	static void writePlotSSE(const std::string &_filename, const std::string &_plotTitle, const std::vector<double> &_sse);
+
+	// Generates a colored point cloud, according to the given labels
 	static void writeClusteredCloud(const std::string &_filename, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels);
+
+	// Generates a point-to-points distance matrix
 	static void writeDistanceMatrix(const std::string &_filename, const cv::Mat &_items, const cv::Mat &_centers, const cv::Mat &_labels, const MetricPtr &_metric);
 
 	// Writes the given centers to a file
