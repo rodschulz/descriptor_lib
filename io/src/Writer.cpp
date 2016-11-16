@@ -116,24 +116,26 @@ void Writer::generateHistogramScript(const std::string &filename_, const std::st
 
 	output << "set style data linespoints\n\n";
 
-	output << "set term png\n";
+	output << "set term png  size 1024,768\n";
 	output << "set output '" << OUTPUT_DIR << filename_ << ".png'\n\n";
 
 	output << "plot \\\n";
 	for (int i = 0; i < _bandsNumber; i++)
 		output << "'" << HISTOGRAM_DATA_FILE
 			   << "' using 1:" << i + 2 << " title 'Band "
-			   << i << (i == _bandsNumber - 1 ? "'\n" : "', \\\n") ;
+			   << i
+			   << "' with linespoints lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette12(i + 1)) << "' pt 2"
+			   << (i == _bandsNumber - 1 ? "\n" : ", \\\n") ;
 
 	output.close();
 }
 
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const DescriptorParams &_params, const int _targetPoint)
 {
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::palette35(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::palette12(0));
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "cloud.pcd", *coloredCloud);
 
-	(*coloredCloud)[_targetPoint].rgb = Utils::getColor(255, 0, 0);
+	(*coloredCloud)[_targetPoint].rgba = Utils::getColor(255, 0, 0);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "pointPosition.pcd", *coloredCloud);
 
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(_bands, _params);
@@ -150,7 +152,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 		{
 			char name[100];
 			sprintf(name, OUTPUT_DIR "band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::palette35(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::palette12(i + 1)));
 
 			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
 
