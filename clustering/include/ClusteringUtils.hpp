@@ -49,7 +49,10 @@ public:
 	}
 
 	// Generates a permutation of the given matrix
-	static inline void generatePermutation(const cv::Mat &matrix_, const int permutationSize_, const int permutationNumber_, cv::Mat &permutation_)
+	static inline void generatePermutation(const cv::Mat &matrix_,
+										   const int permutationSize_,
+										   const int permutationNumber_,
+										   cv::Mat &permutation_)
 	{
 		int begin = permutationNumber_ * permutationSize_;
 		int end = matrix_.cols;
@@ -62,7 +65,10 @@ public:
 	}
 
 	// Labels the given data using the given centers
-	static inline void labelData(const cv::Mat &items_, const cv::Mat &centers_, const MetricPtr &metric_, cv::Mat &labels_)
+	static inline void labelData(const cv::Mat &items_,
+								 const cv::Mat &centers_,
+								 const MetricPtr &metric_,
+								 cv::Mat &labels_)
 	{
 		labels_ = cv::Mat::zeros(items_.rows, 1, CV_32SC1);
 		std::vector<double> distance(items_.rows, std::numeric_limits<double>::max());
@@ -81,13 +87,17 @@ public:
 	}
 
 	// Labels the given data using the given SVN as a classifier indicating the label
-	static inline void labelData(const cv::Mat &items_, const CvSVMPtr &classifier_, cv::Mat &labels_)
+	static inline void labelData(const cv::Mat &items_,
+								 const CvSVMPtr &classifier_,
+								 cv::Mat &labels_)
 	{
 		classifier_->predict(items_, labels_);
 	}
 
-	// Prepares the classificator for the labeling process
-	static CvSVMPtr prepareClassificator(const cv::Mat &centers_, const std::map<std::string, std::string> &centersParams_)
+	// Prepares the classifier for the labeling process
+	static CvSVMPtr prepareClassifier(const cv::Mat &centers_,
+									  const std::map<std::string,
+									  std::string> &centersParams_)
 	{
 		std::vector<std::string> params;
 		std::string metricParams = centersParams_.at("metric");
@@ -120,18 +130,21 @@ public:
 		// Set SVM parameters
 		CvSVMParams svmParams;
 		svmParams.svm_type = CvSVM::C_SVC;
-		svmParams.kernel_type = CvSVM::LINEAR;
-		svmParams.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 100, 1e-6);
+		svmParams.kernel_type = CvSVM::RBF; //CvSVM::LINEAR;
+		svmParams.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000, 1e-8);
 
 		// Train the SVM
 		CvSVMPtr svm = CvSVMPtr(new CvSVM());
-		svm->train(trainingData, labels, cv::Mat(), cv::Mat(), svmParams);
+		svm->train_auto(trainingData, labels, cv::Mat(), cv::Mat(), svmParams);
 
 		return svm;
 	}
 
 	// Calculates the Sum of Squared Errors for the given centers and labels, using the given metric
-	static inline double getSSE(const cv::Mat &_items, const cv::Mat &_labels, const cv::Mat &_centers, const MetricPtr &_metric)
+	static inline double getSSE(const cv::Mat &_items,
+								const cv::Mat &_labels,
+								const cv::Mat &_centers,
+								const MetricPtr &_metric)
 	{
 		double sse = 0;
 		for (int i = 0; i < _items.rows; i++)
@@ -144,7 +157,8 @@ public:
 	}
 
 	// Retrieves a sample of data from the given items matrix
-	static inline void getSampleItems(const cv::Mat &_items, cv::Mat &_sample)
+	static inline void getSampleItems(const cv::Mat &_items,
+									  cv::Mat &_sample)
 	{
 		std::vector<int> randomSet = Utils::getRandomIntArray(_sample.rows, 0, _items.rows - 1, false);
 		for (int j = 0; j < _sample.rows; j++)
@@ -152,7 +166,8 @@ public:
 	}
 
 	// Counts the number of items per centers according to the given labeling
-	static inline std::vector<int> itemsPerCluster(const int clusterNumber_, const cv::Mat &labels_)
+	static inline std::vector<int> itemsPerCluster(const int clusterNumber_,
+			const cv::Mat &labels_)
 	{
 		std::vector<int> count(clusterNumber_, 0);
 		for (int i = 0; i < labels_.rows; i++)
@@ -161,7 +176,10 @@ public:
 	}
 
 	// Evaluates if the stop condition has been met for the current data
-	static inline bool evaluateStopCondition(const cv::Mat &oldCenters_, const cv::Mat &newCenters_, const double stopThreshold_, const MetricPtr &metric_)
+	static inline bool evaluateStopCondition(const cv::Mat &oldCenters_,
+			const cv::Mat &newCenters_,
+			const double stopThreshold_,
+			const MetricPtr &metric_)
 	{
 		bool thresholdReached = true;
 		for (int k = 0; k < oldCenters_.rows && thresholdReached; k++)

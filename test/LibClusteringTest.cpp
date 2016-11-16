@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(labelDataSVM)
 
 	std::map<std::string, std::string> metadata;
 	metadata["metric"] = metricType[METRIC_EUCLIDEAN];
-	CvSVMPtr svm = ClusteringUtils::prepareClassificator(center, metadata);
+	CvSVMPtr svm = ClusteringUtils::prepareClassifier(center, metadata);
 
 	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
 	// Center 2
