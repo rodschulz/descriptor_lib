@@ -12,8 +12,10 @@
 #include "Metric.hpp"
 #include "Utils.hpp"
 
-// SVM's shared pointer
-typedef boost::shared_ptr<CvSVM> CvSVMPtr;
+// shared pointers
+typedef boost::shared_ptr<cv::SVM> SVMPtr;
+typedef boost::shared_ptr<cv::Boost> BoostingPtr;
+typedef boost::shared_ptr<cv::NeuralNet_MLP> NeuralNetworkPtr;
 
 class ClusteringUtils
 {
@@ -88,16 +90,16 @@ public:
 
 	// Labels the given data using the given SVN as a classifier indicating the label
 	static inline void labelData(const cv::Mat &items_,
-								 const CvSVMPtr &classifier_,
+								 const SVMPtr &classifier_,
 								 cv::Mat &labels_)
 	{
 		classifier_->predict(items_, labels_);
 	}
 
 	// Prepares the classifier for the labeling process
-	static CvSVMPtr prepareClassifier(const cv::Mat &centers_,
-									  const std::map<std::string,
-									  std::string> &centersParams_)
+	static SVMPtr prepareClassifier(const cv::Mat &centers_,
+									const std::map<std::string,
+									std::string> &centersParams_)
 	{
 		std::vector<std::string> params;
 		std::string metricParams = centersParams_.at("metric");
@@ -129,12 +131,12 @@ public:
 
 		// Set SVM parameters
 		CvSVMParams svmParams;
-		svmParams.svm_type = CvSVM::C_SVC;
-		svmParams.kernel_type = CvSVM::RBF; //CvSVM::LINEAR;
+		svmParams.svm_type = cv::SVM::C_SVC;
+		svmParams.kernel_type = cv::SVM::RBF; //cv::SVM::LINEAR;
 		svmParams.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 1000, 1e-8);
 
 		// Train the SVM
-		CvSVMPtr svm = CvSVMPtr(new CvSVM());
+		SVMPtr svm = SVMPtr(new cv::SVM());
 		svm->train_auto(trainingData, labels, cv::Mat(), cv::Mat(), svmParams);
 
 		return svm;
