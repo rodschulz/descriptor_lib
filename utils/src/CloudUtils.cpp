@@ -3,16 +3,10 @@
  * 2016
  */
 #include "CloudUtils.hpp"
-#include <pcl/filters/filter.h>
 #include <pcl/filters/convolution_3d.h>
 #include <pcl/surface/mls.h>
 #include <pcl/features/normal_3d_omp.h>
 
-void CloudUtils::removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_)
-{
-	std::vector<int> mapping;
-	pcl::removeNaNFromPointCloud(*cloud_, *cloud_, mapping);
-}
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr CloudUtils::gaussianSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
 		const double sigma_,
@@ -79,8 +73,8 @@ pcl::PointCloud<pcl::Normal>::Ptr CloudUtils::estimateNormals(const pcl::PointCl
 	return normals;
 }
 
-cv::Mat CloudUtils::cloudToMatrix(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-								  const bool includeNormals_)
+cv::Mat CloudUtils::toMatrix(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+							 const bool includeNormals_)
 {
 	cv::Mat data = cv::Mat::zeros(cloud_->size(), includeNormals_ ? 7 : 3, CV_32FC1);
 

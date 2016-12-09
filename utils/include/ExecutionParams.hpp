@@ -12,29 +12,57 @@
 #include <boost/algorithm/string/join.hpp>
 #include "Metric.hpp"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Set of enumerations defining some easy-to-read values for some parameters
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 enum SequenceStat
 {
-	STAT_MEAN, STAT_MEDIAN
+	STAT_MEAN,
+	STAT_MEDIAN
 };
-static std::string seqStat[] = {BOOST_STRINGIZE(STAT_MEAN), BOOST_STRINGIZE(STAT_MEAN)};
+static std::string seqStat[] =
+{
+	BOOST_STRINGIZE(STAT_MEAN),
+	BOOST_STRINGIZE(STAT_MEAN)
+};
+
 
 enum ClusteringImplementation
 {
-	CLUSTERING_OPENCV, CLUSTERING_KMEANS, CLUSTERING_STOCHASTIC, CLUSTERING_KMEDOIDS
+	CLUSTERING_OPENCV,
+	CLUSTERING_KMEANS,
+	CLUSTERING_STOCHASTIC,
+	CLUSTERING_KMEDOIDS
 };
-static std::string clusteringImp[] = {BOOST_STRINGIZE(CLUSTERING_OPENCV), BOOST_STRINGIZE(CLUSTERING_KMEANS),  BOOST_STRINGIZE(CLUSTERING_STOCHASTIC), BOOST_STRINGIZE(CLUSTERING_KMEDOIDS)};
+static std::string clusteringImp[] =
+{
+	BOOST_STRINGIZE(CLUSTERING_OPENCV),
+	BOOST_STRINGIZE(CLUSTERING_KMEANS),
+	BOOST_STRINGIZE(CLUSTERING_STOCHASTIC),
+	BOOST_STRINGIZE(CLUSTERING_KMEDOIDS)
+};
+
 
 enum SynCloudType
 {
-	CLOUD_CUBE, CLOUD_CYLINDER, CLOUD_SPHERE, CLOUD_HALF_SPHERE, CLOUD_PLANE
+	CLOUD_CUBE,
+	CLOUD_CYLINDER,
+	CLOUD_SPHERE,
+	CLOUD_HALF_SPHERE,
+	CLOUD_PLANE
 };
-static std::string cloudType[] = {BOOST_STRINGIZE(CLOUD_CUBE), BOOST_STRINGIZE(CLOUD_CYLINDER), BOOST_STRINGIZE(CLOUD_SPHERE), BOOST_STRINGIZE(CLOUD_HALF_SPHERE), BOOST_STRINGIZE(CLOUD_PLANE)};
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+static std::string cloudType[] = {
+	BOOST_STRINGIZE(CLOUD_CUBE),
+	BOOST_STRINGIZE(CLOUD_CYLINDER),
+	BOOST_STRINGIZE(CLOUD_SPHERE),
+	BOOST_STRINGIZE(CLOUD_HALF_SPHERE),
+	BOOST_STRINGIZE(CLOUD_PLANE)
+};
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Set of structures groupping functionality-related parameters
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /**
  * Structure grouping the parameters involved in the descriptor's calculation
  */
@@ -80,18 +108,18 @@ struct DescriptorParams
 		return getBandsAngularRange() / bandNumber;
 	}
 
-	// Returns a string holding the struct's information
+	// Returns a string holding the structure's information
 	std::string toString() const
 	{
 		std::stringstream stream;
 		stream << std::boolalpha
-				<< "patchSize:" << patchSize
-				<< " bandNumber:" << bandNumber
-				<< " bandWidth:" << bandWidth
-				<< " bidirectional:" << bidirectional
-				<< " useProjection:" << useProjection
-				<< " sequenceBin:" << sequenceBin
-				<< " sequenceStat:" << seqStat[sequenceStat];
+			   << "patchSize:" << patchSize
+			   << " bandNumber:" << bandNumber
+			   << " bandWidth:" << bandWidth
+			   << " bidirectional:" << bidirectional
+			   << " useProjection:" << useProjection
+			   << " sequenceBin:" << sequenceBin
+			   << " sequenceStat:" << seqStat[sequenceStat];
 		return stream.str();
 	}
 };
@@ -127,14 +155,14 @@ struct ClusteringParams
 	{
 		std::ostringstream stream;
 		stream << std::boolalpha
-				<< "implementation:" << clusteringImp[implementation]
-				<< " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
-				<< " clusterNumber:" << clusterNumber
-				<< " maxIterations:" << maxIterations
-				<< " stopThreshold:" << stopThreshold
-				<< " attempts:" << attempts
-				<< " generateElbowCurve:" << generateElbowCurve
-				<< " generateDistanceMatrix:" << generateDistanceMatrix;
+			   << "implementation:" << clusteringImp[implementation]
+			   << " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
+			   << " clusterNumber:" << clusterNumber
+			   << " maxIterations:" << maxIterations
+			   << " stopThreshold:" << stopThreshold
+			   << " attempts:" << attempts
+			   << " generateElbowCurve:" << generateElbowCurve
+			   << " generateDistanceMatrix:" << generateDistanceMatrix;
 
 		return stream.str();
 	}
@@ -161,9 +189,9 @@ struct CloudSmoothingParams
 	{
 		std::stringstream stream;
 		stream << std::boolalpha
-				<< "useSmoothing:" << useSmoothing
-				<< " sigma:" << sigma
-				<< " radius:" << radius;
+			   << "useSmoothing:" << useSmoothing
+			   << " sigma:" << sigma
+			   << " radius:" << radius;
 		return stream.str();
 	}
 };
@@ -187,8 +215,8 @@ struct SyntheticCloudsParams
 	{
 		std::stringstream stream;
 		stream << std::boolalpha
-				<< "useSynthetic:" << useSynthetic
-				<< " synCloudType:" << cloudType[synCloudType];
+			   << "useSynthetic:" << useSynthetic
+			   << " synCloudType:" << cloudType[synCloudType];
 		return stream.str();
 	}
 };

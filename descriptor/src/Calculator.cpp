@@ -35,7 +35,8 @@ Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNorma
 }
 
 void Calculator::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									  const DescriptorParams &params_, cv::Mat &descriptors_)
+									  const DescriptorParams &params_,
+									  cv::Mat &descriptors_)
 {
 	int sequenceSize = params_.getSequenceLength();
 

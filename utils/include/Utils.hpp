@@ -12,6 +12,7 @@
 #include <Eigen/Geometry>
 #include "ExecutionParams.hpp"
 
+
 // Colors defined to be used for points
 typedef enum PointColor
 {
@@ -67,6 +68,7 @@ typedef enum PointColor
 	COLOR_BREWER_QUALITATIVE_BROWN = 0xB15928,
 } PointColor;
 
+
 // Color palettes definitions
 static uint32_t colorPalette12[12] = {
 	COLOR_BREWER_QUALITATIVE_SKYBLUE,
@@ -121,55 +123,71 @@ static uint32_t colorPalette35[35] = {
 	COLOR_WHITE
 };
 
+
 // Utils class definition
 class Utils
 {
 public:
-	// Returns the current application's working directory
+	/**************************************************/
 	static std::string getWorkingDirectory();
 
-	// Returns a string with the hex representation of the hash calculated for the current params instance
-	static std::string getCalculationConfigHash(const std::string _inputCloudFile, const double normalEstimationRadius_, const DescriptorParams &descriptorParams_, const CloudSmoothingParams &smoothingParams_);
+	/**************************************************/
+	static std::string getCalculationConfigHash(const std::string _inputCloudFile,
+			const double normalEstimationRadius_,
+			const DescriptorParams &descriptorParams_,
+			const CloudSmoothingParams &smoothingParams_);
 
-	// Returns the MD5 checksum for the named file
+	/**************************************************/
 	static std::string getFileChecksum(const std::string filename_);
 
-	// Returns a randomly generated integer between the given ranges
-	static int getRandomNumber(const int _min, const int _max);
+	/**************************************************/
+	static int getRandomNumber(const int _min,
+							   const int _max);
 
-	// Returns an array with random floats
-	static std::vector<float> getRandomRealArray(const unsigned int size_, const float min_, const float max_, const bool allowRepetition_);
+	/**************************************************/
+	static std::vector<float> getRandomRealArray(const unsigned int size_,
+			const float min_,
+			const float max_,
+			const bool allowRepetition_);
 
-	// Returns an array with random integers
-	static std::vector<int> getRandomIntArray(const unsigned int _size, const int _min, const int _max, const bool allowRepetition_);
+	/**************************************************/
+	static std::vector<int> getRandomIntArray(const unsigned int _size,
+			const int _min,
+			const int _max,
+			const bool allowRepetition_);
 
-	// Returns a string hex representation of the given number
+	/**************************************************/
 	static std::string num2Hex(const size_t _number);
 
-	// Returns a float representation fo the given RGB color
-	static inline uint32_t getColor(const uint8_t _r, const uint8_t _g, const uint8_t _b)
+	/**************************************************/
+	static inline uint32_t getColor(const uint8_t _r,
+									const uint8_t _g,
+									const uint8_t _b)
 	{
 		uint32_t color = ((0x00 << 24) | (uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
 		return color;
 	}
 
-	// Returns a color from the built-in color pallete (12 colors available)
+	/**************************************************/
 	static inline uint32_t palette12(const int _index)
 	{
 		return colorPalette12[_index % 12];
 	}
 
-	// Returns a color from the built-in color pallete (35 colors available)
+	/**************************************************/
 	static inline uint32_t palette35(const int _index)
 	{
 		return colorPalette35[_index % 35];
 	}
 
-	// Generates a pair of arbitrary points in the given plane, both defining a couple of perpendicular vectors when the difference from the plane's origin is used
-	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_, const Eigen::Vector3f &point_);
+	/**************************************************/
+	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_,
+			const Eigen::Vector3f &point_);
 
-	// Calculates the Sum of Squared Errors indicator for the given vectors over the given centers, using the given labeling
-	static inline double getSSE(const cv::Mat &_vectors, const cv::Mat &centers_, const cv::Mat &labels_)
+	/**************************************************/
+	static inline double getSSE(const cv::Mat &_vectors,
+								const cv::Mat &centers_,
+								const cv::Mat &labels_)
 	{
 		double sse = 0;
 		for (int i = 0; i < _vectors.rows; i++)
@@ -181,20 +199,23 @@ public:
 		return sse;
 	}
 
-	// Returns +1 if the sign of the given value is positive, -1 if it's negative, and 0 when it's 0
+	/**************************************************/
 	template<typename T> static inline int sign(T val)
 	{
 		return (T(0) < val) - (val < T(0));
 	}
 
-	// Calculates the angle between the two given vectors
-	template<class T> static inline double angle(const T &vector1_, const T &vector2_)
+	/**************************************************/
+	template<class T> static inline double angle(const T &vector1_,
+			const T &vector2_)
 	{
 		return atan2(vector1_.cross(vector2_).norm(), vector1_.dot(vector2_));
 	}
 
-	// Returns the signed angle between the two given vectors
-	template<class T> static inline double signedAngle(const T &vector1_, const T &vector2_, const T &_normal)
+	/**************************************************/
+	template<class T> static inline double signedAngle(const T &vector1_,
+			const T &vector2_,
+			const T &_normal)
 	{
 		double direction = _normal.dot(vector1_.cross(vector2_));
 
@@ -215,16 +236,16 @@ public:
 		}
 	}
 
-	// Returns the synthetic cloud type associated to the given string
+	/**************************************************/
 	static SynCloudType getSynCloudType(const std::string &_type);
 
-	// Returns the statistic type associated to the given string
+	/**************************************************/
 	static SequenceStat getStatType(const std::string &_type);
 
-	// Returns the clustering implementation associated to the given string
+	/**************************************************/
 	static ClusteringImplementation getClusteringImplementation(const std::string &_type);
 
-	// Returns the metric type associated to the given string
+	/**************************************************/
 	static MetricType getMetricType(const std::string &_type);
 
 private:

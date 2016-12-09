@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+
 // Extract the current boost's minor version
 #define BOOST_MINOR_VERSION (BOOST_VERSION %100)
 
@@ -32,8 +33,12 @@ boost::mt19937 generator;
 boost::random::mt19937 generator;
 #endif
 
+
 template<typename T1, typename Generator, typename NumberType>
-std::vector<T1> generateRandomSet(const unsigned int size_, const T1 min_, const T1 max_, const bool allowRepetition_)
+std::vector<T1> generateRandomSet(const unsigned int size_,
+								  const T1 min_,
+								  const T1 max_,
+								  const bool allowRepetition_)
 {
 	generator.seed(std::rand());
 
@@ -79,7 +84,10 @@ std::string Utils::getWorkingDirectory()
 	return workingDir;
 }
 
-std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile, const double normalEstimationRadius_, const DescriptorParams &descriptorParams_, const CloudSmoothingParams &smoothingParams_)
+std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile,
+		const double normalEstimationRadius_,
+		const DescriptorParams &descriptorParams_,
+		const CloudSmoothingParams &smoothingParams_)
 {
 	std::string str = "";
 	str += "input=" + getFileChecksum(_inputCloudFile);
@@ -128,7 +136,8 @@ std::string Utils::getFileChecksum(const std::string filename_)
 	return stringMD5;
 }
 
-int Utils::getRandomNumber(const int _min, const int _max)
+int Utils::getRandomNumber(const int _min,
+						   const int _max)
 {
 	generator.seed(std::time(0));
 
@@ -142,7 +151,10 @@ int Utils::getRandomNumber(const int _min, const int _max)
 #endif
 }
 
-std::vector<float> Utils::getRandomRealArray(const unsigned int size_, const float min_, const float max_, const bool allowRepetition_)
+std::vector<float> Utils::getRandomRealArray(const unsigned int size_,
+		const float min_,
+		const float max_,
+		const bool allowRepetition_)
 {
 #if BOOST_MINOR_VERSION <= 46
 	return generateRandomSet<float, boost::mt19937, boost::uniform_real<> >(size_, min_, max_, allowRepetition_);
@@ -151,7 +163,10 @@ std::vector<float> Utils::getRandomRealArray(const unsigned int size_, const flo
 #endif
 }
 
-std::vector<int> Utils::getRandomIntArray(const unsigned int size_, const int min_, const int max_, const bool allowRepetition_)
+std::vector<int> Utils::getRandomIntArray(const unsigned int size_,
+		const int min_,
+		const int max_,
+		const bool allowRepetition_)
 {
 #if BOOST_MINOR_VERSION <= 46
 	return generateRandomSet<int, boost::mt19937, boost::uniform_int<> >(size_, min_, max_, allowRepetition_);
@@ -167,7 +182,8 @@ std::string Utils::num2Hex(const size_t _number)
 	return stream.str();
 }
 
-std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_, const Eigen::Vector3f &point_)
+std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_,
+		const Eigen::Vector3f &point_)
 {
 	Eigen::Vector3f normal = plane_.normal();
 
