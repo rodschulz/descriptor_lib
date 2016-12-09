@@ -11,20 +11,25 @@
 class CloudUtils
 {
 public:
-	// Remove any NAN in the given cloud
-	static void removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud);
+	/**************************************************/
+	static void removeNANs(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_);
 
-	// Performs a gaussian smoothing over the given cloud
-	static pcl::PointCloud<pcl::PointXYZ>::Ptr gaussianSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _sigma, const double _radius);
+	/**************************************************/
+	static pcl::PointCloud<pcl::PointXYZ>::Ptr gaussianSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+			const double sigma_,
+			const double radius_);
 
-	// Performs a Min Least Squares smoothing over the given cloud
-	static pcl::PointCloud<pcl::PointXYZ>::Ptr MLSSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _radius);
+	/**************************************************/
+	static pcl::PointCloud<pcl::PointXYZ>::Ptr MLSSmoothing(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+			const double radius_);
 
-	// Performs the estimation of normals in each point of the given cloud
-	static pcl::PointCloud<pcl::Normal>::Ptr estimateNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &_cloud, const double _searchRadius = -1);
+	/**************************************************/
+	static pcl::PointCloud<pcl::Normal>::Ptr estimateNormals(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+			const double searchRadius_ = -1);
 
-	// Translates the given point cloud to a matrix with the XYZ coordinates and optionally the normal coordinates
-	static cv::Mat cloudToMatrix(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const bool _includeNormals = false);
+	/**************************************************/
+	static cv::Mat cloudToMatrix(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+								 const bool includeNormals_ = false);
 
 private:
 	CloudUtils();

@@ -11,7 +11,10 @@
 #include "Utils.hpp"
 #include "Config.hpp"
 
-pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_searchPoint, const double _searchRadius)
+
+pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud,
+		const pcl::PointNormal &searchPoint_,
+		const double searchRadius_)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr surfacePatch(new pcl::PointCloud<pcl::PointNormal>());
 
@@ -20,7 +23,7 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 
 	std::vector<int> pointIndices;
 	std::vector<float> pointRadiusSquaredDistance;
-	kdtree.radiusSearch(_searchPoint, _searchRadius, pointIndices, pointRadiusSquaredDistance);
+	kdtree.radiusSearch(searchPoint_, searchRadius_, pointIndices, pointRadiusSquaredDistance);
 
 	surfacePatch->reserve(pointIndices.size());
 	for (size_t i = 0; i < pointIndices.size(); i++)
@@ -29,7 +32,9 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 	return surfacePatch;
 }
 
-std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const pcl::PointNormal &_point, const DescriptorParams &_params)
+std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud,
+		const pcl::PointNormal &_point,
+		const DescriptorParams &_params)
 {
 	std::vector<BandPtr> bands;
 	bands.reserve(_params.bandNumber);
@@ -120,7 +125,8 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	return bands;
 }
 
-std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClouds(const std::vector<BandPtr> &_bands, const DescriptorParams &_params)
+std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClouds(const std::vector<BandPtr> &_bands,
+		const DescriptorParams &_params)
 {
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes;
 	planes.reserve(_bands.size());
@@ -151,7 +157,12 @@ std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClou
 	return planes;
 }
 
-void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_p, const Eigen::Vector3f &_n, const float _limit, const std::string &_filename, const PointColor &_color)
+void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane,
+		const Eigen::Vector3f &_p,
+		const Eigen::Vector3f &_n,
+		const float _limit,
+		const std::string &_filename,
+		const PointColor &_color)
 {
 
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr targetPlane = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
@@ -170,7 +181,10 @@ void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_pla
 	pcl::io::savePCDFileASCII(OUTPUT_DIR DEBUG_PREFIX + _filename + CLOUD_FILE_EXTENSION, *targetPlane);
 }
 
-void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line, const float _limit, const std::string &_filename, const PointColor &_color)
+void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line,
+		const float _limit,
+		const std::string &_filename,
+		const PointColor &_color)
 {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr lineCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 
