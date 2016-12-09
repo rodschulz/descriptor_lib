@@ -10,9 +10,9 @@
 
 /**************************************************/
 // Auxiliar method defined to be used while testing
-static bool diffThanZero(const float _value)
+static bool diffThanZero(const float value_)
 {
-	return _value > 0 || _value < 0;
+	return value_ > 0 || value_ < 0;
 }
 /**************************************************/
 
@@ -23,7 +23,7 @@ struct ExecParamsFixture {
 	{
 		targetPoint = 100;
 		normalEstimationRadius = -1;
-		
+
 		params.patchSize = 5;
 		params.bandNumber = 5;
 		params.bandWidth = 1;

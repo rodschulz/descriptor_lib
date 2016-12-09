@@ -54,13 +54,13 @@ public:
 	}
 
 	// Creates a point with XYZ coordinates and a color definition associated
-	static inline pcl::PointXYZRGB createPointXYZRGB(const float _x, const float _y, const float _z, const PointColor &_color)
+	static inline pcl::PointXYZRGB createPointXYZRGB(const float _x, const float _y, const float _z, const PointColor &color_)
 	{
 		pcl::PointXYZRGB p;
 		p.x = _x;
 		p.y = _y;
 		p.z = _z;
-		p.rgba = _color;
+		p.rgba = color_;
 		return p;
 	}
 
@@ -80,7 +80,7 @@ public:
 	}
 
 	// Creates a point with XYZ coordinates, a RGB color definition and a normal vector associated to each point
-	static inline pcl::PointXYZRGBNormal createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const PointColor &_color)
+	static inline pcl::PointXYZRGBNormal createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const PointColor &color_)
 	{
 		pcl::PointXYZRGBNormal p;
 		p.x = _x;
@@ -90,12 +90,12 @@ public:
 		p.normal_y = _ny;
 		p.normal_z = _nz;
 		p.curvature = _curvature;
-		p.rgba = _color;
+		p.rgba = color_;
 		return p;
 	}
 
 	// Creates a point with XYZ coordinates, a RGB color definition and a normal vector associated to each point
-	static inline pcl::PointXYZRGBNormal createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const uint32_t &_color)
+	static inline pcl::PointXYZRGBNormal createPointXYZRGBNormal(const float _x, const float _y, const float _z, const float _nx, const float _ny, const float _nz, const float _curvature, const uint32_t &color_)
 	{
 		pcl::PointXYZRGBNormal p;
 		p.x = _x;
@@ -105,7 +105,7 @@ public:
 		p.normal_y = _ny;
 		p.normal_z = _nz;
 		p.curvature = _curvature;
-		p.rgba = _color;
+		p.rgba = color_;
 		return p;
 	}
 

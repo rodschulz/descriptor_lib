@@ -145,14 +145,14 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 }
 /********** DEBUG DATA GENERATION METHODS **********/
 
-void KMeans::searchClusters(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold)
+void KMeans::searchClusters(ClusteringResults &_results, const cv::Mat &items_, const MetricPtr &metric_, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold)
 {
-	KMeans::run(_results, _items, _metric, _ncluster, _attempts, _maxIterations, _stopThreshold);
+	KMeans::run(_results, items_, metric_, _ncluster, _attempts, _maxIterations, _stopThreshold);
 }
 
-void KMeans::stochasticSearchClusters(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold, const int _sampleSize)
+void KMeans::stochasticSearchClusters(ClusteringResults &_results, const cv::Mat &items_, const MetricPtr &metric_, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold, const int _sampleSize)
 {
-	KMeans::run(_results, _items, _metric, _ncluster, _attempts, _maxIterations, _stopThreshold, _sampleSize);
+	KMeans::run(_results, items_, metric_, _ncluster, _attempts, _maxIterations, _stopThreshold, _sampleSize);
 }
 
 void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const MetricPtr &metric_, const int ncluster_, const int attempts_, const int maxIterations_, const double stopThreshold_, const int sampleSize_)

@@ -79,32 +79,32 @@ std::string Utils::getWorkingDirectory()
 	return workingDir;
 }
 
-std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams)
+std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile, const double normalEstimationRadius_, const DescriptorParams &descriptorParams_, const CloudSmoothingParams &smoothingParams_)
 {
 	std::string str = "";
 	str += "input=" + getFileChecksum(_inputCloudFile);
-	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(_normalEstimationRadius);
-	str += "-patchSize=" + boost::lexical_cast<std::string>(_descriptorParams.patchSize);
-	str += "-bandNumber=" + boost::lexical_cast<std::string>(_descriptorParams.bandNumber);
-	str += "-bandWidth=" + boost::lexical_cast<std::string>(_descriptorParams.bandWidth);
-	str += "-bidirectional=" + boost::lexical_cast<std::string>(_descriptorParams.bidirectional);
-	str += "-useProjection=" + boost::lexical_cast<std::string>(_descriptorParams.useProjection);
-	str += "-sequenceBin=" + boost::lexical_cast<std::string>(_descriptorParams.sequenceBin);
-	str += "-sequenceStat=" + boost::lexical_cast<std::string>(_descriptorParams.sequenceStat);
-	if (_smoothingParams.useSmoothing)
+	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius_);
+	str += "-patchSize=" + boost::lexical_cast<std::string>(descriptorParams_.patchSize);
+	str += "-bandNumber=" + boost::lexical_cast<std::string>(descriptorParams_.bandNumber);
+	str += "-bandWidth=" + boost::lexical_cast<std::string>(descriptorParams_.bandWidth);
+	str += "-bidirectional=" + boost::lexical_cast<std::string>(descriptorParams_.bidirectional);
+	str += "-useProjection=" + boost::lexical_cast<std::string>(descriptorParams_.useProjection);
+	str += "-sequenceBin=" + boost::lexical_cast<std::string>(descriptorParams_.sequenceBin);
+	str += "-sequenceStat=" + boost::lexical_cast<std::string>(descriptorParams_.sequenceStat);
+	if (smoothingParams_.useSmoothing)
 	{
-		str += "-useSmoothing=" + boost::lexical_cast<std::string>(_smoothingParams.useSmoothing);
-		str += "-smoothingSigma=" + boost::lexical_cast<std::string>(_smoothingParams.sigma);
-		str += "-smoothingRadius=" + boost::lexical_cast<std::string>(_smoothingParams.radius);
+		str += "-useSmoothing=" + boost::lexical_cast<std::string>(smoothingParams_.useSmoothing);
+		str += "-smoothingSigma=" + boost::lexical_cast<std::string>(smoothingParams_.sigma);
+		str += "-smoothingRadius=" + boost::lexical_cast<std::string>(smoothingParams_.radius);
 	}
 
 	boost::hash<std::string> strHash;
 	return Utils::num2Hex(strHash(str));
 }
 
-std::string Utils::getFileChecksum(const std::string _filename)
+std::string Utils::getFileChecksum(const std::string filename_)
 {
-	int fileDescriptor = open(_filename.c_str(), O_RDONLY);
+	int fileDescriptor = open(filename_.c_str(), O_RDONLY);
 	if (fileDescriptor < 0)
 		throw std::runtime_error("ERROR: Unable to open file for MD5 checksum");
 
@@ -167,15 +167,15 @@ std::string Utils::num2Hex(const size_t _number)
 	return stream.str();
 }
 
-std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point)
+std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_, const Eigen::Vector3f &point_)
 {
-	Eigen::Vector3f normal = _plane.normal();
+	Eigen::Vector3f normal = plane_.normal();
 
 	// Take an arbitrary direction from the plane's origin (OUTSIDE the plane)
-	Eigen::Vector3f u = _point + Eigen::Vector3f(1E15, 1E15, 1E15);
+	Eigen::Vector3f u = point_ + Eigen::Vector3f(1E15, 1E15, 1E15);
 
 	// Project that arbitrary point into the plane to get the first axis inside the plane
-	Eigen::Vector3f v1 = _plane.projection(u).normalized();
+	Eigen::Vector3f v1 = plane_.projection(u).normalized();
 
 	// Generate the seconde unitary vector
 	Eigen::Vector3f v2 = normal.cross(v1).normalized();

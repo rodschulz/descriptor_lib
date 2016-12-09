@@ -42,10 +42,10 @@ public:
 	void add(const double _element);
 
 	// Fills up the given bins structure with the bins in the current histogram
-	void getBins(const double _binSize, const double _lowerBound, const double _upperBound, Bins &_bins) const;
+	void getBins(const double binSize_, const double lowerBound_, const double upperBound_, Bins &_bins) const;
 
 	// Fills up the given bins structure with the bins in the current histogram
-	void getBins(const double _binSize, Bins &_bins) const;
+	void getBins(const double binSize_, Bins &_bins) const;
 
 private:
 	std::vector<double> data;

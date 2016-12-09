@@ -145,14 +145,14 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(cons
 	return coloredCloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, uint8_t _r, uint8_t _g, uint8_t _b)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint8_t _r, uint8_t _g, uint8_t _b)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-	coloredCloud->reserve(_cloud->size());
+	coloredCloud->reserve(cloud_->size());
 
-	for (unsigned int i = 0; i < _cloud->width; i++)
+	for (unsigned int i = 0; i < cloud_->width; i++)
 	{
-		pcl::PointNormal p = _cloud->points[i];
+		pcl::PointNormal p = cloud_->points[i];
 		coloredCloud->push_back(PointFactory::createPointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
 	}
 

@@ -17,15 +17,22 @@
 #include "Utils.hpp"
 #include "Config.hpp"
 
+
 #define MATRIX_DIMENSIONS			"dims"
 #define SCRIPT_HISTOGRAM_NAME       OUTPUT_DIR "histogramPlot.script"
 #define SCRIPT_SSE_NAME             OUTPUT_DIR "ssePlot.script"
 #define HISTOGRAM_DATA_FILE         OUTPUT_DIR "histogram.dat"
 #define SSE_DATA_FILE               OUTPUT_DIR "sse.dat"
 
-void Writer::writeHistogram(const std::string &filename_, const std::string &_histogramTitle, const std::vector<Hist> &_histograms, const double _binSize, const double _lowerBound, const double _upperBound)
+
+void Writer::writeHistogram(const std::string &filename_,
+							const std::string &histogramTitle_,
+							const std::vector<Hist> &histograms_,
+							const double binSize_,
+							const double lowerBound_,
+							const double upperBound_)
 {
-	if (!_histograms.empty())
+	if (!histograms_.empty())
 	{
 		bool axesCreated = false;
 		std::vector<std::string> rows;
@@ -33,13 +40,13 @@ void Writer::writeHistogram(const std::string &filename_, const std::string &_hi
 		Dimension dimension = ANGLE;
 
 		// Generate data to plot
-		for (size_t i = 0; i < _histograms.size(); i++)
+		for (size_t i = 0; i < histograms_.size(); i++)
 		{
 			Bins bins;
-			if (_lowerBound == -1 || _upperBound == -1)
-				_histograms[i].getBins(_binSize, bins);
+			if (lowerBound_ == -1 || upperBound_ == -1)
+				histograms_[i].getBins(binSize_, bins);
 			else
-				_histograms[i].getBins(_binSize, _lowerBound, _upperBound, bins);
+				histograms_[i].getBins(binSize_, lowerBound_, upperBound_, bins);
 
 			int binsNumber = bins.bins.size();
 
@@ -50,7 +57,7 @@ void Writer::writeHistogram(const std::string &filename_, const std::string &_hi
 				dimension = bins.dimension;
 
 				double step = dimension == ANGLE ? RAD2DEG(bins.step) : bins.step;
-				double boundary = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
+				double boundary = dimension == ANGLE ? RAD2DEG(lowerBound_) : lowerBound_;
 				for (int j = 0; j < binsNumber; j++)
 				{
 					stream.str(std::string());
@@ -69,10 +76,10 @@ void Writer::writeHistogram(const std::string &filename_, const std::string &_hi
 		}
 
 		// Generate the plotting script
-		double step = dimension == ANGLE ? RAD2DEG(_binSize) : _binSize;
-		double lower = dimension == ANGLE ? RAD2DEG(_lowerBound) : _lowerBound;
-		double upper = dimension == ANGLE ? RAD2DEG(_upperBound) : _upperBound;
-		generateHistogramScript(filename_, _histogramTitle, _histograms.size(), step, lower, upper);
+		double step = dimension == ANGLE ? RAD2DEG(binSize_) : binSize_;
+		double lower = dimension == ANGLE ? RAD2DEG(lowerBound_) : lowerBound_;
+		double upper = dimension == ANGLE ? RAD2DEG(upperBound_) : upperBound_;
+		generateHistogramScript(filename_, histogramTitle_, histograms_.size(), step, lower, upper);
 
 		// Generate data file
 		std::ofstream output;
@@ -89,29 +96,34 @@ void Writer::writeHistogram(const std::string &filename_, const std::string &_hi
 	}
 }
 
-void Writer::generateHistogramScript(const std::string &filename_, const std::string &_histogramTitle, const int _bandsNumber, const double _binSize, const double _lowerLimit, const double _upperLimit)
+void Writer::generateHistogramScript(const std::string &filename_,
+									 const std::string &histogramTitle_,
+									 const int bandsNumber_,
+									 const double binSize_,
+									 const double lowerLimit_,
+									 const double upperLimit_)
 {
 	std::ofstream output;
 	output.open(SCRIPT_HISTOGRAM_NAME, std::fstream::out);
 
-	output << "set title '" << _histogramTitle << "'\n";
+	output << "set title '" << histogramTitle_ << "'\n";
 	output << "set ylabel 'Percentage'\n";
 	output << "set xlabel 'Degrees'\n\n";
 
-	output << "set xrange [" << _lowerLimit << ":" << _upperLimit << "]\n";
+	output << "set xrange [" << lowerLimit_ << ":" << upperLimit_ << "]\n";
 	output << "set yrange [0:1]\n";
 	output << "set grid ytics xtics\n\n";
 
-	output << "set xtics " << _binSize << "\n";
+	output << "set xtics " << binSize_ << "\n";
 	output << "set xtics font 'Verdana,9'\n";
 	output << "set xtics rotate by -50\n";
 	output << "set xtics (";
 
-	int binNumber = ceil((_upperLimit - _lowerLimit) / _binSize);
-	double offset = binNumber % 2 > 0 ? 0 : -0.5 * _binSize;
+	int binNumber = ceil((upperLimit_ - lowerLimit_) / binSize_);
+	double offset = binNumber % 2 > 0 ? 0 : -0.5 * binSize_;
 
-	for (double pos = _lowerLimit + offset; pos < _upperLimit; pos += _binSize)
-		output << "'[" << round(pos) << ", " << round(pos + _binSize) << ")' " << pos - offset << (pos + _binSize <= _upperLimit ? ", " : "");
+	for (double pos = lowerLimit_ + offset; pos < upperLimit_; pos += binSize_)
+		output << "'[" << round(pos) << ", " << round(pos + binSize_) << ")' " << pos - offset << (pos + binSize_ <= upperLimit_ ? ", " : "");
 	output << ")\n\n";
 
 	output << "set style data linespoints\n\n";
@@ -120,41 +132,45 @@ void Writer::generateHistogramScript(const std::string &filename_, const std::st
 	output << "set output '" << OUTPUT_DIR << filename_ << ".png'\n\n";
 
 	output << "plot \\\n";
-	for (int i = 0; i < _bandsNumber; i++)
+	for (int i = 0; i < bandsNumber_; i++)
 		output << "'" << HISTOGRAM_DATA_FILE
 			   << "' using 1:" << i + 2 << " title 'Band "
 			   << i
 			   << "' with linespoints lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette12(i + 1)) << "' pt 2"
-			   << (i == _bandsNumber - 1 ? "\n" : ", \\\n") ;
+			   << (i == bandsNumber_ - 1 ? "\n" : ", \\\n") ;
 
 	output.close();
 }
 
-void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const std::vector<BandPtr> &_bands, const std::vector<Hist> &_angleHistograms, const DescriptorParams &_params, const int _targetPoint)
+void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+							const std::vector<BandPtr> &bands_,
+							const std::vector<Hist> &angleHistograms_,
+							const DescriptorParams &params_,
+							const int targetPoint_)
 {
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(_cloud, Utils::palette12(0));
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "cloud.pcd", *coloredCloud);
 
-	(*coloredCloud)[_targetPoint].rgba = Utils::getColor(255, 0, 0);
+	(*coloredCloud)[targetPoint_].rgba = Utils::getColor(255, 0, 0);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "pointPosition.pcd", *coloredCloud);
 
-	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(_bands, _params);
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(bands_, params_);
 
-	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(_cloud, _cloud->at(_targetPoint), _params.patchSize);
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, cloud_->at(targetPoint_), params_.patchSize);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "patch.pcd", *patch);
 
 	std::ofstream sequences;
 	sequences.open(OUTPUT_DIR "sequences", std::fstream::out);
 
-	for (size_t i = 0; i < _bands.size(); i++)
+	for (size_t i = 0; i < bands_.size(); i++)
 	{
-		if (!_bands[i]->data->empty())
+		if (!bands_[i]->data->empty())
 		{
 			char name[100];
 			sprintf(name, OUTPUT_DIR "band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(_bands[i]->data, Utils::palette12(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(bands_[i]->data, Utils::palette12(i + 1)));
 
-			sequences << "band " << i << ": " << _bands[i]->sequenceString << "\n";
+			sequences << "band " << i << ": " << bands_[i]->sequenceString << "\n";
 
 			sprintf(name, OUTPUT_DIR "planeBand%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *planes[i]);
@@ -165,12 +181,14 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud
 
 	// Write histogram data
 	double limit = M_PI;
-	Writer::writeHistogram("angles", "Angle Distribution", _angleHistograms, DEG2RAD(20), -limit, limit);
+	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms_, DEG2RAD(20), -limit, limit);
 }
 
-void Writer::writePlotSSE(const std::string &filename_, const std::string &_plotTitle, const std::vector<double> &_sse)
+void Writer::writePlotSSE(const std::string &filename_,
+						  const std::string &plotTitle_,
+						  const std::vector<double> &sse_)
 {
-	if (_sse.empty())
+	if (sse_.empty())
 	{
 		std::cout << "WARNING: array SSE empty, can't generate SSE plot" << std::endl;
 		return;
@@ -179,15 +197,15 @@ void Writer::writePlotSSE(const std::string &filename_, const std::string &_plot
 	// Generate data file
 	std::ofstream dataFile;
 	dataFile.open(SSE_DATA_FILE, std::fstream::out);
-	for (size_t i = 0; i < _sse.size(); i++)
-		dataFile << i << "\t" << _sse[i] << "\n";
+	for (size_t i = 0; i < sse_.size(); i++)
+		dataFile << i << "\t" << sse_[i] << "\n";
 	dataFile.close();
 
 	// Generate plot script
 	std::ofstream plotScript;
 	plotScript.open(SCRIPT_SSE_NAME, std::fstream::out);
 
-	plotScript << "set title '" << _plotTitle << "'\n";
+	plotScript << "set title '" << plotTitle_ << "'\n";
 	plotScript << "set ylabel 'SSE'\n";
 	plotScript << "set xlabel 'Iterations'\n\n";
 
@@ -208,33 +226,35 @@ void Writer::writePlotSSE(const std::string &filename_, const std::string &_plot
 		std::cout << "WARNING, bad return for command: " << cmd << "\n";
 }
 
-void Writer::writeClusteredCloud(const std::string &filename_, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const cv::Mat &_labels)
+void Writer::writeClusteredCloud(const std::string &filename_,
+								 const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+								 const cv::Mat &labels_)
 {
 	// Color the data according to the clusters
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(_cloud, Utils::palette35(0));
-	for (int i = 0; i < _labels.rows; i++)
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colored = CloudFactory::createColorCloud(cloud_, Utils::palette35(0));
+	for (int i = 0; i < labels_.rows; i++)
 	{
 		int index = 0;
-		switch (_labels.type())
+		switch (labels_.type())
 		{
 		case CV_16U:
-			index = (int) _labels.at<unsigned short>(i);
+			index = (int) labels_.at<unsigned short>(i);
 			break;
 
 		case CV_16S:
-			index = (int) _labels.at<short>(i);
+			index = (int) labels_.at<short>(i);
 			break;
 
 		case CV_32S:
-			index = _labels.at<int>(i);
+			index = labels_.at<int>(i);
 			break;
 
 		case CV_32F:
-			index = (int) _labels.at<float>(i);
+			index = (int) labels_.at<float>(i);
 			break;
 
 		case CV_64F:
-			index  = (int) _labels.at<double>(i);
+			index  = (int) labels_.at<double>(i);
 			break;
 
 		default:
@@ -247,18 +267,22 @@ void Writer::writeClusteredCloud(const std::string &filename_, const pcl::PointC
 	pcl::io::savePCDFileASCII(filename_, *colored);
 }
 
-void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat &_items, const cv::Mat &centers_, const cv::Mat &_labels, const MetricPtr &_metric)
+void Writer::writeDistanceMatrix(const std::string &outputFolder_,
+								 const cv::Mat &items_,
+								 const cv::Mat &centers_,
+								 const cv::Mat &labels_,
+								 const MetricPtr &metric_)
 {
 	std::vector<std::pair<int, int> > data; // fist=index - second=cluster
-	for (int i = 0; i < _labels.rows; i++)
+	for (int i = 0; i < labels_.rows; i++)
 	{
-		data.push_back(std::make_pair(i, _labels.at<int>(i)));
+		data.push_back(std::make_pair(i, labels_.at<int>(i)));
 	}
 	std::sort(data.begin(), data.end(), comparePairs);
 
 	// Generate a matrix of distances between points
 	float maxDistanceBetween = 0;
-	cv::Mat distBetweenPoints = cv::Mat::zeros(_items.rows, _items.rows, CV_32FC1);
+	cv::Mat distBetweenPoints = cv::Mat::zeros(items_.rows, items_.rows, CV_32FC1);
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index1 = data[i].first;
@@ -266,7 +290,7 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 		for (size_t j = 0; j <= i; j++)
 		{
 			int index2 = data[j].first;
-			float distance = (float) _metric->distance(_items.row(index1), _items.row(index2));
+			float distance = (float) metric_->distance(items_.row(index1), items_.row(index2));
 			distBetweenPoints.at<float>(i, j) = distance;
 			distBetweenPoints.at<float>(j, i) = distance;
 
@@ -277,13 +301,13 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	// Generate a matrix of distances to the centers
 	int pixels = 40;
 	float maxDistanceToCenter = 0;
-	cv::Mat distToCenters = cv::Mat::zeros(_items.rows, centers_.rows * pixels, CV_32FC1);
+	cv::Mat distToCenters = cv::Mat::zeros(items_.rows, centers_.rows * pixels, CV_32FC1);
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index = data[i].first;
 		for (int j = 0; j < centers_.rows; j++)
 		{
-			float distance = (float) _metric->distance(_items.row(index), centers_.row(j));
+			float distance = (float) metric_->distance(items_.row(index), centers_.row(j));
 			distToCenters.row(i).colRange(j * pixels, (j + 1) * pixels) = distance;
 			maxDistanceToCenter = distance > maxDistanceToCenter ? distance : maxDistanceToCenter;
 		}
@@ -292,40 +316,54 @@ void Writer::writeDistanceMatrix(const std::string &_outputFolder, const cv::Mat
 	// Write images
 	cv::Mat imageDistBetweenPoints;
 	distBetweenPoints.convertTo(imageDistBetweenPoints, CV_8UC1, 255 / maxDistanceBetween, 0);
-	cv::imwrite(_outputFolder + "distanceBetweenPoints.png", imageDistBetweenPoints);
+	cv::imwrite(outputFolder_ + "distanceBetweenPoints.png", imageDistBetweenPoints);
 
 	cv::Mat imageDistToCenter;
 	distToCenters.convertTo(imageDistToCenter, CV_8UC1, 255 / maxDistanceToCenter, 0);
-	cv::imwrite(_outputFolder + "distanceToCenter.png", imageDistToCenter);
+	cv::imwrite(outputFolder_ + "distanceToCenter.png", imageDistToCenter);
 }
 
-void Writer::writeDescriptorsCache(const cv::Mat &_descriptors, const std::string &_cacheLocation, const std::string &_cloudInputFilename, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams)
+void Writer::writeDescriptorsCache(const cv::Mat &descriptors_,
+								   const std::string &cacheLocation_,
+								   const std::string &cloudInputFilename_,
+								   const double normalEstimationRadius_,
+								   const DescriptorParams &descriptorParams_,
+								   const CloudSmoothingParams &smoothingParams_)
 {
-	if (!boost::filesystem::exists(_cacheLocation))
-		if (system(("mkdir " + _cacheLocation).c_str()) != 0)
+	if (!boost::filesystem::exists(cacheLocation_))
+		if (system(("mkdir " + cacheLocation_).c_str()) != 0)
 			std::cout << "WARNING: can't create cache folder" << std::endl;
 
-	std::string destination = _cacheLocation + Utils::getCalculationConfigHash(_cloudInputFilename, _normalEstimationRadius, _descriptorParams, _smoothingParams);
+	std::string destination = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descriptorParams_, smoothingParams_);
 
 	std::vector<std::string> metadata;
-	metadata.push_back("normalEstimationRadius:" + boost::lexical_cast<std::string>(_normalEstimationRadius));
-	metadata.push_back(_descriptorParams.toString());
-	metadata.push_back(_smoothingParams.toString());
+	metadata.push_back("normalEstimationRadius:" + boost::lexical_cast<std::string>(normalEstimationRadius_));
+	metadata.push_back(descriptorParams_.toString());
+	metadata.push_back(smoothingParams_.toString());
 
-	writeMatrix(destination, _descriptors, metadata);
+	writeMatrix(destination, descriptors_, metadata);
 }
 
-void Writer::writeClustersCenters(const std::string &filename_, const cv::Mat &centers_, const DescriptorParams &_descriptorParams, const ClusteringParams &clusteringParams_, const CloudSmoothingParams &_smoothingParams)
+void Writer::writeClustersCenters(const std::string &filename_,
+								  const cv::Mat &centers_,
+								  const DescriptorParams &descriptorParams_,
+								  const ClusteringParams &clusteringParams_,
+								  const CloudSmoothingParams &smoothingParams_)
 {
 	std::vector<std::string> metadata;
-	metadata.push_back(_descriptorParams.toString());
+	metadata.push_back(descriptorParams_.toString());
 	metadata.push_back(clusteringParams_.toString());
-	metadata.push_back(_smoothingParams.toString());
+	metadata.push_back(smoothingParams_.toString());
 
 	writeMatrix(filename_, centers_, metadata);
 }
 
-void Writer::writeBoW(const std::string &filename_, const cv::Mat &centers_, const ClusteringParams &clusteringParams_, const int nbands_, const int nbins_, const bool bidirectional_)
+void Writer::writeBoW(const std::string &filename_,
+					  const cv::Mat &centers_,
+					  const ClusteringParams &clusteringParams_,
+					  const int nbands_,
+					  const int nbins_,
+					  const bool bidirectional_)
 {
 	std::string str = "bandNumber: " + boost::lexical_cast<std::string>(nbands_) + " binNumber: " + boost::lexical_cast<std::string>(nbins_) + " bidirectional: " + (bidirectional_ ? "true" : "false");
 
@@ -336,37 +374,40 @@ void Writer::writeBoW(const std::string &filename_, const cv::Mat &centers_, con
 	Writer::writeMatrix(filename_, centers_, metadata);
 }
 
-void Writer::saveCloudMatrix(const std::string &filename_, const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud)
+void Writer::saveCloudMatrix(const std::string &filename_,
+							 const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
 {
-	cv::Mat items = cv::Mat::zeros(_cloud->size(), 3, CV_32FC1);
-	for (size_t i = 0; i < _cloud->size(); i++)
+	cv::Mat items = cv::Mat::zeros(cloud_->size(), 3, CV_32FC1);
+	for (size_t i = 0; i < cloud_->size(); i++)
 	{
-		items.at<float>(i, 0) = _cloud->at(i).x;
-		items.at<float>(i, 1) = _cloud->at(i).y;
-		items.at<float>(i, 2) = _cloud->at(i).z;
+		items.at<float>(i, 0) = cloud_->at(i).x;
+		items.at<float>(i, 1) = cloud_->at(i).y;
+		items.at<float>(i, 2) = cloud_->at(i).z;
 	}
 
 	Writer::writeMatrix(filename_, items);
 }
 
-void Writer::writeMatrix(const std::string &filename_, const cv::Mat &_matrix, const std::vector<std::string> &_metadata)
+void Writer::writeMatrix(const std::string &filename_,
+						 const cv::Mat &matrix_,
+						 const std::vector<std::string> &metadata_)
 {
 	std::ofstream outputFile;
 	outputFile.open(filename_.c_str(), std::fstream::out);
 
 	// Write metadata header
-	outputFile << "metadata_lines " << _metadata.size() << "\n";
+	outputFile << "metadata_lines " << metadata_.size() << "\n";
 
 	// Write metadata
-	for (size_t i = 0; i < _metadata.size(); i++)
-		outputFile << _metadata[i] << "\n";
+	for (size_t i = 0; i < metadata_.size(); i++)
+		outputFile << metadata_[i] << "\n";
 
 	// Write the matrix actual data
-	outputFile << MATRIX_DIMENSIONS << " " << _matrix.rows << " " << _matrix.cols << "\n";
-	for (int i = 0; i < _matrix.rows; i++)
+	outputFile << MATRIX_DIMENSIONS << " " << matrix_.rows << " " << matrix_.cols << "\n";
+	for (int i = 0; i < matrix_.rows; i++)
 	{
-		for (int j = 0; j < _matrix.cols; j++)
-			outputFile << std::setprecision(15) << _matrix.at<float>(i, j) << " ";
+		for (int j = 0; j < matrix_.cols; j++)
+			outputFile << std::setprecision(15) << matrix_.at<float>(i, j) << " ";
 		outputFile << "\n";
 	}
 

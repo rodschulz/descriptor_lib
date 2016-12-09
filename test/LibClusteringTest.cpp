@@ -75,67 +75,67 @@ BOOST_AUTO_TEST_CASE(labelDataMetric)
 	BOOST_CHECK_EQUAL(labels.at<int>(10), 2);
 }
 
-BOOST_AUTO_TEST_CASE(labelDataSVM)
-{
-	// Centers for labeling
-	cv::Mat center = cv::Mat::zeros(3, 2, CV_32FC1);
-	center.at<float>(0, 0) = -2.25;
-	center.at<float>(0, 1) = 2.25;
+// BOOST_AUTO_TEST_CASE(labelDataSVM)
+// {
+// 	// Centers for labeling
+// 	cv::Mat center = cv::Mat::zeros(3, 2, CV_32FC1);
+// 	center.at<float>(0, 0) = -2.25;
+// 	center.at<float>(0, 1) = 2.25;
 
-	center.at<float>(1, 0) = 2.5;
-	center.at<float>(1, 1) = -3;
+// 	center.at<float>(1, 0) = 2.5;
+// 	center.at<float>(1, 1) = -3;
 
-	center.at<float>(2, 0) = 4.2;
-	center.at<float>(2, 1) = 3.2;
+// 	center.at<float>(2, 0) = 4.2;
+// 	center.at<float>(2, 1) = 3.2;
 
-	std::map<std::string, std::string> metadata;
-	metadata["metric"] = metricType[METRIC_EUCLIDEAN];
-	SVMPtr svm = ClusteringUtils::prepareClassifier(center, metadata);
+// 	std::map<std::string, std::string> metadata;
+// 	metadata["metric"] = metricType[METRIC_EUCLIDEAN];
+// 	SVMPtr svm = ClusteringUtils::prepareClassifier(center, metadata);
 
-	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
-	// Center 2
-	data.at<float>(0, 0) = 4;
-	data.at<float>(0, 1) = 3;
-	data.at<float>(3, 0) = 3;
-	data.at<float>(3, 1) = 3;
-	data.at<float>(5, 0) = 4;
-	data.at<float>(5, 1) = 2;
-	data.at<float>(7, 0) = 5;
-	data.at<float>(7, 1) = 4;
-	data.at<float>(10, 0) = 5;
-	data.at<float>(10, 1) = 4;
+// 	cv::Mat data = cv::Mat::zeros(11, 2, CV_32FC1);
+// 	// Center 2
+// 	data.at<float>(0, 0) = 4;
+// 	data.at<float>(0, 1) = 3;
+// 	data.at<float>(3, 0) = 3;
+// 	data.at<float>(3, 1) = 3;
+// 	data.at<float>(5, 0) = 4;
+// 	data.at<float>(5, 1) = 2;
+// 	data.at<float>(7, 0) = 5;
+// 	data.at<float>(7, 1) = 4;
+// 	data.at<float>(10, 0) = 5;
+// 	data.at<float>(10, 1) = 4;
 
-	// Center 0
-	data.at<float>(1, 0) = -1;
-	data.at<float>(1, 1) = 2;
-	data.at<float>(2, 0) = -2;
-	data.at<float>(2, 1) = 1;
-	data.at<float>(9, 0) = -2;
-	data.at<float>(9, 1) = 2;
-	data.at<float>(4, 0) = -4;
-	data.at<float>(4, 1) = 4;
+// 	// Center 0
+// 	data.at<float>(1, 0) = -1;
+// 	data.at<float>(1, 1) = 2;
+// 	data.at<float>(2, 0) = -2;
+// 	data.at<float>(2, 1) = 1;
+// 	data.at<float>(9, 0) = -2;
+// 	data.at<float>(9, 1) = 2;
+// 	data.at<float>(4, 0) = -4;
+// 	data.at<float>(4, 1) = 4;
 
-	// Center 1
-	data.at<float>(6, 0) = 2;
-	data.at<float>(6, 1) = -3;
-	data.at<float>(8, 0) = 3;
-	data.at<float>(8, 1) = -3;
+// 	// Center 1
+// 	data.at<float>(6, 0) = 2;
+// 	data.at<float>(6, 1) = -3;
+// 	data.at<float>(8, 0) = 3;
+// 	data.at<float>(8, 1) = -3;
 
-	cv::Mat labels;
-	ClusteringUtils::labelData(data, svm, labels);
+// 	cv::Mat labels;
+// 	ClusteringUtils::labelData(data, svm, labels);
 
-	BOOST_CHECK_EQUAL(labels.at<float>(0), 3);
-	BOOST_CHECK_EQUAL(labels.at<float>(1), 1);
-	BOOST_CHECK_EQUAL(labels.at<float>(2), 1);
-	BOOST_CHECK_EQUAL(labels.at<float>(3), 3);
-	BOOST_CHECK_EQUAL(labels.at<float>(4), 1);
-	BOOST_CHECK_EQUAL(labels.at<float>(5), 3);
-	BOOST_CHECK_EQUAL(labels.at<float>(6), 2);
-	BOOST_CHECK_EQUAL(labels.at<float>(7), 3);
-	BOOST_CHECK_EQUAL(labels.at<float>(8), 2);
-	BOOST_CHECK_EQUAL(labels.at<float>(9), 1);
-	BOOST_CHECK_EQUAL(labels.at<float>(10), 3);
-}
+// 	BOOST_CHECK_EQUAL(labels.at<float>(0), 3);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(1), 1);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(2), 1);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(3), 3);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(4), 1);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(5), 3);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(6), 2);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(7), 3);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(8), 2);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(9), 1);
+// 	BOOST_CHECK_EQUAL(labels.at<float>(10), 3);
+// }
 
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/

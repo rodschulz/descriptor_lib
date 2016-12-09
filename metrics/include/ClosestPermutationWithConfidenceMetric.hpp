@@ -1,6 +1,6 @@
 /**
  * Author: rodrigo
- * 2016     
+ * 2016
  */
 #pragma once
 
@@ -11,7 +11,7 @@ class ClosestPermutationWithConfidenceMetric: public ClosestPermutationMetric
 public:
 	// Constructor
 	ClosestPermutationWithConfidenceMetric(const int permutationSize_) :
-			ClosestPermutationMetric(permutationSize_)
+		ClosestPermutationMetric(permutationSize_)
 	{
 	}
 
@@ -21,7 +21,7 @@ public:
 	}
 
 	// Returns the distance between the given vectors, according to the current metric
-	inline double distance(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+	inline double distance(const cv::Mat &vector1_, const cv::Mat &vector2_) const
 	{
 		throw std::runtime_error("Metric not yet implemented");
 	}
@@ -32,7 +32,7 @@ public:
 		throw std::runtime_error("Metric not yet implemented");
 	}
 
-	inline Permutation getClosestPermutation(const cv::Mat &_vector1, const cv::Mat &_vector2) const
+	inline Permutation getClosestPermutation(const cv::Mat &vector1_, const cv::Mat &vector2_) const
 	{
 		throw std::runtime_error("Metric not yet implemented");
 	}

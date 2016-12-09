@@ -143,15 +143,15 @@ public:
 	}
 
 	// Calculates the Sum of Squared Errors for the given centers and labels, using the given metric
-	static inline double getSSE(const cv::Mat &_items,
-								const cv::Mat &_labels,
-								const cv::Mat &_centers,
-								const MetricPtr &_metric)
+	static inline double getSSE(const cv::Mat &items_,
+								const cv::Mat &labels_,
+								const cv::Mat &centers_,
+								const MetricPtr &metric_)
 	{
 		double sse = 0;
-		for (int i = 0; i < _items.rows; i++)
+		for (int i = 0; i < items_.rows; i++)
 		{
-			double norm = _metric->distance(_items.row(i), _centers.row(_labels.at<int>(i)));
+			double norm = metric_->distance(items_.row(i), centers_.row(labels_.at<int>(i)));
 			sse += (norm * norm);
 		}
 
@@ -159,12 +159,12 @@ public:
 	}
 
 	// Retrieves a sample of data from the given items matrix
-	static inline void getSampleItems(const cv::Mat &_items,
+	static inline void getSampleItems(const cv::Mat &items_,
 									  cv::Mat &_sample)
 	{
-		std::vector<int> randomSet = Utils::getRandomIntArray(_sample.rows, 0, _items.rows - 1, false);
+		std::vector<int> randomSet = Utils::getRandomIntArray(_sample.rows, 0, items_.rows - 1, false);
 		for (int j = 0; j < _sample.rows; j++)
-			_items.row(randomSet[j]).copyTo(_sample.row(j));
+			items_.row(randomSet[j]).copyTo(_sample.row(j));
 	}
 
 	// Counts the number of items per centers according to the given labeling

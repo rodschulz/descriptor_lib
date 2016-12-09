@@ -129,10 +129,10 @@ public:
 	static std::string getWorkingDirectory();
 
 	// Returns a string with the hex representation of the hash calculated for the current params instance
-	static std::string getCalculationConfigHash(const std::string _inputCloudFile, const double _normalEstimationRadius, const DescriptorParams &_descriptorParams, const CloudSmoothingParams &_smoothingParams);
+	static std::string getCalculationConfigHash(const std::string _inputCloudFile, const double normalEstimationRadius_, const DescriptorParams &descriptorParams_, const CloudSmoothingParams &smoothingParams_);
 
 	// Returns the MD5 checksum for the named file
-	static std::string getFileChecksum(const std::string _filename);
+	static std::string getFileChecksum(const std::string filename_);
 
 	// Returns a randomly generated integer between the given ranges
 	static int getRandomNumber(const int _min, const int _max);
@@ -166,15 +166,15 @@ public:
 	}
 
 	// Generates a pair of arbitrary points in the given plane, both defining a couple of perpendicular vectors when the difference from the plane's origin is used
-	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &_plane, const Eigen::Vector3f &_point);
+	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_, const Eigen::Vector3f &point_);
 
 	// Calculates the Sum of Squared Errors indicator for the given vectors over the given centers, using the given labeling
-	static inline double getSSE(const cv::Mat &_vectors, const cv::Mat &_centers, const cv::Mat &_labels)
+	static inline double getSSE(const cv::Mat &_vectors, const cv::Mat &centers_, const cv::Mat &labels_)
 	{
 		double sse = 0;
 		for (int i = 0; i < _vectors.rows; i++)
 		{
-			float norm = cv::norm(_vectors.row(i), _centers.row(_labels.at<int>(i)));
+			float norm = cv::norm(_vectors.row(i), centers_.row(labels_.at<int>(i)));
 			sse += (norm * norm);
 		}
 
@@ -188,27 +188,27 @@ public:
 	}
 
 	// Calculates the angle between the two given vectors
-	template<class T> static inline double angle(const T &_vector1, const T &_vector2)
+	template<class T> static inline double angle(const T &vector1_, const T &vector2_)
 	{
-		return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+		return atan2(vector1_.cross(vector2_).norm(), vector1_.dot(vector2_));
 	}
 
 	// Returns the signed angle between the two given vectors
-	template<class T> static inline double signedAngle(const T &_vector1, const T &_vector2, const T &_normal)
+	template<class T> static inline double signedAngle(const T &vector1_, const T &vector2_, const T &_normal)
 	{
-		double direction = _normal.dot(_vector1.cross(_vector2));
+		double direction = _normal.dot(vector1_.cross(vector2_));
 
 		// Check if the cross product is not zero
 		if (fabs(direction) > 1E-7)
 		{
 			if (direction < 0)
-				return -atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+				return -atan2(vector1_.cross(vector2_).norm(), vector1_.dot(vector2_));
 			else
-				return atan2(_vector1.cross(_vector2).norm(), _vector1.dot(_vector2));
+				return atan2(vector1_.cross(vector2_).norm(), vector1_.dot(vector2_));
 		}
 		else
 		{
-			if (_vector1.dot(_vector2) >= 0)
+			if (vector1_.dot(vector2_) >= 0)
 				return 0;
 			else
 				return M_PI;

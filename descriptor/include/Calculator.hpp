@@ -16,36 +16,49 @@ typedef std::vector<BandPtr> Descriptor;
 class Calculator
 {
 public:
-	// Calculates the descriptor over the given cloud, using the given params
-	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, const int _targetPointIndex);
+	/**************************************************/
+	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+										  const DescriptorParams &params_,
+										  const int targetPointIndex_);
 
-	// Calculates the descriptor over the given cloud, using the given params
-	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, const pcl::PointNormal &_target);
+	/**************************************************/
+	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+										  const DescriptorParams &params_,
+										  const pcl::PointNormal &target_);
 
-	// Calculates the descriptor for each point in the given cloud and fills a matrix with the data
-	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud, const DescriptorParams &_params, cv::Mat &_descriptors);
+	/**************************************************/
+	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+									 const DescriptorParams &params_,
+									 cv::Mat &descriptors_);
 
-	// Generates a vector holding the angular histograms for each band in the given array of bands (descriptor)
-	static std::vector<Hist> generateAngleHistograms(const Descriptor &_descriptor, const bool _useProjection);
+	/**************************************************/
+	static std::vector<Hist> generateAngleHistograms(const Descriptor &descriptor_,
+			const bool useProjection_);
 
-	// Calculates the sequence associated to each band in the descriptor
-	static void fillSequences(Descriptor &_descriptor, const DescriptorParams &_params, const double _sequenceStep);
+	/**************************************************/
+	static void fillSequences(Descriptor &descriptor_,
+							  const DescriptorParams &params_,
+							  const double sequenceStep_);
 
-	// Returns a char to build a char sequence, according to the given value and step
-	static inline char getSequenceChar(const double _value, const double _step)
+	/**************************************************/
+	static inline char getSequenceChar(const double value_,
+									   const double step_)
 	{
-		int index = _value / _step;
+		int index = value_ / step_;
 		if (index == 0)
 			return '0';
 
 		return index > 0 ? 'A' + (index - 1) : 'a' - (index + 1);
 	}
 
-	// Calculates the angle between the two given vectors
-	static inline double calculateAngle(const Eigen::Vector3f &_vector1, const Eigen::Vector3f &_vector2, const Eigen::Hyperplane<float, 3> &_plane, const bool _useProjection)
+	/**************************************************/
+	static inline double calculateAngle(const Eigen::Vector3f &vector1_,
+										const Eigen::Vector3f &vector2_,
+										const Eigen::Hyperplane<float, 3> &plane_,
+										const bool useProjection_)
 	{
-		Eigen::Vector3f v2 = _useProjection ? _plane.projection(_vector2).normalized() : _vector2;
-		return Utils::signedAngle<Eigen::Vector3f>(_vector1, v2, (Eigen::Vector3f) _plane.normal());
+		Eigen::Vector3f v2 = useProjection_ ? plane_.projection(vector2_).normalized() : vector2_;
+		return Utils::signedAngle<Eigen::Vector3f>(vector1_, v2, (Eigen::Vector3f) plane_.normal());
 	}
 
 private:

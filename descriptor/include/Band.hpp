@@ -28,18 +28,19 @@ public:
 	// Vector corresponding to the numeric sequence representation
 	std::vector<float> sequenceVector;
 
-	Band(const pcl::PointNormal &_point, const Eigen::Hyperplane<float, 3> &_plane)
+	Band(const pcl::PointNormal &point_,
+		 const Eigen::Hyperplane<float, 3> &plane_)
 	{
 		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		point = _point;
-		plane = _plane;
+		point = point_;
+		plane = plane_;
 		sequenceString = "";
 	}
 
-	Band(const pcl::PointNormal &_point)
+	Band(const pcl::PointNormal &point_)
 	{
 		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		point = _point;
+		point = point_;
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
 		sequenceString = "";
 	}

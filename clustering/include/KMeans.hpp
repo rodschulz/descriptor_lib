@@ -24,7 +24,7 @@ private:
 	~KMeans();
 
 	// Runs the kmeans algorithm to find clusters in the given data
-	static inline void run(ClusteringResults &_results, const cv::Mat &_items, const MetricPtr &_metric, const int _ncluster, const int _attempts, const int _maxIterations, const double _threshold, const int _sampleSize = -1);
+	static inline void run(ClusteringResults &_results, const cv::Mat &items_, const MetricPtr &metric_, const int _ncluster, const int _attempts, const int _maxIterations, const double _threshold, const int _sampleSize = -1);
 
 	// Updates the possition of the centers according to the given data labels
 	static inline bool updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::Mat labels_, const double stopThreshold_, const MetricPtr &metric_);

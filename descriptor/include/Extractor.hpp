@@ -12,37 +12,37 @@ class Extractor
 {
 public:
 	/**************************************************/
-	static pcl::PointCloud<pcl::PointNormal>::Ptr getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud,
+	static pcl::PointCloud<pcl::PointNormal>::Ptr getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 			const pcl::PointNormal &searchPoint_,
 			const double searchRadius_);
 
 	/**************************************************/
-	static std::vector<BandPtr> getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud,
-										 const pcl::PointNormal &_point,
-										 const DescriptorParams &_params);
+	static std::vector<BandPtr> getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+										 const pcl::PointNormal &point_,
+										 const DescriptorParams &params_);
 
 	/**************************************************/
-	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> generatePlaneClouds(const std::vector<BandPtr> &_bands,
-			const DescriptorParams &_params);
+	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> generatePlaneClouds(const std::vector<BandPtr> &bands_,
+			const DescriptorParams &params_);
 
 private:
 	Extractor();
 	~Extractor();
 
 	/**************************************************/
-	static void DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &_plane,
-										 const Eigen::Vector3f &_p,
-										 const Eigen::Vector3f &_n,
-										 const float _limit,
-										 const std::string &_filename,
-										 const PointColor &_color);
+	static void DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &plane_,
+										 const Eigen::Vector3f &p_,
+										 const Eigen::Vector3f &n_,
+										 const float limit_,
+										 const std::string &filename_,
+										 const PointColor &color_);
 
 	/**************************************************/
-	static void DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &_line,
-											const float _limit,
-											const std::string &_filename,
-											const PointColor &_color);
+	static void DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &line_,
+											const float limit_,
+											const std::string &filename_,
+											const PointColor &color_);
 
 	/**************************************************/
-	static std::pair<float, float> DEBUG_getDebugGenerationLimit(const pcl::PointCloud<pcl::PointNormal>::Ptr &_cloud);
+	static std::pair<float, float> DEBUG_getDebugGenerationLimit(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_);
 };
