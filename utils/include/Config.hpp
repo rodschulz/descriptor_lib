@@ -61,7 +61,7 @@ public:
 		return getInstance()->cacheLocation;
 	}
 
-	// Returns the descritor calculation parameters
+	// Returns the descriptor calculation parameters
 	static DescriptorParams getDescriptorParams()
 	{
 		if (getInstance()->descriptorParams == NULL)
