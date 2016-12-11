@@ -5,7 +5,10 @@
 #include "CloudFactory.hpp"
 #include "PointFactory.hpp"
 
-pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCube(const double _size, const Eigen::Vector3f &_center, const int _npoints)
+
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCube(const double _size,
+		const Eigen::Vector3f &_center,
+		const int _npoints)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 	int N = sqrt(_npoints / 6);
@@ -54,7 +57,11 @@ pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCube(const double _si
 	return cloud;
 }
 
-pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCylinderSection(const float _angle, const float _radius, const float _height, const Eigen::Vector3f &_center, const int _npoints)
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCylinderSection(const float _angle,
+		const float _radius,
+		const float _height,
+		const Eigen::Vector3f &_center,
+		const int _npoints)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 
@@ -92,7 +99,12 @@ pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCylinderSection(const
 	return cloud;
 }
 
-pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createHorizontalPlane(const float _minX, const float _maxX, const float _minY, const float _maxY, const float _z, const int _npoints)
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createHorizontalPlane(const float _minX,
+		const float _maxX,
+		const float _minY,
+		const float _maxY,
+		const float _z,
+		const int _npoints)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 	int N = sqrt(_npoints);
@@ -108,7 +120,10 @@ pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createHorizontalPlane(const
 	return cloud;
 }
 
-pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createSphereSection(const float _azimuth, const float _radius, const Eigen::Vector3f &_center, const int _npoints)
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createSphereSection(const float _azimuth,
+		const float _radius,
+		const Eigen::Vector3f &_center,
+		const int _npoints)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 
@@ -131,7 +146,8 @@ pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createSphereSection(const f
 	return cloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint32_t color_)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+		uint32_t color_)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	coloredCloud->reserve(cloud_->size());
@@ -145,7 +161,10 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(cons
 	return coloredCloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint8_t _r, uint8_t _g, uint8_t _b)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+		uint8_t _r,
+		uint8_t _g,
+		uint8_t _b)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	coloredCloud->reserve(cloud_->size());

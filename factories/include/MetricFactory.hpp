@@ -16,33 +16,34 @@
 class MetricFactory
 {
 public:
-	// Creates a metric instance according to the given parameters
-	static MetricPtr createMetric(const MetricType &_type, const std::vector<std::string> _args = std::vector<std::string>())
+	/**************************************************/
+	static MetricPtr createMetric(const MetricType &_type,
+								  const std::vector<std::string> _args = std::vector<std::string>())
 	{
 		switch (_type)
 		{
-			case METRIC_EUCLIDEAN:
-				return MetricPtr(new EuclideanMetric());
+		case METRIC_EUCLIDEAN:
+			return MetricPtr(new EuclideanMetric());
 
-			case METRIC_CLOSEST_PERMUTATION:
-			case METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE:
-			{
-				int size = 0;
+		case METRIC_CLOSEST_PERMUTATION:
+		case METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE:
+		{
+			int size = 0;
 
-				// Check if should use the configuration to "calculate" the params or read them
-				if (boost::iequals("conf", _args[1]))
-					size = Config::getDescriptorParams().getSequenceLength();
-				else
-					size = atoi(_args[1].c_str());
+			// Check if should use the configuration to "calculate" the params or read them
+			if (boost::iequals("conf", _args[1]))
+				size = Config::getDescriptorParams().getSequenceLength();
+			else
+				size = atoi(_args[1].c_str());
 
-				if (_type == METRIC_CLOSEST_PERMUTATION)
-					return MetricPtr(new ClosestPermutationMetric(size));
-				else
-					return MetricPtr(new ClosestPermutationWithConfidenceMetric(size));
-			}
+			if (_type == METRIC_CLOSEST_PERMUTATION)
+				return MetricPtr(new ClosestPermutationMetric(size));
+			else
+				return MetricPtr(new ClosestPermutationWithConfidenceMetric(size));
+		}
 
-			default:
-				return MetricPtr();
+		default:
+			return MetricPtr();
 		}
 	}
 
