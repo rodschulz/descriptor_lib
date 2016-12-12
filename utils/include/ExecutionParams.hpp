@@ -61,7 +61,7 @@ static std::string cloudType[] = {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set of structures groupping functionality-related parameters
+// Set of structures grouping functionality-related parameters
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Structure grouping the parameters involved in the descriptor's calculation
@@ -125,7 +125,7 @@ struct DescriptorParams
 };
 
 /**
- * Structure grouping the params involved in the custering process
+ * Structure grouping the params involved in the clustering process
  */
 struct ClusteringParams
 {
@@ -134,7 +134,7 @@ struct ClusteringParams
 	int clusterNumber; // Number of clusters used in the clustering test
 	int maxIterations; // Clustering max iterations
 	double stopThreshold; // Clustering stop threshold
-	int attempts; // Number of attemtps to try when clustering
+	int attempts; // Number of attempts to try when clustering
 	bool generateElbowCurve; // Flag indicating if an elbow graph has to be generated
 	bool generateDistanceMatrix; // Flag indicating if the distance matrix image has to be generated
 
@@ -174,7 +174,7 @@ struct ClusteringParams
 struct CloudSmoothingParams
 {
 	bool useSmoothing; // Flag indicating if the smoothing has to be performed or not
-	double sigma; // Sigma used for the gaussian smoothning
+	double sigma; // Sigma used for the gaussian smoothing
 	double radius; // Search radius used for the gaussian smoothing
 
 	CloudSmoothingParams()

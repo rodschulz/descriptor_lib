@@ -2,14 +2,25 @@
  * Author: rodrigo
  * 2016
  */
-#include "DescriptorXX.hpp"
+#include "SHOT.hpp"
 #include <pcl/features/shot.h>
 #include <pcl/common/io.h>
 #include "CloudUtils.hpp"
 
 
+void SHOT::load(const YAML::Node &config_)
+{
+	searchRadius = config_["searchRadius"].as<float>();
+}
+
+std::string SHOT::toString() const
+{
+	std::stringstream stream;
+	stream << "searchRadius:" << searchRadius;
+	return stream.str();
+}
+
 void SHOT::computeDense(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
-						const DescriptorParamsPtr &params_,
 						cv::Mat &descriptors_) const
 {
 	// Remove any NaN
@@ -21,13 +32,12 @@ void SHOT::computeDense(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
 	pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(filtered, -1);
 
 	// Compute the descriptor
-	SHOTParams *params = (SHOTParams *)params_.get();
 	pcl::PointCloud<pcl::SHOT352>::Ptr descCloud(new pcl::PointCloud<pcl::SHOT352>());
 	pcl::SHOTEstimation<pcl::PointXYZ, pcl::Normal, pcl::SHOT352> shot;
 	shot.setInputCloud(filtered);
 	shot.setInputNormals(normals);
-	shot.setRadiusSearch(params->searchRadius);
-	shot.setLRFRadius(params->searchRadius);
+	shot.setRadiusSearch(searchRadius);
+	shot.setLRFRadius(searchRadius);
 	shot.compute(*descCloud);
 
 	// Prepare matrix to copy data
