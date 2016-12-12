@@ -10,12 +10,18 @@
 #include "CloudUtils.hpp"
 #include "Utils.hpp"
 
+
 enum ReadingState
 {
-	READING_METADATA, READING_DIMENSIONS, READING_DATA
+	READING_METADATA,
+	READING_DIMENSIONS,
+	READING_DATA
 };
 
-bool Loader::loadMatrix(const std::string &filename_, cv::Mat &matrix_, std::map<std::string, std::string> *metadata_)
+
+bool Loader::loadMatrix(const std::string &filename_,
+						cv::Mat &matrix_,
+						std::map<std::string, std::string> *metadata_)
 {
 	bool loadOk = true;
 	size_t row = 0;
@@ -106,18 +112,28 @@ bool Loader::loadMatrix(const std::string &filename_, cv::Mat &matrix_, std::map
 	return loadOk;
 }
 
-bool Loader::loadDescriptors(const std::string &cacheLocation_, const std::string &cloudInputFilename_, const double normalEstimationRadius_, const DescriptorParams &descritorParams_, const CloudSmoothingParams &smoothingParams_, cv::Mat &descriptors_)
+bool Loader::loadDescriptors(const std::string &cacheLocation_,
+							 const std::string &cloudInputFilename_,
+							 const double normalEstimationRadius_,
+							 const DescriptorParams &descritorParams_,
+							 const CloudSmoothingParams &smoothingParams_,
+							 cv::Mat &descriptors_)
 {
 	std::string filename = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descritorParams_, smoothingParams_);
 	return loadMatrix(filename, descriptors_);
 }
 
-bool Loader::loadCenters(const std::string &filename_, cv::Mat &centers_, std::map<std::string, std::string> *metadata_)
+bool Loader::loadCenters(const std::string &filename_,
+						 cv::Mat &centers_,
+						 std::map<std::string, std::string> *metadata_)
 {
 	return loadMatrix(filename_, centers_, metadata_);
 }
 
-bool Loader::loadCloud(const std::string &filename_, const double normalEstimationRadius_, const CloudSmoothingParams &params_, pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
+bool Loader::loadCloud(const std::string &filename_,
+					   const double normalEstimationRadius_,
+					   const CloudSmoothingParams &params_,
+					   pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
 {
 	// Load cartesian data from disk
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ(new pcl::PointCloud<pcl::PointXYZ>());
@@ -143,7 +159,9 @@ bool Loader::loadCloud(const std::string &filename_, const double normalEstimati
 	return loadOk;
 }
 
-void Loader::traverseDirectory(const std::string &inputDirectory_, std::vector<std::pair<cv::Mat, std::map<std::string, std::string> > > &data_, std::pair<int, int> &dimensions_)
+void Loader::traverseDirectory(const std::string &inputDirectory_,
+							   std::vector<std::pair<cv::Mat, std::map<std::string, std::string> > > &data_,
+							   std::pair<int, int> &dimensions_)
 {
 	boost::filesystem::path target(inputDirectory_);
 	boost::filesystem::directory_iterator it(target), eod;
