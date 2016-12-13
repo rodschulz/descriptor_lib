@@ -32,6 +32,7 @@ std::string DCH::toString() const
 }
 
 void DCH::computeDense(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+					   const pcl::PointCloud<pcl::Normal>::Ptr &normals_,
 					   cv::Mat &descriptors_) const
 {
 }

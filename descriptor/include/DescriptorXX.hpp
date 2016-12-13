@@ -38,7 +38,20 @@ public:
 
 	/**************************************************/
 	virtual void computeDense(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+							  const pcl::PointCloud<pcl::Normal>::Ptr &normals_,
 							  cv::Mat &decriptors_) const = 0;
+
+	/**************************************************/
+	// virtual void computePoint(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+	// 						  const pcl::PointCloud<pcl::Normal>::Ptr &normals_,
+	// 						  const int index_,
+	// 						  cv::Mat &decriptor_) const = 0;
+
+	// /**************************************************/
+	// virtual void computePoint(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+	// 						  const pcl::PointCloud<pcl::Normal>::Ptr &normals_,
+	// 						  const pcl::PointXYZ &point_,
+	// 						  cv::Mat &decriptor_) const = 0;
 
 	/**************************************************/
 	DescriptorType getType() const

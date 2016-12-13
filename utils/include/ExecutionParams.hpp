@@ -114,12 +114,12 @@ struct DescriptorParams
 		std::stringstream stream;
 		stream << std::boolalpha
 			   << "patchSize:" << patchSize
-			   << " bandNumber:" << bandNumber
-			   << " bandWidth:" << bandWidth
-			   << " bidirectional:" << bidirectional
-			   << " useProjection:" << useProjection
-			   << " sequenceBin:" << sequenceBin
-			   << " sequenceStat:" << seqStat[sequenceStat];
+			   << "-bandNumber:" << bandNumber
+			   << "-bandWidth:" << bandWidth
+			   << "-bidirectional:" << bidirectional
+			   << "-useProjection:" << useProjection
+			   << "-sequenceBin:" << sequenceBin
+			   << "-sequenceStat:" << seqStat[sequenceStat];
 		return stream.str();
 	}
 };
@@ -156,13 +156,13 @@ struct ClusteringParams
 		std::ostringstream stream;
 		stream << std::boolalpha
 			   << "implementation:" << clusteringImp[implementation]
-			   << " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
-			   << " clusterNumber:" << clusterNumber
-			   << " maxIterations:" << maxIterations
-			   << " stopThreshold:" << stopThreshold
-			   << " attempts:" << attempts
-			   << " generateElbowCurve:" << generateElbowCurve
-			   << " generateDistanceMatrix:" << generateDistanceMatrix;
+			   << "-metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
+			   << "-clusterNumber:" << clusterNumber
+			   << "-maxIterations:" << maxIterations
+			   << "-stopThreshold:" << stopThreshold
+			   << "-attempts:" << attempts
+			   << "-generateElbowCurve:" << generateElbowCurve
+			   << "-generateDistanceMatrix:" << generateDistanceMatrix;
 
 		return stream.str();
 	}
@@ -190,14 +190,14 @@ struct CloudSmoothingParams
 		std::stringstream stream;
 		stream << std::boolalpha
 			   << "useSmoothing:" << useSmoothing
-			   << " sigma:" << sigma
-			   << " radius:" << radius;
+			   << "-sigma:" << sigma
+			   << "-radius:" << radius;
 		return stream.str();
 	}
 };
 
 /**
- * Structure defing the params for the generation of synthetic clouds
+ * Structure defining the params for the generation of synthetic clouds
  */
 struct SyntheticCloudsParams
 {
@@ -216,7 +216,7 @@ struct SyntheticCloudsParams
 		std::stringstream stream;
 		stream << std::boolalpha
 			   << "useSynthetic:" << useSynthetic
-			   << " synCloudType:" << cloudType[synCloudType];
+			   << "-synCloudType:" << cloudType[synCloudType];
 		return stream.str();
 	}
 };

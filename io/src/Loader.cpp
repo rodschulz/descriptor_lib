@@ -112,48 +112,33 @@ bool Loader::loadMatrix(const std::string &filename_,
 	return loadOk;
 }
 
-bool Loader::loadDescriptors(const std::string &cacheLocation_,
+bool Loader::loadDescriptors(const std::string &cacheDir_,
 							 const std::string &cloudInputFilename_,
 							 const double normalEstimationRadius_,
-							 const DescriptorParams &descritorParams_,
+							 const DescriptorPtr &descritor_,
 							 const CloudSmoothingParams &smoothingParams_,
 							 cv::Mat &descriptors_)
 {
-	std::string filename = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descritorParams_, smoothingParams_);
+	std::string filename = cacheDir_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descritor_, smoothingParams_);
 	return loadMatrix(filename, descriptors_);
 }
 
-bool Loader::loadCenters(const std::string &filename_,
-						 cv::Mat &centers_,
-						 std::map<std::string, std::string> *metadata_)
-{
-	return loadMatrix(filename_, centers_, metadata_);
-}
-
 bool Loader::loadCloud(const std::string &filename_,
-					   const double normalEstimationRadius_,
 					   const CloudSmoothingParams &params_,
-					   pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
+					   pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_)
 {
 	// Load cartesian data from disk
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudXYZ(new pcl::PointCloud<pcl::PointXYZ>());
-	bool loadOk = pcl::io::loadPCDFile<pcl::PointXYZ>(filename_, *cloudXYZ) == 0;
+	cloud_ = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>());
+	bool loadOk = pcl::io::loadPCDFile<pcl::PointXYZ>(filename_, *cloud_) == 0;
 
 	if (loadOk)
 	{
 		// Remove NANs
-		CloudUtils::removeNANs(cloudXYZ);
+		CloudUtils::removeNANs(cloud_);
 
 		// Apply smoothing
 		if (params_.useSmoothing)
-			cloudXYZ = CloudUtils::gaussianSmoothing(cloudXYZ, params_.sigma, params_.radius);
-
-		// Estimate normals
-		pcl::PointCloud<pcl::Normal>::Ptr normals = CloudUtils::estimateNormals(cloudXYZ, normalEstimationRadius_);
-
-		// Deliver the cloud
-		cloud_->clear();
-		pcl::concatenateFields(*cloudXYZ, *normals, *cloud_);
+			cloud_ = CloudUtils::gaussianSmoothing(cloud_, params_.sigma, params_.radius);
 	}
 
 	return loadOk;
@@ -175,7 +160,7 @@ void Loader::traverseDirectory(const std::string &inputDirectory_,
 
 				cv::Mat centers;
 				std::map<std::string, std::string> metadata;
-				if (loadCenters(filePath.string(), centers, &metadata))
+				if (loadMatrix(filePath.string(), centers, &metadata))
 				{
 					data_.push_back(std::make_pair(centers, metadata));
 					dimensions_.first += centers.rows;

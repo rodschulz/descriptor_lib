@@ -11,6 +11,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "ExecutionParams.hpp"
+#include "DescriptorXX.hpp"
 
 
 // Colors defined to be used for points
@@ -134,7 +135,7 @@ public:
 	/**************************************************/
 	static std::string getCalculationConfigHash(const std::string _inputCloudFile,
 			const double normalEstimationRadius_,
-			const DescriptorParams &descriptorParams_,
+			const DescriptorPtr &descritor_,
 			const CloudSmoothingParams &smoothingParams_);
 
 	/**************************************************/

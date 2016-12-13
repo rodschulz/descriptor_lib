@@ -327,18 +327,18 @@ void Writer::writeDescriptorsCache(const cv::Mat &descriptors_,
 								   const std::string &cacheLocation_,
 								   const std::string &cloudInputFilename_,
 								   const double normalEstimationRadius_,
-								   const DescriptorParams &descriptorParams_,
+								   const DescriptorPtr &descritor_,
 								   const CloudSmoothingParams &smoothingParams_)
 {
 	if (!boost::filesystem::exists(cacheLocation_))
 		if (system(("mkdir " + cacheLocation_).c_str()) != 0)
 			std::cout << "WARNING: can't create cache folder" << std::endl;
 
-	std::string destination = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descriptorParams_, smoothingParams_);
+	std::string destination = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descritor_, smoothingParams_);
 
 	std::vector<std::string> metadata;
 	metadata.push_back("normalEstimationRadius:" + boost::lexical_cast<std::string>(normalEstimationRadius_));
-	metadata.push_back(descriptorParams_.toString());
+	metadata.push_back(descritor_->toString());
 	metadata.push_back(smoothingParams_.toString());
 
 	writeMatrix(destination, descriptors_, metadata);

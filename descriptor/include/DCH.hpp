@@ -32,6 +32,7 @@ public:
 
 	/**************************************************/
 	void computeDense(const pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_,
+					  const pcl::PointCloud<pcl::Normal>::Ptr &normals_,
 					  cv::Mat &decriptors_) const;
 
 private:

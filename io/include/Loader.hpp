@@ -8,6 +8,7 @@
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
 #include <string>
+#include "DescriptorXX.hpp"
 #include "ExecutionParams.hpp"
 
 class Loader
@@ -19,23 +20,17 @@ public:
 						   std::map<std::string, std::string> *metadata_ = NULL);
 
 	/**************************************************/
-	static bool loadDescriptors(const std::string &cacheLocation_,
+	static bool loadDescriptors(const std::string &cacheDir_,
 								const std::string &cloudInputFilename_,
 								const double normalEstimationRadius_,
-								const DescriptorParams &descritorParams_,
+								const DescriptorPtr &descritor_,
 								const CloudSmoothingParams &smoothingParams_,
 								cv::Mat &descriptors_);
 
 	/**************************************************/
-	static bool loadCenters(const std::string &filename_,
-							cv::Mat &centers_,
-							std::map<std::string, std::string> *metadata_ = NULL);
-
-	/**************************************************/
 	static bool loadCloud(const std::string &filename_,
-						  const double normalEstimationRadius_,
 						  const CloudSmoothingParams &params_,
-						  pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_);
+						  pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_);
 
 	/**************************************************/
 	static void traverseDirectory(const std::string &inputDirectory_,

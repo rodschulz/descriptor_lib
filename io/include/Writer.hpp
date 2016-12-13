@@ -9,6 +9,7 @@
 #include "Hist.hpp"
 #include "Extractor.hpp"
 #include "Metric.hpp"
+#include "DescriptorXX.hpp"
 
 class Writer
 {
@@ -65,7 +66,7 @@ public:
 									  const std::string &cacheLocation_,
 									  const std::string &cloudInputFilename_,
 									  const double normalEstimationRadius_,
-									  const DescriptorParams &descriptorParams_,
+									  const DescriptorPtr &descritor_,
 									  const CloudSmoothingParams &smoothingParams_);
 
 	/**************************************************/
