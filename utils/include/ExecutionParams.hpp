@@ -28,7 +28,7 @@ static std::string seqStat[] =
 	BOOST_STRINGIZE(STAT_MEDIAN)
 };
 
-SequenceStat toStatType(const std::string &type_)
+static inline SequenceStat toStatType(const std::string &type_)
 {
 	if (boost::iequals(type_, "mean"))
 		return STAT_MEAN;
@@ -57,7 +57,7 @@ static std::string clusteringImp[] =
 	BOOST_STRINGIZE(CLUSTERING_KMEDOIDS)
 };
 
-ClusteringImplementation toClusteringImp(const std::string &type_)
+static inline ClusteringImplementation toClusteringImp(const std::string &type_)
 {
 	if (boost::iequals(type_, "opencv"))
 		return CLUSTERING_OPENCV;
@@ -91,7 +91,7 @@ static std::string cloudType[] = {
 	BOOST_STRINGIZE(CLOUD_PLANE)
 };
 
-SynCloudType toSynCloudType(const std::string &type_)
+static inline SynCloudType toSynCloudType(const std::string &type_)
 {
 	if (boost::iequals(type_, "cube"))
 		return CLOUD_CUBE;

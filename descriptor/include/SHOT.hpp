@@ -6,23 +6,25 @@
 
 #include <iostream>
 #include <pcl/features/shot.h>
-#include "ExecutionParams.hpp"
+#include "DescriptorParams.hpp"
 
 
 class SHOT
 {
 public:
 	static void computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-							 const DescriptorParams &params_,
+							 const DescriptorParamsPtr &params_,
 							 cv::Mat &descriptors_)
 	{
+		SHOTParams *params = dynamic_cast<SHOTParams *>(params_.get());
+
 		// Compute the descriptor
 		pcl::PointCloud<pcl::SHOT352>::Ptr descriptorCloud(new pcl::PointCloud<pcl::SHOT352>());
 		pcl::SHOTEstimation<pcl::PointNormal, pcl::PointNormal, pcl::SHOT352> shot;
 		shot.setInputCloud(cloud_);
 		shot.setInputNormals(cloud_);
-		shot.setRadiusSearch(params_.searchRadius);
-		shot.setLRFRadius(params_.searchRadius);
+		shot.setRadiusSearch(params->searchRadius);
+		shot.setLRFRadius(params->searchRadius);
 		shot.compute(*descriptorCloud);
 
 		// Prepare matrix to copy data
