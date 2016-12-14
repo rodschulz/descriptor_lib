@@ -31,12 +31,15 @@ struct ExecParamsFixture {
 		params.useProjection = false;
 		params.sequenceBin = 1;
 		params.sequenceStat = STAT_MEAN;
+
+		DescriptorParamsPtr paramsPtr = DescriptorParamsPtr(&params);
 	}
 	~ ExecParamsFixture() {}
 
 	int targetPoint;
 	double normalEstimationRadius;
-	DescriptorParams params;
+	DCHParams params;
+	DescriptorParamsPtr paramsPtr;
 };
 /**************************************************/
 
@@ -49,8 +52,8 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, ExecParamsFixture)
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 20000);
 	pcl::PointNormal point = cloud->at(targetPoint);
 
-	Descriptor descriptor1 = DCH::calculateDescriptor(cloud, params, targetPoint);
-	Descriptor descriptor2 = DCH::calculateDescriptor(cloud, params, point);
+	Descriptor descriptor1 = DCH::calculateDescriptor(cloud, paramsPtr, targetPoint);
+	Descriptor descriptor2 = DCH::calculateDescriptor(cloud, paramsPtr, point);
 
 	// Check sizes
 	BOOST_CHECK_EQUAL(descriptor1.size(), params.bandNumber);
@@ -73,8 +76,8 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_plane, ExecParamsFixture)
 
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
-	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	DCH::fillSequences(bands, params, M_PI / 18);
+	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, &params);
+	DCH::fillSequences(bands, paramsPtr, M_PI / 18);
 
 	int sequenceSize = params.getSequenceLength();
 	std::string zeroSequence = "";
@@ -98,8 +101,8 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, ExecParamsFixture)
 
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
-	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	DCH::fillSequences(bands, params, M_PI / 18);
+	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, &params);
+	DCH::fillSequences(bands, paramsPtr, M_PI / 18);
 
 	int sequenceSize = params.getSequenceLength();
 	std::string sequence = "000AAAABBB";
@@ -141,7 +144,7 @@ BOOST_FIXTURE_TEST_CASE(getBands_no_bidirectional, ExecParamsFixture)
 	pcl::PointNormal point = cloud->at(targetPoint);
 
 	// Extract bands
-	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
+	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, &params);
 
 	// Check number of bands is ok
 	BOOST_CHECK_EQUAL(bands.size(), params.bandNumber);
@@ -172,13 +175,13 @@ BOOST_FIXTURE_TEST_CASE(getBands_bidirectional, ExecParamsFixture)
 	pcl::PointNormal point = cloud->at(targetPoint);
 
 	// Extract bands
-	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
+	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, &params);
 
 	// Check number of bands is ok
 	BOOST_CHECK_EQUAL(bands.size(), params.bandNumber);
 
 	// Extract bands
-	bands = Extractor::getBands(cloud, point, params);
+	bands = Extractor::getBands(cloud, point, &params);
 
 	// Check bands are ok
 	Eigen::Vector3f pointNormal = point.getNormalVector3fMap();

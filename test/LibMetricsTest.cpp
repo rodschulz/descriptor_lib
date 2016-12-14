@@ -1,6 +1,6 @@
 /**
  * Author: rodrigo
- * 2016     
+ * 2016
  */
 #include <boost/test/unit_test.hpp>
 #include "MetricFactory.hpp"
@@ -33,6 +33,18 @@ BOOST_AUTO_TEST_CASE(createMetric)
 
 	ClosestPermutationWithConfidenceMetric* closestPermutationWithConfidence = dynamic_cast<ClosestPermutationWithConfidenceMetric*> (metric.get());
 	BOOST_CHECK(closestPermutationWithConfidence != NULL);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(MetricFactory_class_suite)
+
+BOOST_AUTO_TEST_CASE(toMetricType)
+{
+	BOOST_CHECK_EQUAL(Metric::toMetricType("euclidean"), METRIC_EUCLIDEAN);
+	BOOST_CHECK_EQUAL(Metric::toMetricType("closest"), METRIC_CLOSEST_PERMUTATION);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

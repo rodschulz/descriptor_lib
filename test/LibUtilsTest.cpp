@@ -171,31 +171,31 @@ BOOST_AUTO_TEST_CASE(generatePerpendicularPointsInPlane)
 	BOOST_CHECK_SMALL(axes.second.dot(normal), 1E-20f);
 }
 
-BOOST_AUTO_TEST_CASE(getSynCloudType)
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(ExecutionParams_suite)
+
+BOOST_AUTO_TEST_CASE(strToSynCloudType)
 {
-	BOOST_CHECK_EQUAL(Utils::getSynCloudType("cube"), CLOUD_CUBE);
-	BOOST_CHECK_EQUAL(Utils::getSynCloudType("cylinder"), CLOUD_CYLINDER);
-	BOOST_CHECK_EQUAL(Utils::getSynCloudType("sphere"), CLOUD_SPHERE);
+	BOOST_CHECK_EQUAL(toSynCloudType("cube"), CLOUD_CUBE);
+	BOOST_CHECK_EQUAL(toSynCloudType("cylinder"), CLOUD_CYLINDER);
+	BOOST_CHECK_EQUAL(toSynCloudType("sphere"), CLOUD_SPHERE);
 }
 
-BOOST_AUTO_TEST_CASE(getStatType)
+BOOST_AUTO_TEST_CASE(strToStatType)
 {
-	BOOST_CHECK_EQUAL(Utils::getStatType("mean"), STAT_MEAN);
-	BOOST_CHECK_EQUAL(Utils::getStatType("median"), STAT_MEDIAN);
+	BOOST_CHECK_EQUAL(toStatType("mean"), STAT_MEAN);
+	BOOST_CHECK_EQUAL(toStatType("median"), STAT_MEDIAN);
 }
 
-BOOST_AUTO_TEST_CASE(getClusteringImplementation)
+BOOST_AUTO_TEST_CASE(strToClusteringImp)
 {
-	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("opencv"), CLUSTERING_OPENCV);
-	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("kmeans"), CLUSTERING_KMEANS);
-	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("stochastic"), CLUSTERING_STOCHASTIC);
-	BOOST_CHECK_EQUAL(Utils::getClusteringImplementation("kmedoids"), CLUSTERING_KMEDOIDS);
-}
-
-BOOST_AUTO_TEST_CASE(getMetricType)
-{
-	BOOST_CHECK_EQUAL(Utils::getMetricType("euclidean"), METRIC_EUCLIDEAN);
-	BOOST_CHECK_EQUAL(Utils::getMetricType("closest"), METRIC_CLOSEST_PERMUTATION);
+	BOOST_CHECK_EQUAL(toClusteringImp("opencv"), CLUSTERING_OPENCV);
+	BOOST_CHECK_EQUAL(toClusteringImp("kmeans"), CLUSTERING_KMEANS);
+	BOOST_CHECK_EQUAL(toClusteringImp("stochastic"), CLUSTERING_STOCHASTIC);
+	BOOST_CHECK_EQUAL(toClusteringImp("kmedoids"), CLUSTERING_KMEDOIDS);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -204,12 +204,12 @@ BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(DescriptorParams_class_suite)
 
-BOOST_AUTO_TEST_CASE(constructor)
+BOOST_AUTO_TEST_CASE(DCH_constructor)
 {
-	BOOST_CHECK_EQUAL(sizeof(DescriptorParams), 56);
-	BOOST_CHECK_MESSAGE(sizeof(DescriptorParams) == 56, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
+	BOOST_CHECK_EQUAL(sizeof(DCHParams), 56);
+	BOOST_CHECK_MESSAGE(sizeof(DCHParams) == 56, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
 
-	DescriptorParams params;
+	DCHParams params;
 	BOOST_CHECK_EQUAL(params.searchRadius, 0.05);
 	BOOST_CHECK_EQUAL(params.bandNumber, 4);
 	BOOST_CHECK_EQUAL(params.bandWidth, 0.01);
@@ -219,9 +219,9 @@ BOOST_AUTO_TEST_CASE(constructor)
 	BOOST_CHECK_EQUAL(params.sequenceStat, STAT_MEAN);
 }
 
-BOOST_AUTO_TEST_CASE(getBandsAngularRange)
+BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularRange)
 {
-	DescriptorParams params;
+	DCHParams params;
 
 	params.bidirectional = true;
 	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), M_PI);
@@ -229,9 +229,9 @@ BOOST_AUTO_TEST_CASE(getBandsAngularRange)
 	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), 2 * M_PI);
 }
 
-BOOST_AUTO_TEST_CASE(getBandsAngularStep)
+BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularStep)
 {
-	DescriptorParams params;
+	DCHParams params;
 
 	params.bidirectional = true;
 	params.bandNumber = 10;
@@ -242,9 +242,9 @@ BOOST_AUTO_TEST_CASE(getBandsAngularStep)
 	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 5);
 }
 
-BOOST_AUTO_TEST_CASE(getSequenceLength)
+BOOST_AUTO_TEST_CASE(DCHParams_getSequenceLength)
 {
-	DescriptorParams params;
+	DCHParams params;
 
 	params.bidirectional = true;
 	params.searchRadius = 10;
