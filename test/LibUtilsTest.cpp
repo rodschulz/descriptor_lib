@@ -206,16 +206,16 @@ BOOST_AUTO_TEST_SUITE(DescriptorParams_class_suite)
 
 BOOST_AUTO_TEST_CASE(DCH_constructor)
 {
-	BOOST_CHECK_EQUAL(sizeof(DCHParams), 56);
-	BOOST_CHECK_MESSAGE(sizeof(DCHParams) == 56, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
+	BOOST_CHECK_EQUAL(sizeof(DCHParams), 40);
+	BOOST_CHECK_MESSAGE(sizeof(DCHParams) == 40, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
 
 	DCHParams params;
-	BOOST_CHECK_EQUAL(params.searchRadius, 0.05);
+	BOOST_CHECK_CLOSE(params.searchRadius, 0.05, 1e-5);
 	BOOST_CHECK_EQUAL(params.bandNumber, 4);
-	BOOST_CHECK_EQUAL(params.bandWidth, 0.01);
+	BOOST_CHECK_CLOSE(params.bandWidth, 0.01, 1e-5);
 	BOOST_CHECK_EQUAL(params.bidirectional, true);
 	BOOST_CHECK_EQUAL(params.useProjection, true);
-	BOOST_CHECK_EQUAL(params.sequenceBin, 0.01);
+	BOOST_CHECK_CLOSE(params.sequenceBin, 0.01, 1e-5);
 	BOOST_CHECK_EQUAL(params.sequenceStat, STAT_MEAN);
 }
 
@@ -224,9 +224,9 @@ BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularRange)
 	DCHParams params;
 
 	params.bidirectional = true;
-	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), M_PI);
+	BOOST_CHECK_CLOSE(params.getBandsAngularRange(), M_PI, 1e-5);
 	params.bidirectional = false;
-	BOOST_CHECK_EQUAL(params.getBandsAngularRange(), 2 * M_PI);
+	BOOST_CHECK_CLOSE(params.getBandsAngularRange(), 2 * M_PI, 1e-5);
 }
 
 BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularStep)
@@ -235,11 +235,11 @@ BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularStep)
 
 	params.bidirectional = true;
 	params.bandNumber = 10;
-	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 10);
+	BOOST_CHECK_CLOSE(params.getBandsAngularStep(), M_PI / 10, 1e-5);
 
 	params.bidirectional = false;
 	params.bandNumber = 10;
-	BOOST_CHECK_EQUAL(params.getBandsAngularStep(), M_PI / 5);
+	BOOST_CHECK_CLOSE(params.getBandsAngularStep(), M_PI / 5, 1e-5);
 }
 
 BOOST_AUTO_TEST_CASE(DCHParams_getSequenceLength)

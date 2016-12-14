@@ -78,12 +78,12 @@ struct DescriptorParams
 /**************************************************/
 struct DCHParams: public DescriptorParams
 {
-	double searchRadius; // Search radius for the KNN search method
+	float searchRadius; // Search radius for the KNN search method
 	int bandNumber; // Number of bands of the descriptor
-	double bandWidth; // Width of each band
+	float bandWidth; // Width of each band
 	bool bidirectional; // True if each band is bidirectional
 	bool useProjection; // True if the angle calculation is using a projection
-	double sequenceBin; // Size of the bins used in the sequence construction
+	float sequenceBin; // Size of the bins used in the sequence construction
 	SequenceStat sequenceStat; // Statistic used in the descriptor
 
 	/**************************************************/
@@ -134,7 +134,7 @@ struct DCHParams: public DescriptorParams
 	}
 
 	/**************************************************/
-	double getBandsAngularRange() const
+	float getBandsAngularRange() const
 	{
 		if (bidirectional)
 			return M_PI;
@@ -143,7 +143,7 @@ struct DCHParams: public DescriptorParams
 	}
 
 	/**************************************************/
-	double getBandsAngularStep() const
+	float getBandsAngularStep() const
 	{
 		return getBandsAngularRange() / bandNumber;
 	}
