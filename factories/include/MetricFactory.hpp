@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 #include "EuclideanMetric.hpp"
 #include "ClosestPermutationMetric.hpp"
@@ -30,13 +31,22 @@ public:
 		{
 			int size = 0;
 
-			//FIX THIS!
-
 			// Check if should use the configuration to "calculate" the params or read them
-			// if (boost::iequals("conf", _args[1]))
-			// 	size = Config::getDescriptorParams().getSequenceLength();
-			// else
-			// 	size = atoi(_args[1].c_str());
+			if (boost::iequals("conf", _args[1]))
+			{
+
+				DCHParams *params = dynamic_cast<DCHParams *>(Config::getDescriptorParams().get());
+				if (params)
+					size = params->getSequenceLength();
+				else
+				{
+					std::cout << "[MetricFactory] WARNING: 'conf' arg incompatible with selected descriptor. Falling back to EuclideanMetric" << std::endl;
+					return MetricPtr(new EuclideanMetric());
+				}
+			}
+			else
+				size = atoi(_args[1].c_str());
+
 
 			if (type_ == METRIC_CLOSEST_PERMUTATION)
 				return MetricPtr(new ClosestPermutationMetric(size));
