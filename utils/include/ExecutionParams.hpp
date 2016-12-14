@@ -206,25 +206,3 @@ struct SyntheticCloudsParams
 		return stream.str();
 	}
 };
-
-/**
- * Structure grouping the params for the metric testing routines
- */
-struct MetricTestingParams
-{
-	MetricPtr metric; // Type of metric to be tested
-
-	/**************************************************/
-	MetricTestingParams()
-	{
-		metric = MetricPtr();
-	}
-
-	/**************************************************/
-	std::string toString() const
-	{
-		std::stringstream stream;
-		stream << std::boolalpha << "metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]";
-		return stream.str();
-	}
-};

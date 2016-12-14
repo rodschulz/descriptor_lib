@@ -26,7 +26,6 @@ Config::Config()
 	clusteringParams = NULL;
 	cloudSmoothingParams = NULL;
 	syntheticCloudParams = NULL;
-	metricTestingParams = NULL;
 }
 
 Config::~Config()
@@ -64,7 +63,7 @@ bool Config::load(const std::string &filename_)
 			ClusteringParams *params = new ClusteringParams();
 			params->implementation = toClusteringImp(clusteringConfig["implementation"].as<std::string>());
 			std::vector<std::string> metricDetails = clusteringConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::create(Metric::toMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::create(Metric::toType(metricDetails[0]), metricDetails);
 			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
 			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
@@ -97,17 +96,6 @@ bool Config::load(const std::string &filename_)
 			params->synCloudType = toSynCloudType(synthCloudConfig["type"].as<std::string>());
 
 			instance->syntheticCloudParams = params;
-		}
-
-		if (config["metricTesting"])
-		{
-			YAML::Node metricTestConfig = config["metricTesting"];
-
-			MetricTestingParams *params = new MetricTestingParams();
-			std::vector<std::string> metricDetails = metricTestConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::create(Metric::toMetricType(metricDetails[0]), metricDetails);
-
-			instance->metricTestingParams = params;
 		}
 	}
 	catch (std::exception &_ex)

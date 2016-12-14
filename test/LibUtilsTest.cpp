@@ -316,19 +316,3 @@ BOOST_AUTO_TEST_CASE(constructor)
 
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
-
-/**************************************************/
-BOOST_AUTO_TEST_SUITE(MetricTestingParams_class_suite)
-
-BOOST_AUTO_TEST_CASE(constructor)
-{
-	BOOST_CHECK_EQUAL(sizeof(MetricTestingParams), 16);
-	BOOST_CHECK_MESSAGE(sizeof(MetricTestingParams) == 16, "MetricTestingParams size changed, check that any new member is being properly initialized in the constructor");
-
-	MetricTestingParams params;
-
-	BOOST_CHECK_EQUAL(params.metric, MetricPtr());
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-/**************************************************/

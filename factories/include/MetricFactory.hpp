@@ -50,9 +50,7 @@ public:
 	}
 
 private:
-	// Constructor
 	MetricFactory();
-	// Destructor
 	~MetricFactory();
 };
 

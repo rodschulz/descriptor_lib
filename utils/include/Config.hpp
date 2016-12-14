@@ -100,14 +100,6 @@ public:
 		return *getInstance()->syntheticCloudParams;
 	}
 
-	// Returns the cloud smoothing parameters
-	static MetricTestingParams getMetricTestingParams()
-	{
-		if (getInstance()->metricTestingParams == NULL)
-			throw std::runtime_error("metric testing params not loaded");
-
-		return *getInstance()->metricTestingParams;
-	}
 
 private:
 	Config();
@@ -116,7 +108,6 @@ private:
 	ClusteringParams *clusteringParams;
 	CloudSmoothingParams *cloudSmoothingParams;
 	SyntheticCloudsParams *syntheticCloudParams;
-	MetricTestingParams *metricTestingParams;
 	YAML::Node config;
 
 	bool debug; // Flag indicating if the debug generation is enabled or not

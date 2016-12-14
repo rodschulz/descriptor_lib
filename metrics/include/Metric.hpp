@@ -54,7 +54,7 @@ public:
 	}
 
 	/**************************************************/
-	static MetricType toMetricType(const std::string &type_)
+	static MetricType toType(const std::string &type_)
 	{
 		if (boost::iequals(type_, "euclidean"))
 			return METRIC_EUCLIDEAN;
