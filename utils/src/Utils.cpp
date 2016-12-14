@@ -92,19 +92,9 @@ std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile,
 	std::string str = "";
 	str += "input=" + getFileChecksum(_inputCloudFile);
 	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius_);
-	str += "-patchSize=" + boost::lexical_cast<std::string>(descriptorParams_.patchSize);
-	str += "-bandNumber=" + boost::lexical_cast<std::string>(descriptorParams_.bandNumber);
-	str += "-bandWidth=" + boost::lexical_cast<std::string>(descriptorParams_.bandWidth);
-	str += "-bidirectional=" + boost::lexical_cast<std::string>(descriptorParams_.bidirectional);
-	str += "-useProjection=" + boost::lexical_cast<std::string>(descriptorParams_.useProjection);
-	str += "-sequenceBin=" + boost::lexical_cast<std::string>(descriptorParams_.sequenceBin);
-	str += "-sequenceStat=" + boost::lexical_cast<std::string>(descriptorParams_.sequenceStat);
+	str += "-" + descriptorParams_.toString();
 	if (smoothingParams_.useSmoothing)
-	{
-		str += "-useSmoothing=" + boost::lexical_cast<std::string>(smoothingParams_.useSmoothing);
-		str += "-smoothingSigma=" + boost::lexical_cast<std::string>(smoothingParams_.sigma);
-		str += "-smoothingRadius=" + boost::lexical_cast<std::string>(smoothingParams_.radius);
-	}
+		str += "-" + smoothingParams_.toString();
 
 	boost::hash<std::string> strHash;
 	return Utils::num2Hex(strHash(str));

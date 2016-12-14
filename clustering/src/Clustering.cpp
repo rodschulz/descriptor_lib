@@ -99,8 +99,8 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 
 	for (size_t i = 0; i < locations.size(); i++)
 	{
-		locations[i].x = params_.patchSize;
-		locations[i].z = params_.patchSize * 3 * i;
+		locations[i].x = params_.searchRadius;
+		locations[i].z = params_.searchRadius * 3 * i;
 	}
 
 	// Angular step between bands

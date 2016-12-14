@@ -131,7 +131,7 @@ std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClou
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes;
 	planes.reserve(bands_.size());
 
-	float delta = params_.patchSize;
+	float delta = params_.searchRadius;
 	float begin = params_.bidirectional ? -delta : 0;
 	float step = (delta - begin) / 10;
 

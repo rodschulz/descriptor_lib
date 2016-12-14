@@ -24,7 +24,7 @@ struct ExecParamsFixture {
 		targetPoint = 100;
 		normalEstimationRadius = -1;
 
-		params.patchSize = 5;
+		params.searchRadius = 5;
 		params.bandNumber = 5;
 		params.bandWidth = 1;
 		params.bidirectional = false;

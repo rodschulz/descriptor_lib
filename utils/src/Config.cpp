@@ -52,7 +52,7 @@ bool Config::load(const std::string &filename_)
 			YAML::Node descriptorConfig = config["descriptor"];
 
 			DescriptorParams *params = new DescriptorParams();
-			params->patchSize = descriptorConfig["patchSize"].as<double>();
+			params->searchRadius = descriptorConfig["searchRadius"].as<double>();
 			params->bandNumber = descriptorConfig["bandNumber"].as<int>();
 			params->bandWidth = descriptorConfig["bandWidth"].as<double>();
 			params->bidirectional = descriptorConfig["bidirectional"].as<bool>();

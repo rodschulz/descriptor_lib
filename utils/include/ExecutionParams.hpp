@@ -61,14 +61,14 @@ static std::string cloudType[] = {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set of structures groupping functionality-related parameters
+// Set of structures grouping functionality-related parameters
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Structure grouping the parameters involved in the descriptor's calculation
  */
 struct DescriptorParams
 {
-	double patchSize; // Search radius for the KNN search method
+	double searchRadius; // Search radius for the KNN search method
 	int bandNumber; // Number of bands to use in the descriptor
 	double bandWidth; // Width of each descriptor's band
 	bool bidirectional; // Indicates if each band has to be analyzed bidirectionally or not
@@ -78,7 +78,7 @@ struct DescriptorParams
 
 	DescriptorParams()
 	{
-		patchSize = 0.05;
+		searchRadius = 0.05;
 		bandNumber = 4;
 		bandWidth = 0.01;
 		bidirectional = true;
@@ -90,7 +90,7 @@ struct DescriptorParams
 	// Returns sequence's length on each bands (number of bins) according to the current config
 	int getSequenceLength() const
 	{
-		return (bidirectional ? patchSize * 2.0 : patchSize) / sequenceBin;
+		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
 	}
 
 	// Returns the angular range of the bands according to the current config
@@ -113,19 +113,19 @@ struct DescriptorParams
 	{
 		std::stringstream stream;
 		stream << std::boolalpha
-			   << "patchSize:" << patchSize
-			   << " bandNumber:" << bandNumber
-			   << " bandWidth:" << bandWidth
-			   << " bidirectional:" << bidirectional
-			   << " useProjection:" << useProjection
-			   << " sequenceBin:" << sequenceBin
-			   << " sequenceStat:" << seqStat[sequenceStat];
+			   << "searchRadius:" << searchRadius
+			   << "-bandNumber:" << bandNumber
+			   << "-bandWidth:" << bandWidth
+			   << "-bidirectional:" << bidirectional
+			   << "-useProjection:" << useProjection
+			   << "-sequenceBin:" << sequenceBin
+			   << "-sequenceStat:" << seqStat[sequenceStat];
 		return stream.str();
 	}
 };
 
 /**
- * Structure grouping the params involved in the custering process
+ * Structure grouping the params involved in the clustering process
  */
 struct ClusteringParams
 {
@@ -134,7 +134,7 @@ struct ClusteringParams
 	int clusterNumber; // Number of clusters used in the clustering test
 	int maxIterations; // Clustering max iterations
 	double stopThreshold; // Clustering stop threshold
-	int attempts; // Number of attemtps to try when clustering
+	int attempts; // Number of attempts to try when clustering
 	bool generateElbowCurve; // Flag indicating if an elbow graph has to be generated
 	bool generateDistanceMatrix; // Flag indicating if the distance matrix image has to be generated
 
@@ -156,13 +156,13 @@ struct ClusteringParams
 		std::ostringstream stream;
 		stream << std::boolalpha
 			   << "implementation:" << clusteringImp[implementation]
-			   << " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
-			   << " clusterNumber:" << clusterNumber
-			   << " maxIterations:" << maxIterations
-			   << " stopThreshold:" << stopThreshold
-			   << " attempts:" << attempts
-			   << " generateElbowCurve:" << generateElbowCurve
-			   << " generateDistanceMatrix:" << generateDistanceMatrix;
+			   << "-metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
+			   << "-clusterNumber:" << clusterNumber
+			   << "-maxIterations:" << maxIterations
+			   << "-stopThreshold:" << stopThreshold
+			   << "-attempts:" << attempts
+			   << "-generateElbowCurve:" << generateElbowCurve
+			   << "-generateDistanceMatrix:" << generateDistanceMatrix;
 
 		return stream.str();
 	}
@@ -174,7 +174,7 @@ struct ClusteringParams
 struct CloudSmoothingParams
 {
 	bool useSmoothing; // Flag indicating if the smoothing has to be performed or not
-	double sigma; // Sigma used for the gaussian smoothning
+	double sigma; // Sigma used for the gaussian smoothing
 	double radius; // Search radius used for the gaussian smoothing
 
 	CloudSmoothingParams()
@@ -190,14 +190,14 @@ struct CloudSmoothingParams
 		std::stringstream stream;
 		stream << std::boolalpha
 			   << "useSmoothing:" << useSmoothing
-			   << " sigma:" << sigma
-			   << " radius:" << radius;
+			   << "-sigma:" << sigma
+			   << "-radius:" << radius;
 		return stream.str();
 	}
 };
 
 /**
- * Structure defing the params for the generation of synthetic clouds
+ * Structure defining the params for the generation of synthetic clouds
  */
 struct SyntheticCloudsParams
 {
@@ -216,7 +216,7 @@ struct SyntheticCloudsParams
 		std::stringstream stream;
 		stream << std::boolalpha
 			   << "useSynthetic:" << useSynthetic
-			   << " synCloudType:" << cloudType[synCloudType];
+			   << "-synCloudType:" << cloudType[synCloudType];
 		return stream.str();
 	}
 };
@@ -237,7 +237,7 @@ struct MetricTestingParams
 	std::string toString() const
 	{
 		std::stringstream stream;
-		stream << std::boolalpha << " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]";
+		stream << std::boolalpha << "metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]";
 		return stream.str();
 	}
 };

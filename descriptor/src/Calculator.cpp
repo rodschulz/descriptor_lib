@@ -25,7 +25,7 @@ Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNorma
 		const pcl::PointNormal &target_)
 {
 	// Get target point and surface patch
-	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, target_, params_.patchSize);
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, target_, params_.searchRadius);
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(patch, target_, params_);
