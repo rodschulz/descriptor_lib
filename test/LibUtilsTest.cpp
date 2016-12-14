@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_SUITE(DescriptorParams_class_suite)
 
 BOOST_AUTO_TEST_CASE(constructor)
 {
-	BOOST_CHECK_EQUAL(sizeof(DescriptorParams), 48);
-	BOOST_CHECK_MESSAGE(sizeof(DescriptorParams) == 48, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
+	BOOST_CHECK_EQUAL(sizeof(DescriptorParams), 56);
+	BOOST_CHECK_MESSAGE(sizeof(DescriptorParams) == 56, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
 
 	DescriptorParams params;
 	BOOST_CHECK_EQUAL(params.searchRadius, 0.05);

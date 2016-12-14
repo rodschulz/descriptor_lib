@@ -10,10 +10,12 @@
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
 
-#define OUTPUT_DIR			"./output/"
-#define DEBUG_DIR			"./debug/"
+
+#define OUTPUT_DIR				"./output/"
+#define DEBUG_DIR				"./debug/"
 #define CLOUD_FILE_EXTENSION	".pcd"
 #define DEBUG_PREFIX			"DEBUG_"
+
 
 class Config
 {
@@ -61,7 +63,7 @@ public:
 		return getInstance()->cacheLocation;
 	}
 
-	// Returns the descritor calculation parameters
+	// Returns the descriptor calculation parameters
 	static DescriptorParams getDescriptorParams()
 	{
 		if (getInstance()->descriptorParams == NULL)

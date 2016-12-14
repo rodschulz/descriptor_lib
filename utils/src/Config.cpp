@@ -49,16 +49,23 @@ bool Config::load(const std::string &filename_)
 
 		if (config["descriptor"])
 		{
-			YAML::Node descriptorConfig = config["descriptor"];
-
 			DescriptorParams *params = new DescriptorParams();
+
+			std::string nodeName = config["descriptor"]["type"].as<std::string>();
+			params->type = Utils::getDescriptorType(nodeName);
+
+			YAML::Node descriptorConfig = config["descriptor"][nodeName];
 			params->searchRadius = descriptorConfig["searchRadius"].as<double>();
-			params->bandNumber = descriptorConfig["bandNumber"].as<int>();
-			params->bandWidth = descriptorConfig["bandWidth"].as<double>();
-			params->bidirectional = descriptorConfig["bidirectional"].as<bool>();
-			params->useProjection = descriptorConfig["useProjection"].as<bool>();
-			params->sequenceBin = descriptorConfig["sequenceBin"].as<double>();
-			params->sequenceStat = Utils::getStatType(descriptorConfig["sequenceStat"].as<std::string>());
+
+			if (params->type == DESCRIPTOR_DCH)
+			{
+				params->bandNumber = descriptorConfig["bandNumber"].as<int>();
+				params->bandWidth = descriptorConfig["bandWidth"].as<double>();
+				params->bidirectional = descriptorConfig["bidirectional"].as<bool>();
+				params->useProjection = descriptorConfig["useProjection"].as<bool>();
+				params->sequenceBin = descriptorConfig["sequenceBin"].as<double>();
+				params->sequenceStat = Utils::getStatType(descriptorConfig["sequenceStat"].as<std::string>());
+			}
 
 			getInstance()->descriptorParams = params;
 		}

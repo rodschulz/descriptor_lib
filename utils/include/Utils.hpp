@@ -237,16 +237,19 @@ public:
 	}
 
 	/**************************************************/
-	static SynCloudType getSynCloudType(const std::string &_type);
+	static SequenceStat getStatType(const std::string &type_);
 
 	/**************************************************/
-	static SequenceStat getStatType(const std::string &_type);
+	static ClusteringImplementation getClusteringImplementation(const std::string &type_);
 
 	/**************************************************/
-	static ClusteringImplementation getClusteringImplementation(const std::string &_type);
+	static SynCloudType getSynCloudType(const std::string &type_);
 
 	/**************************************************/
-	static MetricType getMetricType(const std::string &_type);
+	static MetricType getMetricType(const std::string &type_);
+
+	/**************************************************/
+	static DescriptorType getDescriptorType(const std::string &type_);
 
 private:
 	Utils();
