@@ -1,6 +1,6 @@
 /**
  * Author: rodrigo
- * 2015
+ * 2016
  */
 #pragma once
 
@@ -52,25 +52,10 @@ struct DescriptorParams
 	virtual std::string toString() const = 0;
 
 	/**************************************************/
-	static DescriptorType toType(const std::string &type_)
-	{
-		if (boost::iequals(type_, "DCH"))
-			return DESCRIPTOR_DCH;
-		else if (boost::iequals(type_, "SHOT"))
-			return DESCRIPTOR_SHOT;
-		else if (boost::iequals(type_, "USC"))
-			return DESCRIPTOR_USC;
-		else if (boost::iequals(type_, "PFH"))
-			return DESCRIPTOR_PFH;
-		else if (boost::iequals(type_, "ROPS"))
-			return DESCRIPTOR_ROPS;
-
-		std::cout << "WARNING: wrong descriptor type, assuming DCH";
-		return DESCRIPTOR_DCH;
-	}
+	static DescriptorType toType(const std::string &type_);
 
 	/**************************************************/
-	static inline DescriptorParamsPtr create(const DescriptorType type_);
+	static DescriptorParamsPtr create(const DescriptorType type_);
 };
 
 
@@ -100,53 +85,19 @@ struct DCHParams: public DescriptorParams
 	}
 
 	/**************************************************/
-	void load(const YAML::Node &config_)
-	{
-		searchRadius = config_["searchRadius"].as<float>();
-		bandNumber = config_["bandNumber"].as<int>();
-		bandWidth = config_["bandWidth"].as<float>();
-		bidirectional = config_["bidirectional"].as<bool>();
-		useProjection = config_["useProjection"].as<bool>();
-		sequenceBin = config_["sequenceBin"].as<float>();
-		sequenceStat = toStatType(config_["sequenceStat"].as<std::string>());
-	}
+	void load(const YAML::Node &config_);
 
 	/**************************************************/
-	std::string toString() const
-	{
-		std::stringstream stream;
-		stream << std::boolalpha
-			   << "type:" << descType[type]
-			   << " searchRadius:" << searchRadius
-			   << " bandNumber:" << bandNumber
-			   << " bandWidth:" << bandWidth
-			   << " bidirectional:" << bidirectional
-			   << " useProjection:" << useProjection
-			   << " sequenceBin:" << sequenceBin
-			   << " sequenceStat:" << seqStat[sequenceStat];
-		return stream.str();
-	}
+	std::string toString() const;
 
 	/**************************************************/
-	int getSequenceLength() const
-	{
-		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
-	}
+	int getSequenceLength() const;
 
 	/**************************************************/
-	float getBandsAngularRange() const
-	{
-		if (bidirectional)
-			return M_PI;
-		else
-			return 2 * M_PI;
-	}
+	float getBandsAngularRange() const;
 
 	/**************************************************/
-	float getBandsAngularStep() const
-	{
-		return getBandsAngularRange() / bandNumber;
-	}
+	float getBandsAngularStep() const;
 };
 
 
@@ -163,46 +114,8 @@ struct SHOTParams: public DescriptorParams
 	}
 
 	/**************************************************/
-	void load(const YAML::Node &config_)
-	{
-		searchRadius = config_["searchRadius"].as<float>();
-	}
+	void load(const YAML::Node &config_);
 
 	/**************************************************/
-	std::string toString() const
-	{
-		std::stringstream stream;
-		stream << std::boolalpha
-			   << "type:" << descType[type]
-			   << " searchRadius:" << searchRadius;
-		return stream.str();
-	}
+	std::string toString() const;
 };
-
-
-/**************************************************/
-/**************************************************/
-DescriptorParamsPtr DescriptorParams::create(const DescriptorType type_)
-{
-	switch (type_)
-	{
-	default:
-	case DESCRIPTOR_UNKNOWN:
-		std::cout << "WARNING: bad descriptor type for params instantiation, assuming DCH" << std::endl;
-
-	case DESCRIPTOR_DCH:
-		return DescriptorParamsPtr(new DCHParams());
-
-	case DESCRIPTOR_SHOT:
-		return DescriptorParamsPtr(new SHOTParams());
-
-	case DESCRIPTOR_USC:
-		return DescriptorParamsPtr();
-
-	case DESCRIPTOR_PFH:
-		return DescriptorParamsPtr();
-
-	case DESCRIPTOR_ROPS:
-		return DescriptorParamsPtr();
-	}
-}

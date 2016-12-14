@@ -112,93 +112,6 @@ static inline SynCloudType toSynCloudType(const std::string &type_)
 
 /**************************************************/
 /**************************************************/
-
-
-// enum DescriptorType
-// {
-// 	DESCRIPTOR_DCH,
-// 	DESCRIPTOR_SHOT,
-// 	DESCRIPTOR_USC,
-// 	DESCRIPTOR_PFH,
-// 	DESCRIPTOR_ROPS,
-// };
-// static std::string descType[] = {
-// 	BOOST_STRINGIZE(DESCRIPTOR_DCH),
-// 	BOOST_STRINGIZE(DESCRIPTOR_SHOT),
-// 	BOOST_STRINGIZE(DESCRIPTOR_USC),
-// 	BOOST_STRINGIZE(DESCRIPTOR_PFH),
-// 	BOOST_STRINGIZE(DESCRIPTOR_ROPS)
-// };
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set of structures grouping functionality-related parameters
-////////////////////////////////////////////////////////////////////////////////
-/**
- * Structure grouping the parameters involved in the descriptor's calculation
- */
-// struct DescriptorParams
-// {
-// 	DescriptorType type; // Descriptor type
-// 	double searchRadius; // Search radius for the KNN search method
-// 	int bandNumber; // Number of bands of the descriptor
-// 	double bandWidth; // Width of each band
-// 	bool bidirectional; // True if each band is bidirectional
-// 	bool useProjection; // True if the angle calculation is using a projection
-// 	double sequenceBin; // Size of the bins used in the sequence construction
-// 	SequenceStat sequenceStat; // Statistic used in the descriptor
-
-// 	/**************************************************/
-// 	DescriptorParams()
-// 	{
-// 		type = DESCRIPTOR_DCH;
-// 		searchRadius = 0.05;
-// 		bandNumber = 4;
-// 		bandWidth = 0.01;
-// 		bidirectional = true;
-// 		useProjection = true;
-// 		sequenceBin = 0.01;
-// 		sequenceStat = STAT_MEAN;
-// 	}
-
-// 	/**************************************************/
-// 	int getSequenceLength() const
-// 	{
-// 		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
-// 	}
-
-// 	/**************************************************/
-// 	double getBandsAngularRange() const
-// 	{
-// 		if (bidirectional)
-// 			return M_PI;
-// 		else
-// 			return 2 * M_PI;
-// 	}
-
-// 	/**************************************************/
-// 	double getBandsAngularStep() const
-// 	{
-// 		return getBandsAngularRange() / bandNumber;
-// 	}
-
-// 	/**************************************************/
-// 	std::string toString() const
-// 	{
-// 		std::stringstream stream;
-// 		stream << std::boolalpha
-// 			   << "type:" << descType[type]
-// 			   << " searchRadius:" << searchRadius
-// 			   << " bandNumber:" << bandNumber
-// 			   << " bandWidth:" << bandWidth
-// 			   << " bidirectional:" << bidirectional
-// 			   << " useProjection:" << useProjection
-// 			   << " sequenceBin:" << sequenceBin
-// 			   << " sequenceStat:" << seqStat[sequenceStat];
-// 		return stream.str();
-// 	}
-// };
-
 /**
  * Structure grouping the params involved in the clustering process
  */
@@ -320,4 +233,3 @@ struct MetricTestingParams
 		return stream.str();
 	}
 };
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
