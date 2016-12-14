@@ -24,7 +24,7 @@ Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr
 									const DescriptorParamsPtr &params_,
 									const pcl::PointNormal &target_)
 {
-	DCHParams *params = (DCHParams *)params_.get();
+	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 
 	// Get target point and surface patch
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, target_, params->searchRadius);
@@ -40,7 +40,7 @@ void DCH::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &clo
 							   const DescriptorParamsPtr &params_,
 							   cv::Mat &descriptors_)
 {
-	DCHParams *params = (DCHParams *)params_.get();
+	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 	int sequenceSize = params->getSequenceLength();
 
 	// Resize the matrix in case it doesn't match the required dimensions
@@ -87,7 +87,7 @@ void DCH::fillSequences(Descriptor &descriptor_,
 						const DescriptorParamsPtr &params_,
 						const double sequenceStep_)
 {
-	DCHParams *params = (DCHParams *)params_.get();
+	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 	double binSize = params->sequenceBin;
 	int binsNumber = params->getSequenceLength();
 

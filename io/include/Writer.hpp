@@ -9,6 +9,7 @@
 #include "Hist.hpp"
 #include "Extractor.hpp"
 #include "Metric.hpp"
+#include "DescriptorParams.hpp"
 
 class Writer
 {
@@ -25,7 +26,7 @@ public:
 	static void writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							   const std::vector<BandPtr> &bands_,
 							   const std::vector<Hist> &angleHistograms_,
-							   const DescriptorParams &params_,
+							   const DescriptorParamsPtr &params_,
 							   const int targetPoint_);
 
 	/**************************************************/
@@ -48,7 +49,7 @@ public:
 	/**************************************************/
 	static void writeClustersCenters(const std::string &filename_,
 									 const cv::Mat &centers_,
-									 const DescriptorParams &descriptorParams_,
+									 const DescriptorParamsPtr &descriptorParams_,
 									 const ClusteringParams &clusteringParams_,
 									 const CloudSmoothingParams &smoothingParams_);
 
@@ -65,7 +66,7 @@ public:
 									  const std::string &cacheLocation_,
 									  const std::string &cloudInputFilename_,
 									  const double normalEstimationRadius_,
-									  const DescriptorParams &descriptorParams_,
+									  const DescriptorParamsPtr &descriptorParams_,
 									  const CloudSmoothingParams &smoothingParams_);
 
 	/**************************************************/

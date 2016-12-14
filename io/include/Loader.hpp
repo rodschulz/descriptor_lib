@@ -8,7 +8,7 @@
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
 #include <string>
-#include "ExecutionParams.hpp"
+#include "DescriptorParams.hpp"
 
 class Loader
 {
@@ -22,7 +22,7 @@ public:
 	static bool loadDescriptors(const std::string &cacheLocation_,
 								const std::string &cloudInputFilename_,
 								const double normalEstimationRadius_,
-								const DescriptorParams &descritorParams_,
+								const DescriptorParamsPtr &descritorParams_,
 								const CloudSmoothingParams &smoothingParams_,
 								cv::Mat &descriptors_);
 

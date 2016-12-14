@@ -145,18 +145,21 @@ void Writer::generateHistogramScript(const std::string &filename_,
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							const std::vector<BandPtr> &bands_,
 							const std::vector<Hist> &angleHistograms_,
-							const DescriptorParams &params_,
+							const DescriptorParamsPtr &params_,
 							const int targetPoint_)
 {
+	DCHParams *params = dynamic_cast<DCHParams *>(params_.get()); // FIX THIS !! => do something when the cast fails because is another descriptor
+
+
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "cloud.pcd", *coloredCloud);
 
 	(*coloredCloud)[targetPoint_].rgba = Utils::getColor(255, 0, 0);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "pointPosition.pcd", *coloredCloud);
 
-	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(bands_, params_);
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(bands_, params);
 
-	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, cloud_->at(targetPoint_), params_.searchRadius);
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, cloud_->at(targetPoint_), params->searchRadius);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "patch.pcd", *patch);
 
 	std::ofstream sequences;
@@ -327,7 +330,7 @@ void Writer::writeDescriptorsCache(const cv::Mat &descriptors_,
 								   const std::string &cacheLocation_,
 								   const std::string &cloudInputFilename_,
 								   const double normalEstimationRadius_,
-								   const DescriptorParams &descriptorParams_,
+								   const DescriptorParamsPtr &descriptorParams_,
 								   const CloudSmoothingParams &smoothingParams_)
 {
 	if (!boost::filesystem::exists(cacheLocation_))
@@ -338,7 +341,7 @@ void Writer::writeDescriptorsCache(const cv::Mat &descriptors_,
 
 	std::vector<std::string> metadata;
 	metadata.push_back("normalEstimationRadius:" + boost::lexical_cast<std::string>(normalEstimationRadius_));
-	metadata.push_back(descriptorParams_.toString());
+	metadata.push_back(descriptorParams_->toString());
 	metadata.push_back(smoothingParams_.toString());
 
 	writeMatrix(destination, descriptors_, metadata);
@@ -346,12 +349,12 @@ void Writer::writeDescriptorsCache(const cv::Mat &descriptors_,
 
 void Writer::writeClustersCenters(const std::string &filename_,
 								  const cv::Mat &centers_,
-								  const DescriptorParams &descriptorParams_,
+								  const DescriptorParamsPtr &descriptorParams_,
 								  const ClusteringParams &clusteringParams_,
 								  const CloudSmoothingParams &smoothingParams_)
 {
 	std::vector<std::string> metadata;
-	metadata.push_back(descriptorParams_.toString());
+	metadata.push_back(descriptorParams_->toString());
 	metadata.push_back(clusteringParams_.toString());
 	metadata.push_back(smoothingParams_.toString());
 

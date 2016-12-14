@@ -115,7 +115,7 @@ bool Loader::loadMatrix(const std::string &filename_,
 bool Loader::loadDescriptors(const std::string &cacheLocation_,
 							 const std::string &cloudInputFilename_,
 							 const double normalEstimationRadius_,
-							 const DescriptorParams &descritorParams_,
+							 const DescriptorParamsPtr &descritorParams_,
 							 const CloudSmoothingParams &smoothingParams_,
 							 cv::Mat &descriptors_)
 {
