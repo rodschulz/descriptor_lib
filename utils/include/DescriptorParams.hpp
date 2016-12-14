@@ -70,7 +70,7 @@ struct DescriptorParams
 	}
 
 	/**************************************************/
-	static DescriptorParamsPtr create(const DescriptorType type_);
+	static inline DescriptorParamsPtr create(const DescriptorType type_);
 };
 
 
