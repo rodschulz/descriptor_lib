@@ -2,7 +2,7 @@
  * Author: rodrigo
  * 2015
  */
-#include "Calculator.hpp"
+#include "DCH.hpp"
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 #include <boost/accumulators/statistics/count.hpp>
@@ -12,31 +12,31 @@
 using namespace boost::accumulators;
 
 
-Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-		const DescriptorParams &params_,
-		const int targetPointIndex_)
+Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+									const DescriptorParams &params_,
+									const int targetPointIndex_)
 {
 	pcl::PointNormal target = cloud_->at(targetPointIndex_);
 	return calculateDescriptor(cloud_, params_, target);
 }
 
-Descriptor Calculator::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-		const DescriptorParams &params_,
-		const pcl::PointNormal &target_)
+Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+									const DescriptorParams &params_,
+									const pcl::PointNormal &target_)
 {
 	// Get target point and surface patch
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, target_, params_.searchRadius);
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(patch, target_, params_);
-	Calculator::fillSequences(bands, params_, M_PI / 18);
+	DCH::fillSequences(bands, params_, M_PI / 18);
 
 	return bands;
 }
 
-void Calculator::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									  const DescriptorParams &params_,
-									  cv::Mat &descriptors_)
+void DCH::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+							   const DescriptorParams &params_,
+							   cv::Mat &descriptors_)
 {
 	int sequenceSize = params_.getSequenceLength();
 
@@ -49,14 +49,14 @@ void Calculator::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::P
 	// Extract the descriptors
 	for (size_t i = 0; i < cloud_->size(); i++)
 	{
-		std::vector<BandPtr> bands = Calculator::calculateDescriptor(cloud_, params_, cloud_->points[i]);
+		std::vector<BandPtr> bands = DCH::calculateDescriptor(cloud_, params_, cloud_->points[i]);
 
 		for (size_t j = 0; j < bands.size(); j++)
 			memcpy(&descriptors_.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
 	}
 }
 
-std::vector<Hist> Calculator::generateAngleHistograms(const Descriptor &descriptor_,
+std::vector<Hist> DCH::generateAngleHistograms(const Descriptor &descriptor_,
 		const bool useProjection_)
 {
 	// TODO move this method to the output class, since this is only to generate the histogram generated as output
@@ -80,9 +80,9 @@ std::vector<Hist> Calculator::generateAngleHistograms(const Descriptor &descript
 	return histograms;
 }
 
-void Calculator::fillSequences(Descriptor &descriptor_,
-							   const DescriptorParams &params_,
-							   const double sequenceStep_)
+void DCH::fillSequences(Descriptor &descriptor_,
+						const DescriptorParams &params_,
+						const double sequenceStep_)
 {
 	double binSize = params_.sequenceBin;
 	int binsNumber = params_.getSequenceLength();

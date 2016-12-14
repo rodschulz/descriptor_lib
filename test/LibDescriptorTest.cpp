@@ -3,7 +3,7 @@
  * 2016
  */
 #include <boost/test/unit_test.hpp>
-#include "Calculator.hpp"
+#include "DCH.hpp"
 #include "Extractor.hpp"
 #include "CloudFactory.hpp"
 #include <pcl/io/pcd_io.h>
@@ -49,8 +49,8 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, ExecParamsFixture)
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 20000);
 	pcl::PointNormal point = cloud->at(targetPoint);
 
-	Descriptor descriptor1 = Calculator::calculateDescriptor(cloud, params, targetPoint);
-	Descriptor descriptor2 = Calculator::calculateDescriptor(cloud, params, point);
+	Descriptor descriptor1 = DCH::calculateDescriptor(cloud, params, targetPoint);
+	Descriptor descriptor2 = DCH::calculateDescriptor(cloud, params, point);
 
 	// Check sizes
 	BOOST_CHECK_EQUAL(descriptor1.size(), params.bandNumber);
@@ -74,7 +74,7 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_plane, ExecParamsFixture)
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	Calculator::fillSequences(bands, params, M_PI / 18);
+	DCH::fillSequences(bands, params, M_PI / 18);
 
 	int sequenceSize = params.getSequenceLength();
 	std::string zeroSequence = "";
@@ -99,7 +99,7 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, ExecParamsFixture)
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	Calculator::fillSequences(bands, params, M_PI / 18);
+	DCH::fillSequences(bands, params, M_PI / 18);
 
 	int sequenceSize = params.getSequenceLength();
 	std::string sequence = "000AAAABBB";
@@ -114,16 +114,16 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, ExecParamsFixture)
 
 BOOST_AUTO_TEST_CASE(getSequenceChar)
 {
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(1, 5), '0');
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(-1, 5), '0');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(1, 5), '0');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-1, 5), '0');
 
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(7, 5), 'A');
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(12, 5), 'B');
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(19, 5), 'C');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(7, 5), 'A');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(12, 5), 'B');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(19, 5), 'C');
 
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(-7, 5), 'a');
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(-12, 5), 'b');
-	BOOST_CHECK_EQUAL(Calculator::getSequenceChar(-19, 5), 'c');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-7, 5), 'a');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-12, 5), 'b');
+	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-19, 5), 'c');
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -13,7 +13,7 @@
 // Type definition declaring the descriptor's structure
 typedef std::vector<BandPtr> Descriptor;
 
-class Calculator
+class DCH
 {
 public:
 	/**************************************************/
@@ -62,7 +62,7 @@ public:
 	}
 
 private:
-	Calculator();
-	~Calculator();
+	DCH();
+	~DCH();
 };
 
