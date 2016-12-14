@@ -9,6 +9,7 @@
 #include "ExecutionParams.hpp"
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
+#include "DescriptorParams.hpp"
 
 
 #define OUTPUT_DIR				"./output/"
@@ -64,12 +65,12 @@ public:
 	}
 
 	// Returns the descriptor calculation parameters
-	static DescriptorParams getDescriptorParams()
+	static DescriptorParamsPtr getDescriptorParams()
 	{
-		if (getInstance()->descriptorParams == NULL)
+		if (!getInstance()->descriptorParams)
 			throw std::runtime_error("descriptor params not loaded");
 
-		return *getInstance()->descriptorParams;
+		return getInstance()->descriptorParams;
 	}
 
 	// Returns the clustering parameters
@@ -109,11 +110,9 @@ public:
 	}
 
 private:
-	// Constructor
 	Config();
 
-	// Cached config params
-	DescriptorParams *descriptorParams;
+	DescriptorParamsPtr descriptorParams;
 	ClusteringParams *clusteringParams;
 	CloudSmoothingParams *cloudSmoothingParams;
 	SyntheticCloudsParams *syntheticCloudParams;

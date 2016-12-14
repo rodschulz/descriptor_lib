@@ -11,6 +11,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "ExecutionParams.hpp"
+#include "DescriptorParams.hpp"
 
 
 // Colors defined to be used for points
@@ -134,7 +135,7 @@ public:
 	/**************************************************/
 	static std::string getCalculationConfigHash(const std::string _inputCloudFile,
 			const double normalEstimationRadius_,
-			const DescriptorParams &descriptorParams_,
+			const DescriptorParamsPtr &descriptorParams_,
 			const CloudSmoothingParams &smoothingParams_);
 
 	/**************************************************/
@@ -235,21 +236,6 @@ public:
 				return M_PI;
 		}
 	}
-
-	/**************************************************/
-	static SequenceStat getStatType(const std::string &type_);
-
-	/**************************************************/
-	static ClusteringImplementation getClusteringImplementation(const std::string &type_);
-
-	/**************************************************/
-	static SynCloudType getSynCloudType(const std::string &type_);
-
-	/**************************************************/
-	static MetricType getMetricType(const std::string &type_);
-
-	/**************************************************/
-	static DescriptorType getDescriptorType(const std::string &type_);
 
 private:
 	Utils();

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string.hpp>
 #include "Metric.hpp"
 
 
@@ -27,7 +28,20 @@ static std::string seqStat[] =
 	BOOST_STRINGIZE(STAT_MEDIAN)
 };
 
+SequenceStat toStatType(const std::string &type_)
+{
+	if (boost::iequals(type_, "mean"))
+		return STAT_MEAN;
+	else if (boost::iequals(type_, "median"))
+		return STAT_MEDIAN;
 
+	std::cout << "WARNING: wrong stat type, assuming MEAN";
+	return STAT_MEAN;
+}
+
+
+/**************************************************/
+/**************************************************/
 enum ClusteringImplementation
 {
 	CLUSTERING_OPENCV,
@@ -43,7 +57,24 @@ static std::string clusteringImp[] =
 	BOOST_STRINGIZE(CLUSTERING_KMEDOIDS)
 };
 
+ClusteringImplementation toClusteringImp(const std::string &type_)
+{
+	if (boost::iequals(type_, "opencv"))
+		return CLUSTERING_OPENCV;
+	else if (boost::iequals(type_, "kmeans"))
+		return CLUSTERING_KMEANS;
+	else if (boost::iequals(type_, "stochastic"))
+		return CLUSTERING_STOCHASTIC;
+	else if (boost::iequals(type_, "kmedoids"))
+		return CLUSTERING_KMEDOIDS;
 
+	std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
+	return CLUSTERING_OPENCV;
+}
+
+
+/**************************************************/
+/**************************************************/
 enum SynCloudType
 {
 	CLOUD_CUBE,
@@ -60,22 +91,44 @@ static std::string cloudType[] = {
 	BOOST_STRINGIZE(CLOUD_PLANE)
 };
 
-
-enum DescriptorType
+SynCloudType toSynCloudType(const std::string &type_)
 {
-	DESCRIPTOR_DCH,
-	DESCRIPTOR_SHOT,
-	DESCRIPTOR_USC,
-	DESCRIPTOR_PFH,
-	DESCRIPTOR_ROPS,
-};
-static std::string descType[] = {
-	BOOST_STRINGIZE(DESCRIPTOR_DCH),
-	BOOST_STRINGIZE(DESCRIPTOR_SHOT),
-	BOOST_STRINGIZE(DESCRIPTOR_USC),
-	BOOST_STRINGIZE(DESCRIPTOR_PFH),
-	BOOST_STRINGIZE(DESCRIPTOR_ROPS)
-};
+	if (boost::iequals(type_, "cube"))
+		return CLOUD_CUBE;
+	else if (boost::iequals(type_, "cylinder"))
+		return CLOUD_CYLINDER;
+	else if (boost::iequals(type_, "sphere"))
+		return CLOUD_SPHERE;
+	else if (boost::iequals(type_, "half_sphere"))
+		return CLOUD_HALF_SPHERE;
+	else if (boost::iequals(type_, "plane"))
+		return CLOUD_PLANE;
+
+	std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
+	return CLOUD_SPHERE;
+}
+
+
+
+/**************************************************/
+/**************************************************/
+
+
+// enum DescriptorType
+// {
+// 	DESCRIPTOR_DCH,
+// 	DESCRIPTOR_SHOT,
+// 	DESCRIPTOR_USC,
+// 	DESCRIPTOR_PFH,
+// 	DESCRIPTOR_ROPS,
+// };
+// static std::string descType[] = {
+// 	BOOST_STRINGIZE(DESCRIPTOR_DCH),
+// 	BOOST_STRINGIZE(DESCRIPTOR_SHOT),
+// 	BOOST_STRINGIZE(DESCRIPTOR_USC),
+// 	BOOST_STRINGIZE(DESCRIPTOR_PFH),
+// 	BOOST_STRINGIZE(DESCRIPTOR_ROPS)
+// };
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,67 +137,67 @@ static std::string descType[] = {
 /**
  * Structure grouping the parameters involved in the descriptor's calculation
  */
-struct DescriptorParams
-{
-	DescriptorType type; // Descriptor type
-	double searchRadius; // Search radius for the KNN search method
-	int bandNumber; // Number of bands of the descriptor
-	double bandWidth; // Width of each band
-	bool bidirectional; // True if each band is bidirectional
-	bool useProjection; // True if the angle calculation is using a projection
-	double sequenceBin; // Size of the bins used in the sequence construction
-	SequenceStat sequenceStat; // Statistic used in the descriptor
+// struct DescriptorParams
+// {
+// 	DescriptorType type; // Descriptor type
+// 	double searchRadius; // Search radius for the KNN search method
+// 	int bandNumber; // Number of bands of the descriptor
+// 	double bandWidth; // Width of each band
+// 	bool bidirectional; // True if each band is bidirectional
+// 	bool useProjection; // True if the angle calculation is using a projection
+// 	double sequenceBin; // Size of the bins used in the sequence construction
+// 	SequenceStat sequenceStat; // Statistic used in the descriptor
 
-	/**************************************************/
-	DescriptorParams()
-	{
-		type = DESCRIPTOR_DCH;
-		searchRadius = 0.05;
-		bandNumber = 4;
-		bandWidth = 0.01;
-		bidirectional = true;
-		useProjection = true;
-		sequenceBin = 0.01;
-		sequenceStat = STAT_MEAN;
-	}
+// 	/**************************************************/
+// 	DescriptorParams()
+// 	{
+// 		type = DESCRIPTOR_DCH;
+// 		searchRadius = 0.05;
+// 		bandNumber = 4;
+// 		bandWidth = 0.01;
+// 		bidirectional = true;
+// 		useProjection = true;
+// 		sequenceBin = 0.01;
+// 		sequenceStat = STAT_MEAN;
+// 	}
 
-	/**************************************************/
-	int getSequenceLength() const
-	{
-		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
-	}
+// 	/**************************************************/
+// 	int getSequenceLength() const
+// 	{
+// 		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
+// 	}
 
-	/**************************************************/
-	double getBandsAngularRange() const
-	{
-		if (bidirectional)
-			return M_PI;
-		else
-			return 2 * M_PI;
-	}
+// 	/**************************************************/
+// 	double getBandsAngularRange() const
+// 	{
+// 		if (bidirectional)
+// 			return M_PI;
+// 		else
+// 			return 2 * M_PI;
+// 	}
 
-	/**************************************************/
-	double getBandsAngularStep() const
-	{
-		return getBandsAngularRange() / bandNumber;
-	}
+// 	/**************************************************/
+// 	double getBandsAngularStep() const
+// 	{
+// 		return getBandsAngularRange() / bandNumber;
+// 	}
 
-	/**************************************************/
-	std::string toString() const
-	{
-		std::stringstream stream;
-		stream << std::boolalpha
-			   << "type:" << descType[type]
-			   << " searchRadius:" << searchRadius
-			   << " bandNumber:" << bandNumber
-			   << " bandWidth:" << bandWidth
-			   << " bidirectional:" << bidirectional
-			   << " useProjection:" << useProjection
-			   << " sequenceBin:" << sequenceBin
-			   << " sequenceStat:" << seqStat[sequenceStat];
-		return stream.str();
-	}
-};
+// 	/**************************************************/
+// 	std::string toString() const
+// 	{
+// 		std::stringstream stream;
+// 		stream << std::boolalpha
+// 			   << "type:" << descType[type]
+// 			   << " searchRadius:" << searchRadius
+// 			   << " bandNumber:" << bandNumber
+// 			   << " bandWidth:" << bandWidth
+// 			   << " bidirectional:" << bidirectional
+// 			   << " useProjection:" << useProjection
+// 			   << " sequenceBin:" << sequenceBin
+// 			   << " sequenceStat:" << seqStat[sequenceStat];
+// 		return stream.str();
+// 	}
+// };
 
 /**
  * Structure grouping the params involved in the clustering process

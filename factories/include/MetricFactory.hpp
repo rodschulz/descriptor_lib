@@ -29,11 +29,13 @@ public:
 		{
 			int size = 0;
 
+			//FIX THIS!
+
 			// Check if should use the configuration to "calculate" the params or read them
-			if (boost::iequals("conf", _args[1]))
-				size = Config::getDescriptorParams().getSequenceLength();
-			else
-				size = atoi(_args[1].c_str());
+			// if (boost::iequals("conf", _args[1]))
+			// 	size = Config::getDescriptorParams().getSequenceLength();
+			// else
+			// 	size = atoi(_args[1].c_str());
 
 			if (type_ == METRIC_CLOSEST_PERMUTATION)
 				return MetricPtr(new ClosestPermutationMetric(size));

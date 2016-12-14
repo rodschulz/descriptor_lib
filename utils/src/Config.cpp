@@ -15,7 +15,7 @@
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/node/impl.h>
 #include "MetricFactory.hpp"
-#include "Utils.hpp"
+
 
 Config::Config()
 {
@@ -23,7 +23,6 @@ Config::Config()
 	targetPoint = -1;
 	normalEstimationRadius = -1;
 
-	descriptorParams = NULL;
 	clusteringParams = NULL;
 	cloudSmoothingParams = NULL;
 	syntheticCloudParams = NULL;
@@ -39,45 +38,33 @@ bool Config::load(const std::string &filename_)
 	bool loadOk = true;
 	try
 	{
-		YAML::Node config = YAML::LoadFile(filename_);
-		getInstance()->config = config;
+		Config *instance = getInstance();
 
-		getInstance()->debug = config["debug"].as<bool>(false);
-		getInstance()->targetPoint = config["targetPoint"].as<int>(-1);
-		getInstance()->normalEstimationRadius = config["normalEstimationRadius"].as<double>(-1);
-		getInstance()->cacheLocation = config["cacheLocation"].as<std::string>("");
+		YAML::Node config = YAML::LoadFile(filename_);
+		instance->config = config;
+
+		instance->debug = config["debug"].as<bool>(false);
+		instance->targetPoint = config["targetPoint"].as<int>(-1);
+		instance->normalEstimationRadius = config["normalEstimationRadius"].as<double>(-1);
+		instance->cacheLocation = config["cacheLocation"].as<std::string>("");
+
 
 		if (config["descriptor"])
 		{
-			DescriptorParams *params = new DescriptorParams();
-
 			std::string nodeName = config["descriptor"]["type"].as<std::string>();
-			params->type = Utils::getDescriptorType(nodeName);
-
-			YAML::Node descriptorConfig = config["descriptor"][nodeName];
-			params->searchRadius = descriptorConfig["searchRadius"].as<double>();
-
-			if (params->type == DESCRIPTOR_DCH)
-			{
-				params->bandNumber = descriptorConfig["bandNumber"].as<int>();
-				params->bandWidth = descriptorConfig["bandWidth"].as<double>();
-				params->bidirectional = descriptorConfig["bidirectional"].as<bool>();
-				params->useProjection = descriptorConfig["useProjection"].as<bool>();
-				params->sequenceBin = descriptorConfig["sequenceBin"].as<double>();
-				params->sequenceStat = Utils::getStatType(descriptorConfig["sequenceStat"].as<std::string>());
-			}
-
-			getInstance()->descriptorParams = params;
+			instance->descriptorParams = DescriptorParams::create(DescriptorParams::toType(nodeName));
+			instance->descriptorParams->load(config["descriptor"][nodeName]);
 		}
+
 
 		if (config["clustering"])
 		{
 			YAML::Node clusteringConfig = config["clustering"];
 
 			ClusteringParams *params = new ClusteringParams();
-			params->implementation = Utils::getClusteringImplementation(clusteringConfig["implementation"].as<std::string>());
+			params->implementation = toClusteringImp(clusteringConfig["implementation"].as<std::string>());
 			std::vector<std::string> metricDetails = clusteringConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::createMetric(Utils::getMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::createMetric(Metric::toMetricType(metricDetails[0]), metricDetails);
 			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
 			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
@@ -85,8 +72,9 @@ bool Config::load(const std::string &filename_)
 			params->generateElbowCurve = clusteringConfig["generateElbowCurve"].as<bool>();
 			params->generateDistanceMatrix = clusteringConfig["generateDistanceMatrix"].as<bool>();
 
-			getInstance()->clusteringParams = params;
+			instance->clusteringParams = params;
 		}
+
 
 		if (config["cloudSmoothing"])
 		{
@@ -97,7 +85,7 @@ bool Config::load(const std::string &filename_)
 			params->radius = smoothingConfig["radius"].as<double>();
 			params->sigma = smoothingConfig["sigma"].as<double>();
 
-			getInstance()->cloudSmoothingParams = params;
+			instance->cloudSmoothingParams = params;
 		}
 
 		if (config["syntheticCloud"])
@@ -106,9 +94,9 @@ bool Config::load(const std::string &filename_)
 
 			SyntheticCloudsParams *params = new SyntheticCloudsParams();
 			params->useSynthetic = synthCloudConfig["generateCloud"].as<bool>();
-			params->synCloudType = Utils::getSynCloudType(synthCloudConfig["type"].as<std::string>());
+			params->synCloudType = toSynCloudType(synthCloudConfig["type"].as<std::string>());
 
-			getInstance()->syntheticCloudParams = params;
+			instance->syntheticCloudParams = params;
 		}
 
 		if (config["metricTesting"])
@@ -117,9 +105,9 @@ bool Config::load(const std::string &filename_)
 
 			MetricTestingParams *params = new MetricTestingParams();
 			std::vector<std::string> metricDetails = metricTestConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::createMetric(Utils::getMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::createMetric(Metric::toMetricType(metricDetails[0]), metricDetails);
 
-			getInstance()->metricTestingParams = params;
+			instance->metricTestingParams = params;
 		}
 	}
 	catch (std::exception &_ex)

@@ -86,13 +86,13 @@ std::string Utils::getWorkingDirectory()
 
 std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile,
 		const double normalEstimationRadius_,
-		const DescriptorParams &descriptorParams_,
+		const DescriptorParamsPtr &descriptorParams_,
 		const CloudSmoothingParams &smoothingParams_)
 {
 	std::string str = "";
 	str += "input=" + getFileChecksum(_inputCloudFile);
 	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius_);
-	str += "-" + descriptorParams_.toString();
+	str += "-" + descriptorParams_->toString();
 	if (smoothingParams_.useSmoothing)
 		str += "-" + smoothingParams_.toString();
 
@@ -188,77 +188,4 @@ std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsIn
 
 	// Return the axes
 	return std::pair<Eigen::Vector3f, Eigen::Vector3f>(v1, v2);
-}
-
-SynCloudType Utils::getSynCloudType(const std::string &type_)
-{
-	if (boost::iequals(type_, "cube"))
-		return CLOUD_CUBE;
-	else if (boost::iequals(type_, "cylinder"))
-		return CLOUD_CYLINDER;
-	else if (boost::iequals(type_, "sphere"))
-		return CLOUD_SPHERE;
-	else if (boost::iequals(type_, "half_sphere"))
-		return CLOUD_HALF_SPHERE;
-	else if (boost::iequals(type_, "plane"))
-		return CLOUD_PLANE;
-
-	std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
-	return CLOUD_SPHERE;
-}
-
-SequenceStat Utils::getStatType(const std::string &type_)
-{
-	if (boost::iequals(type_, "mean"))
-		return STAT_MEAN;
-	else if (boost::iequals(type_, "median"))
-		return STAT_MEDIAN;
-
-	std::cout << "WARNING: wrong stat type, assuming MEAN";
-	return STAT_MEAN;
-}
-
-ClusteringImplementation Utils::getClusteringImplementation(const std::string &type_)
-{
-	if (boost::iequals(type_, "opencv"))
-		return CLUSTERING_OPENCV;
-	else if (boost::iequals(type_, "kmeans"))
-		return CLUSTERING_KMEANS;
-	else if (boost::iequals(type_, "stochastic"))
-		return CLUSTERING_STOCHASTIC;
-	else if (boost::iequals(type_, "kmedoids"))
-		return CLUSTERING_KMEDOIDS;
-
-	std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
-	return CLUSTERING_OPENCV;
-}
-
-MetricType Utils::getMetricType(const std::string &type_)
-{
-	if (boost::iequals(type_, "euclidean"))
-		return METRIC_EUCLIDEAN;
-	else if (boost::iequals(type_, "closest"))
-		return METRIC_CLOSEST_PERMUTATION;
-	else if (boost::iequals(type_, "closest_with_confidence"))
-		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
-
-	std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
-	return METRIC_EUCLIDEAN;
-}
-
-DescriptorType Utils::getDescriptorType(const std::string &type_)
-{
-	if (boost::iequals(type_, "DCH"))
-		return DESCRIPTOR_DCH;
-	else if (boost::iequals(type_, "SHOT"))
-		return DESCRIPTOR_SHOT;
-	else if (boost::iequals(type_, "USC"))
-		return DESCRIPTOR_USC;
-	else if (boost::iequals(type_, "PFH"))
-		return DESCRIPTOR_PFH;
-	else if (boost::iequals(type_, "ROPS"))
-		return DESCRIPTOR_ROPS;
-
-	std::cout << "WARNING: wrong descriptor type, assuming DCH";
-	return DESCRIPTOR_DCH;
 }
