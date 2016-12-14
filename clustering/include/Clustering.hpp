@@ -8,6 +8,7 @@
 #include <pcl/point_types.h>
 #include <opencv2/core/core.hpp>
 #include "ExecutionParams.hpp"
+#include "DescriptorParams.hpp"
 #include "Metric.hpp"
 
 
@@ -47,7 +48,7 @@ public:
 	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr cloud_,
 			const cv::Mat &labels_,
 			const cv::Mat &centers_,
-			const DescriptorParams &params_);
+			const DCHParams &params_);
 
 
 	/**************************************************/

@@ -34,10 +34,10 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 
 std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 		const pcl::PointNormal &point_,
-		const DescriptorParams &params_)
+		const DCHParams *params_)
 {
 	std::vector<BandPtr> bands;
-	bands.reserve(params_.bandNumber);
+	bands.reserve(params_->bandNumber);
 
 	Eigen::Vector3f p = point_.getVector3fMap();
 	Eigen::Vector3f n = ((Eigen::Vector3f) point_.getNormalVector3fMap()).normalized();
@@ -57,12 +57,12 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	/********** Debug **********/
 
 	// Angular step for bands definitions
-	double angleStep = params_.getBandsAngularStep();
+	double angleStep = params_->getBandsAngularStep();
 
 	// Create the lines defining each band and also each band's longitudinal plane
 	std::vector<Eigen::ParametrizedLine<float, 3> > lines;
 	std::vector<Eigen::Vector3f> normals, directors;
-	for (int i = 0; i < params_.bandNumber; i++)
+	for (int i = 0; i < params_->bandNumber; i++)
 	{
 		// Calculate the line's director std::vector and define the line
 		directors.push_back((axes.first * cos(angleStep * i) + axes.second * sin(angleStep * i)).normalized());
@@ -82,7 +82,7 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	// TODO check if it's better to measure the distance between the projected point on the plane and the projection of the projection of the point over the line
 
 	// Extracting points for each band (.52 to give a little extra room)
-	double halfBand = params_.bandWidth * 0.52;
+	double halfBand = params_->bandWidth * 0.52;
 	for (size_t j = 0; j < lines.size(); j++)
 	{
 		for (size_t i = 0; i < cloud_->size(); i++)
@@ -90,7 +90,7 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 			Eigen::Vector3f point = cloud_->points[i].getVector3fMap();
 			Eigen::Vector3f projection = plane.projection(point);
 
-			if (params_.bidirectional)
+			if (params_->bidirectional)
 			{
 				if (lines[j].distance(projection) <= halfBand)
 					bands[j]->data->push_back(cloud_->points[i]);
@@ -126,13 +126,13 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 }
 
 std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClouds(const std::vector<BandPtr> &bands_,
-		const DescriptorParams &params_)
+		const DCHParams *params_)
 {
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes;
 	planes.reserve(bands_.size());
 
-	float delta = params_.searchRadius;
-	float begin = params_.bidirectional ? -delta : 0;
+	float delta = params_->searchRadius;
+	float begin = params_->bidirectional ? -delta : 0;
 	float step = (delta - begin) / 10;
 
 	for (size_t i = 0; i < bands_.size(); i++)

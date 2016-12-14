@@ -11,6 +11,7 @@
 #include "KMedoids.hpp"
 #include "ClusteringUtils.hpp"
 
+
 void Clustering::searchClusters(const cv::Mat &items_,
 								const ClusteringParams &params_,
 								ClusteringResults &results_)
@@ -95,8 +96,9 @@ void Clustering::generateElbowGraph(const cv::Mat &items_,
 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr cloud_,
 		const cv::Mat &labels_,
 		const cv::Mat &centers_,
-		const DescriptorParams &params_)
+		const DCHParams &params_)
 {
+
 	//TODO improve the representation "bending" the bands according to the mean normal in each bin
 
 	int sequenceLength = params_.getSequenceLength();

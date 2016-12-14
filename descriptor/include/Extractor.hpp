@@ -5,7 +5,7 @@
 #pragma once
 
 #include <vector>
-#include "ExecutionParams.hpp"
+#include "DescriptorParams.hpp"
 #include "Band.hpp"
 
 class Extractor
@@ -19,11 +19,11 @@ public:
 	/**************************************************/
 	static std::vector<BandPtr> getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 										 const pcl::PointNormal &point_,
-										 const DescriptorParams &params_);
+										 const DCHParams *params_);
 
 	/**************************************************/
 	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> generatePlaneClouds(const std::vector<BandPtr> &bands_,
-			const DescriptorParams &params_);
+			const DCHParams *params_);
 
 private:
 	Extractor();

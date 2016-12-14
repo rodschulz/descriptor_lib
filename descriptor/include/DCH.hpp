@@ -5,7 +5,6 @@
 #pragma once
 
 #include <vector>
-#include "ExecutionParams.hpp"
 #include "Utils.hpp"
 #include "Extractor.hpp"
 #include "Hist.hpp"
@@ -18,17 +17,17 @@ class DCH
 public:
 	/**************************************************/
 	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-										  const DescriptorParams &params_,
+										  const DescriptorParamsPtr &params_,
 										  const int targetPointIndex_);
 
 	/**************************************************/
 	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-										  const DescriptorParams &params_,
+										  const DescriptorParamsPtr &params_,
 										  const pcl::PointNormal &target_);
 
 	/**************************************************/
 	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									 const DescriptorParams &params_,
+									 const DescriptorParamsPtr &params_,
 									 cv::Mat &descriptors_);
 
 	/**************************************************/
@@ -37,7 +36,7 @@ public:
 
 	/**************************************************/
 	static void fillSequences(Descriptor &descriptor_,
-							  const DescriptorParams &params_,
+							  const DescriptorParamsPtr &params_,
 							  const double sequenceStep_);
 
 	/**************************************************/

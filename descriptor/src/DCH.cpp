@@ -13,7 +13,7 @@ using namespace boost::accumulators;
 
 
 Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									const DescriptorParams &params_,
+									const DescriptorParamsPtr &params_,
 									const int targetPointIndex_)
 {
 	pcl::PointNormal target = cloud_->at(targetPointIndex_);
@@ -21,28 +21,31 @@ Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr
 }
 
 Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									const DescriptorParams &params_,
+									const DescriptorParamsPtr &params_,
 									const pcl::PointNormal &target_)
 {
+	DCHParams *params = (DCHParams *)params_.get();
+
 	// Get target point and surface patch
-	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, target_, params_.searchRadius);
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, target_, params->searchRadius);
 
 	// Extract bands
-	std::vector<BandPtr> bands = Extractor::getBands(patch, target_, params_);
+	std::vector<BandPtr> bands = Extractor::getBands(patch, target_, params);
 	DCH::fillSequences(bands, params_, M_PI / 18);
 
 	return bands;
 }
 
 void DCH::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-							   const DescriptorParams &params_,
+							   const DescriptorParamsPtr &params_,
 							   cv::Mat &descriptors_)
 {
-	int sequenceSize = params_.getSequenceLength();
+	DCHParams *params = (DCHParams *)params_.get();
+	int sequenceSize = params->getSequenceLength();
 
 	// Resize the matrix in case it doesn't match the required dimensions
 	int rows = cloud_->size();
-	int cols = sequenceSize * params_.bandNumber;
+	int cols = sequenceSize * params->bandNumber;
 	if (descriptors_.rows != rows || descriptors_.cols != cols)
 		descriptors_ = cv::Mat::zeros(rows, cols, CV_32FC1);
 
@@ -81,11 +84,12 @@ std::vector<Hist> DCH::generateAngleHistograms(const Descriptor &descriptor_,
 }
 
 void DCH::fillSequences(Descriptor &descriptor_,
-						const DescriptorParams &params_,
+						const DescriptorParamsPtr &params_,
 						const double sequenceStep_)
 {
-	double binSize = params_.sequenceBin;
-	int binsNumber = params_.getSequenceLength();
+	DCHParams *params = (DCHParams *)params_.get();
+	double binSize = params->sequenceBin;
+	int binsNumber = params->getSequenceLength();
 
 	for (size_t i = 0; i < descriptor_.size(); i++)
 	{
@@ -101,7 +105,7 @@ void DCH::fillSequences(Descriptor &descriptor_,
 		for (size_t j = 0; j < band->data->size(); j++)
 		{
 			pcl::PointNormal p = band->data->at(j);
-			double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, params_.useProjection);
+			double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, params->useProjection);
 			int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / binSize;
 
 			if (dataMap.find(index) == dataMap.end())
@@ -115,7 +119,7 @@ void DCH::fillSequences(Descriptor &descriptor_,
 		{
 			if (dataMap.find(j) != dataMap.end())
 			{
-				float value = params_.sequenceStat == STAT_MEAN ? (float) mean(dataMap[j]) : (float) median(dataMap[j]);
+				float value = params->sequenceStat == STAT_MEAN ? (float) mean(dataMap[j]) : (float) median(dataMap[j]);
 				band->sequenceString += getSequenceChar(value, sequenceStep_);
 				band->sequenceVector.push_back(value);
 			}
