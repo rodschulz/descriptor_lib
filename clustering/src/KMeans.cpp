@@ -11,6 +11,7 @@
 #include "Config.hpp"
 #include "ClusteringUtils.hpp"
 
+
 /********** DEBUG DATA GENERATION METHODS **********/
 #define DEBUG_DATA_EXT			".dat"
 #define DEBUG_PLOT_SCRIPT		"plot.script"
@@ -18,7 +19,11 @@
 #define DEBUG_PLOT_CENTERS		"plotCenters" DEBUG_DATA_EXT
 #define DEBUG_PLOT_CENTERS_IMG	"plotCentersImg" DEBUG_DATA_EXT
 
-void DEBUG_getLimits(const cv::Mat &items_, std::pair<std::pair<float, float>, std::pair<float, float> > &limits_, std::pair<float, float> &center_)
+
+void DEBUG_getLimits(const cv::Mat &items_,
+					 std::pair<std::pair<float, float>,
+					 std::pair<float, float> > &limits_,
+					 std::pair<float, float> &center_)
 {
 	float minX, minY, maxX, maxY, meanX, meanY;
 	minX = minY = std::numeric_limits<float>::max();
@@ -48,7 +53,13 @@ void DEBUG_getLimits(const cv::Mat &items_, std::pair<std::pair<float, float>, s
 	center_ = std::pair<float, float>(meanX / items_.rows, meanY / items_.rows);
 }
 
-void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const cv::Mat &centers_, const cv::Mat &labels_, const std::pair<std::pair<float, float>, std::pair<float, float> > &limits_, const std::pair<float, float> &center_, const int attempt_)
+void DEBUG_generateImage(const std::string &title_,
+						 const cv::Mat &items_,
+						 const cv::Mat &centers_,
+						 const cv::Mat &labels_,
+						 const std::pair<std::pair<float, float>, std::pair<float, float> > &limits_,
+						 const std::pair<float, float> &center_,
+						 const int attempt_)
 {
 	static int img = 0;
 	static int lastAttempt = 0;
@@ -145,17 +156,38 @@ void DEBUG_generateImage(const std::string &title_, const cv::Mat &items_, const
 }
 /********** DEBUG DATA GENERATION METHODS **********/
 
-void KMeans::searchClusters(ClusteringResults &_results, const cv::Mat &items_, const MetricPtr &metric_, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold)
+
+void KMeans::searchClusters(ClusteringResults &results_,
+							const cv::Mat &items_,
+							const MetricPtr &metric_,
+							const int ncluster_,
+							const int attempts_,
+							const int maxIterations_,
+							const double _stopThreshold)
 {
-	KMeans::run(_results, items_, metric_, _ncluster, _attempts, _maxIterations, _stopThreshold);
+	KMeans::run(results_, items_, metric_, ncluster_, attempts_, maxIterations_, _stopThreshold);
 }
 
-void KMeans::stochasticSearchClusters(ClusteringResults &_results, const cv::Mat &items_, const MetricPtr &metric_, const int _ncluster, const int _attempts, const int _maxIterations, const double _stopThreshold, const int _sampleSize)
+void KMeans::stochasticSearchClusters(ClusteringResults &results_,
+									  const cv::Mat &items_,
+									  const MetricPtr &metric_,
+									  const int ncluster_,
+									  const int attempts_,
+									  const int maxIterations_,
+									  const double _stopThreshold,
+									  const int sampleSize_)
 {
-	KMeans::run(_results, items_, metric_, _ncluster, _attempts, _maxIterations, _stopThreshold, _sampleSize);
+	KMeans::run(results_, items_, metric_, ncluster_, attempts_, maxIterations_, _stopThreshold, sampleSize_);
 }
 
-void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const MetricPtr &metric_, const int ncluster_, const int attempts_, const int maxIterations_, const double stopThreshold_, const int sampleSize_)
+void KMeans::run(ClusteringResults &results_,
+				 const cv::Mat &items_,
+				 const MetricPtr &metric_,
+				 const int ncluster_,
+				 const int attempts_,
+				 const int maxIterations_,
+				 const double stopThreshold_,
+				 const int sampleSize_)
 {
 	/***** DEBUG *****/
 	bool debugKmeans = Config::get()["kmeans"]["debugAlgorithm"].as<bool>(false);
@@ -293,7 +325,11 @@ void KMeans::run(ClusteringResults &results_, const cv::Mat &items_, const Metri
 		std::cout << "\tcluster " << zeroPointClusters[i] << ": 0 points\n";
 }
 
-bool KMeans::updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::Mat labels_, const double stopThreshold_, const MetricPtr &metric_)
+bool KMeans::updateCenters(cv::Mat &centers_,
+						   const cv::Mat &sample_,
+						   const cv::Mat labels_,
+						   const double stopThreshold_,
+						   const MetricPtr &metric_)
 {
 	// Calculate updated positions for the centers
 	cv::Mat newCenters = metric_->calculateMeans(centers_.rows, sample_, labels_, centers_);
@@ -308,7 +344,9 @@ bool KMeans::updateCenters(cv::Mat &centers_, const cv::Mat &sample_, const cv::
 	return stop;
 }
 
-int KMeans::findClosestCenter(const cv::Mat &vector_, const cv::Mat &centers_, const MetricPtr &metric_)
+int KMeans::findClosestCenter(const cv::Mat &vector_,
+							  const cv::Mat &centers_,
+							  const MetricPtr &metric_)
 {
 	int closestCenter = -1;
 

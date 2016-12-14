@@ -11,7 +11,9 @@
 #include "KMedoids.hpp"
 #include "ClusteringUtils.hpp"
 
-void Clustering::searchClusters(const cv::Mat &items_, const ClusteringParams &params_, ClusteringResults &_results)
+void Clustering::searchClusters(const cv::Mat &items_,
+								const ClusteringParams &params_,
+								ClusteringResults &results_)
 {
 	switch (params_.implementation)
 	{
@@ -20,24 +22,25 @@ void Clustering::searchClusters(const cv::Mat &items_, const ClusteringParams &p
 	/* no break */
 
 	case CLUSTERING_OPENCV:
-		cv::kmeans(items_, params_.clusterNumber, _results.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params_.maxIterations, params_.stopThreshold), params_.attempts, cv::KMEANS_PP_CENTERS, _results.centers);
+		cv::kmeans(items_, params_.clusterNumber, results_.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params_.maxIterations, params_.stopThreshold), params_.attempts, cv::KMEANS_PP_CENTERS, results_.centers);
 		break;
 
 	case CLUSTERING_KMEANS:
-		KMeans::searchClusters(_results, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold);
+		KMeans::searchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold);
 		break;
 
 	case CLUSTERING_STOCHASTIC:
-		KMeans::stochasticSearchClusters(_results, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold, items_.rows / 10);
+		KMeans::stochasticSearchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold, items_.rows / 10);
 		break;
 
 	case CLUSTERING_KMEDOIDS:
-		KMedoids::searchClusters(_results, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold);
+		KMedoids::searchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold);
 		break;
 	}
 }
 
-void Clustering::generateElbowGraph(const cv::Mat &items_, const ClusteringParams &params_)
+void Clustering::generateElbowGraph(const cv::Mat &items_,
+									const ClusteringParams &params_)
 {
 	std::cout << "*** ELBOW: begining graph generation ***" << std::endl;
 
@@ -89,7 +92,10 @@ void Clustering::generateElbowGraph(const cv::Mat &items_, const ClusteringParam
 	std::cout << "*** ELBOW: graph generation finished ***" << std::endl;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr cloud_, const cv::Mat &labels_, const cv::Mat &centers_, const DescriptorParams &params_)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr cloud_,
+		const cv::Mat &labels_,
+		const cv::Mat &centers_,
+		const DescriptorParams &params_)
 {
 	//TODO improve the representation "bending" the bands according to the mean normal in each bin
 
@@ -167,7 +173,8 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr Clustering::generateClusterRepresen
 	return output;
 }
 
-cv::Mat Clustering::generatePointDistanceMatrix(const cv::Mat &items_, const MetricPtr &metric_)
+cv::Mat Clustering::generatePointDistanceMatrix(const cv::Mat &items_,
+		const MetricPtr &metric_)
 {
 	cv::Mat distanceMatrix = cv::Mat::zeros(items_.rows, items_.rows, CV_32FC1);
 
@@ -184,7 +191,8 @@ cv::Mat Clustering::generatePointDistanceMatrix(const cv::Mat &items_, const Met
 	return distanceMatrix;
 }
 
-cv::Mat Clustering::generatePointDistanceMatrix2(const cv::Mat &items_, const MetricPtr &metric_)
+cv::Mat Clustering::generatePointDistanceMatrix2(const cv::Mat &items_,
+		const MetricPtr &metric_)
 {
 	cv::Mat distanceMatrix = cv::Mat::zeros(items_.rows, items_.rows, CV_32FC1);
 
@@ -202,17 +210,19 @@ cv::Mat Clustering::generatePointDistanceMatrix2(const cv::Mat &items_, const Me
 	return distanceMatrix;
 }
 
-void Clustering::generatePointDistanceMatrix3(cv::Mat &_distanceMatrix, const cv::Mat &items_, const MetricPtr &metric_)
+void Clustering::generatePointDistanceMatrix3(cv::Mat &distanceMatrix_,
+		const cv::Mat &items_,
+		const MetricPtr &metric_)
 {
-	_distanceMatrix = cv::Mat::zeros(items_.rows, items_.rows, CV_32FC1);
+	distanceMatrix_ = cv::Mat::zeros(items_.rows, items_.rows, CV_32FC1);
 
 	for (int i = 0; i < items_.rows; i++)
 	{
 		for (int j = 0; j <= i; j++)
 		{
 			float distance = (float) metric_->distance(items_.row(i), items_.row(j));
-			_distanceMatrix.at<float>(i, j) = distance;
-			_distanceMatrix.at<float>(j, i) = distance;
+			distanceMatrix_.at<float>(i, j) = distance;
+			distanceMatrix_.at<float>(j, i) = distance;
 		}
 	}
 }
