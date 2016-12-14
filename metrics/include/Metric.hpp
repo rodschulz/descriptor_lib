@@ -39,9 +39,6 @@ public:
 								   const cv::Mat &currentMeans_ = cv::Mat()) const = 0;
 
 	/**************************************************/
-	// virtual cv::Mat calculateMedoids(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMedoids = cv::Mat());
-
-	/**************************************************/
 	virtual MetricType getType() const = 0;
 
 	/**************************************************/

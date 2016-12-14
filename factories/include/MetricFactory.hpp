@@ -13,11 +13,12 @@
 #include "ClosestPermutationWithConfidenceMetric.hpp"
 #include "Config.hpp"
 
+
 class MetricFactory
 {
 public:
-	// Creates a metric instance according to the given parameters
-	static MetricPtr createMetric(const MetricType &type_, const std::vector<std::string> _args = std::vector<std::string>())
+	static MetricPtr create(const MetricType &type_,
+							const std::vector<std::string> _args = std::vector<std::string>())
 	{
 		switch (type_)
 		{

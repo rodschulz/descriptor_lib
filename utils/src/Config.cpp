@@ -64,7 +64,7 @@ bool Config::load(const std::string &filename_)
 			ClusteringParams *params = new ClusteringParams();
 			params->implementation = toClusteringImp(clusteringConfig["implementation"].as<std::string>());
 			std::vector<std::string> metricDetails = clusteringConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::createMetric(Metric::toMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::create(Metric::toMetricType(metricDetails[0]), metricDetails);
 			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
 			params->maxIterations = clusteringConfig["maxIterations"].as<int>();
 			params->stopThreshold = clusteringConfig["stopThreshold"].as<double>();
@@ -105,7 +105,7 @@ bool Config::load(const std::string &filename_)
 
 			MetricTestingParams *params = new MetricTestingParams();
 			std::vector<std::string> metricDetails = metricTestConfig["metric"].as<std::vector<std::string> >();
-			params->metric = MetricFactory::createMetric(Metric::toMetricType(metricDetails[0]), metricDetails);
+			params->metric = MetricFactory::create(Metric::toMetricType(metricDetails[0]), metricDetails);
 
 			instance->metricTestingParams = params;
 		}

@@ -8,7 +8,6 @@
 #include "Utils.hpp"
 #include "PointFactory.hpp"
 #include "KMeans.hpp"
-#include "KMedoids.hpp"
 #include "ClusteringUtils.hpp"
 
 
@@ -20,7 +19,6 @@ void Clustering::searchClusters(const cv::Mat &items_,
 	{
 	default:
 		std::cout << "WARNING: invalid clustering method. Falling back to OpenCV" << std::endl;
-	/* no break */
 
 	case CLUSTERING_OPENCV:
 		cv::kmeans(items_, params_.clusterNumber, results_.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params_.maxIterations, params_.stopThreshold), params_.attempts, cv::KMEANS_PP_CENTERS, results_.centers);
@@ -32,10 +30,6 @@ void Clustering::searchClusters(const cv::Mat &items_,
 
 	case CLUSTERING_STOCHASTIC:
 		KMeans::stochasticSearchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold, items_.rows / 10);
-		break;
-
-	case CLUSTERING_KMEDOIDS:
-		KMedoids::searchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold);
 		break;
 	}
 }

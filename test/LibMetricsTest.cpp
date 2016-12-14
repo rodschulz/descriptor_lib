@@ -8,10 +8,10 @@
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(MetricFactory_class_suite)
 
-BOOST_AUTO_TEST_CASE(createMetric)
+BOOST_AUTO_TEST_CASE(create)
 {
 	// Creation of Euclidean metric
-	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN);
+	MetricPtr metric = MetricFactory::create(METRIC_EUCLIDEAN);
 	BOOST_CHECK(metric.get() != NULL);
 
 	EuclideanMetric* euclidean = dynamic_cast<EuclideanMetric*> (metric.get());
@@ -21,14 +21,14 @@ BOOST_AUTO_TEST_CASE(createMetric)
 	std::vector<std::string> args = std::vector<std::string>();
 	args.push_back("");
 	args.push_back("4");
-	metric = MetricFactory::createMetric(METRIC_CLOSEST_PERMUTATION, args);
+	metric = MetricFactory::create(METRIC_CLOSEST_PERMUTATION, args);
 	BOOST_CHECK(metric.get() != NULL);
 
 	ClosestPermutationMetric* closestPermutation = dynamic_cast<ClosestPermutationMetric*> (metric.get());
 	BOOST_CHECK(closestPermutation != NULL);
 
 	// Creation of ClosestPermutationWithConfidence metric
-	metric = MetricFactory::createMetric(METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE, args);
+	metric = MetricFactory::create(METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE, args);
 	BOOST_CHECK(metric.get() != NULL);
 
 	ClosestPermutationWithConfidenceMetric* closestPermutationWithConfidence = dynamic_cast<ClosestPermutationWithConfidenceMetric*> (metric.get());
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(EuclideanMetric_class_suite)
 
 BOOST_AUTO_TEST_CASE(euclideanDistance)
 {
-	MetricPtr metric = MetricFactory::createMetric(METRIC_EUCLIDEAN);
+	MetricPtr metric = MetricFactory::create(METRIC_EUCLIDEAN);
 
 	cv::Mat vector1 = cv::Mat::ones(3, 1, CV_32FC1);
 	cv::Mat vector2 = cv::Mat::ones(3, 1, CV_32FC1);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(closestDistance)
 	std::vector<std::string> args = std::vector<std::string>();
 	args.push_back("");
 	args.push_back("1");
-	MetricPtr metric = MetricFactory::createMetric(METRIC_CLOSEST_PERMUTATION, args);
+	MetricPtr metric = MetricFactory::create(METRIC_CLOSEST_PERMUTATION, args);
 
 	cv::Mat vector1 = cv::Mat::ones(1, 5, CV_32FC1);
 	cv::Mat vector2 = cv::Mat::ones(1, 5, CV_32FC1);
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(closestDistance)
 	args = std::vector<std::string>();
 	args.push_back("");
 	args.push_back("2");
-	metric = MetricFactory::createMetric(METRIC_CLOSEST_PERMUTATION, args);
+	metric = MetricFactory::create(METRIC_CLOSEST_PERMUTATION, args);
 
 	vector1 = cv::Mat::zeros(1, 8, CV_32FC1);
 	vector2 = cv::Mat::zeros(1, 8, CV_32FC1);
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(closestPermutation)
 	std::vector<std::string> args = std::vector<std::string>();
 	args.push_back("");
 	args.push_back("1");
-	ClosestPermutationMetric *metric = (ClosestPermutationMetric *)MetricFactory::createMetric(METRIC_CLOSEST_PERMUTATION, args).get();
+	ClosestPermutationMetric *metric = (ClosestPermutationMetric *)MetricFactory::create(METRIC_CLOSEST_PERMUTATION, args).get();
 
 	cv::Mat vector1 = cv::Mat::ones(1, 5, CV_32FC1);
 	cv::Mat vector2 = cv::Mat::ones(1, 5, CV_32FC1);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(closestPermutation)
 	args = std::vector<std::string>();
 	args.push_back("");
 	args.push_back("2");
-	metric = (ClosestPermutationMetric *)MetricFactory::createMetric(METRIC_CLOSEST_PERMUTATION, args).get();
+	metric = (ClosestPermutationMetric *)MetricFactory::create(METRIC_CLOSEST_PERMUTATION, args).get();
 
 	vector1 = cv::Mat::zeros(1, 8, CV_32FC1);
 	vector2 = cv::Mat::zeros(1, 8, CV_32FC1);

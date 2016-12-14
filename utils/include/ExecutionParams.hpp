@@ -47,14 +47,12 @@ enum ClusteringImplementation
 	CLUSTERING_OPENCV,
 	CLUSTERING_KMEANS,
 	CLUSTERING_STOCHASTIC,
-	CLUSTERING_KMEDOIDS
 };
 static std::string clusteringImp[] =
 {
 	BOOST_STRINGIZE(CLUSTERING_OPENCV),
 	BOOST_STRINGIZE(CLUSTERING_KMEANS),
 	BOOST_STRINGIZE(CLUSTERING_STOCHASTIC),
-	BOOST_STRINGIZE(CLUSTERING_KMEDOIDS)
 };
 
 static inline ClusteringImplementation toClusteringImp(const std::string &type_)
@@ -65,8 +63,6 @@ static inline ClusteringImplementation toClusteringImp(const std::string &type_)
 		return CLUSTERING_KMEANS;
 	else if (boost::iequals(type_, "stochastic"))
 		return CLUSTERING_STOCHASTIC;
-	else if (boost::iequals(type_, "kmedoids"))
-		return CLUSTERING_KMEDOIDS;
 
 	std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
 	return CLUSTERING_OPENCV;
@@ -107,7 +103,6 @@ static inline SynCloudType toSynCloudType(const std::string &type_)
 	std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
 	return CLOUD_SPHERE;
 }
-
 
 
 /**************************************************/

@@ -195,7 +195,6 @@ BOOST_AUTO_TEST_CASE(strToClusteringImp)
 	BOOST_CHECK_EQUAL(toClusteringImp("opencv"), CLUSTERING_OPENCV);
 	BOOST_CHECK_EQUAL(toClusteringImp("kmeans"), CLUSTERING_KMEANS);
 	BOOST_CHECK_EQUAL(toClusteringImp("stochastic"), CLUSTERING_STOCHASTIC);
-	BOOST_CHECK_EQUAL(toClusteringImp("kmedoids"), CLUSTERING_KMEDOIDS);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
