@@ -7,6 +7,7 @@
 #include <fstream>
 #include <pcl/io/pcd_io.h>
 #include <boost/lexical_cast.hpp>
+#include <plog/Log.h>
 #include "CloudUtils.hpp"
 #include "Utils.hpp"
 
@@ -89,7 +90,7 @@ bool Loader::loadMatrix(const std::string &filename_,
 						}
 						catch (boost::bad_lexical_cast ex_)
 						{
-							std::cout << "\tWARNING: NaN found at (row, col) = (" << row << ", " << col << "). Setting to zero." << std::endl;
+							LOGW << "NaN found at (r,c) = (" << row << ", " << col << "). Changing to zero.";
 						}
 
 						matrix_.at<float>(row, col) = value;
@@ -106,7 +107,7 @@ bool Loader::loadMatrix(const std::string &filename_,
 	}
 	catch (std::exception &_ex)
 	{
-		std::cout << "ERROR: " << _ex.what() << std::endl;
+		LOGE << "ERROR: " << _ex.what();
 		loadOk = false;
 	}
 	return loadOk;
@@ -164,7 +165,7 @@ void Loader::traverseDirectory(const std::string &inputDirectory_,
 		{
 			if (boost::iequals(filePath.extension().string(), ".dat"))
 			{
-				std::cout << "Loading: " << filePath.string() << std::endl;
+				LOGI << "Loading: " << filePath.string();
 
 				cv::Mat centers;
 				std::map<std::string, std::string> metadata;
@@ -175,7 +176,7 @@ void Loader::traverseDirectory(const std::string &inputDirectory_,
 					dimensions_.second = std::max(dimensions_.second, centers.cols);
 				}
 				else
-					std::cout << "...failed, skipping to next file" << std::endl;
+					LOGI << "...failed, skipping to next file";
 			}
 		}
 		else

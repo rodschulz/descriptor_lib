@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include <plog/Log.h>
 #include "EuclideanMetric.hpp"
 #include "ClosestPermutationMetric.hpp"
 #include "ClosestPermutationWithConfidenceMetric.hpp"
@@ -40,7 +41,7 @@ public:
 					size = params->getSequenceLength();
 				else
 				{
-					std::cout << "[MetricFactory] WARNING: 'conf' arg incompatible with selected descriptor. Falling back to EuclideanMetric" << std::endl;
+					LOGW << "'conf' arg incompatible with selected descriptor, changing to EuclideanMetric";
 					return MetricPtr(new EuclideanMetric());
 				}
 			}
