@@ -17,6 +17,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <plog/Log.h>
 
 
 // Extract the current boost's minor version
@@ -75,7 +76,7 @@ std::string Utils::getWorkingDirectory()
 {
 	char workingDir[1024];
 	if (getcwd(workingDir, sizeof(workingDir)) == NULL)
-		std::cout << "WARNING: can't get working directory location" << std::endl;
+		LOGW << "Can't get working directory location";
 
 	int len = strlen(workingDir);
 	workingDir[len] = '/';

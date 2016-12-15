@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
+#include <plog/Log.h>
 #include "Metric.hpp"
 
 
@@ -35,7 +36,7 @@ static inline SequenceStat toStatType(const std::string &type_)
 	else if (boost::iequals(type_, "median"))
 		return STAT_MEDIAN;
 
-	std::cout << "WARNING: wrong stat type, assuming MEAN";
+	LOGW << "Wrong stat type, assuming MEAN";
 	return STAT_MEAN;
 }
 
@@ -64,7 +65,7 @@ static inline ClusteringImplementation toClusteringImp(const std::string &type_)
 	else if (boost::iequals(type_, "stochastic"))
 		return CLUSTERING_STOCHASTIC;
 
-	std::cout << "WARNING: wrong clustering implementation, assuming OPENCV";
+	LOGW << "Wrong clustering implementation, assuming OPENCV";
 	return CLUSTERING_OPENCV;
 }
 
@@ -100,7 +101,7 @@ static inline SynCloudType toSynCloudType(const std::string &type_)
 	else if (boost::iequals(type_, "plane"))
 		return CLOUD_PLANE;
 
-	std::cout << "WARNING: wrong synthetic cloud type, assuming SPHERE";
+	LOGW << "Wrong synthetic cloud type, assuming SPHERE";
 	return CLOUD_SPHERE;
 }
 

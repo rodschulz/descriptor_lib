@@ -14,6 +14,7 @@
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/node/impl.h>
+#include <plog/Log.h>
 #include "MetricFactory.hpp"
 
 
@@ -26,10 +27,6 @@ Config::Config()
 	clusteringParams = NULL;
 	cloudSmoothingParams = NULL;
 	syntheticCloudParams = NULL;
-}
-
-Config::~Config()
-{
 }
 
 bool Config::load(const std::string &filename_)
@@ -100,7 +97,7 @@ bool Config::load(const std::string &filename_)
 	}
 	catch (std::exception &_ex)
 	{
-		std::cout << "ERROR: " << _ex.what() << std::endl;
+		LOGE << _ex.what() << std::endl;
 		loadOk = false;
 	}
 

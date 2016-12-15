@@ -10,18 +10,12 @@
 class EuclideanMetric: public Metric
 {
 public:
-	// Constructor
-	EuclideanMetric()
-	{
-	}
+	EuclideanMetric() {}
+	~EuclideanMetric() {}
 
-	// Destructor
-	~EuclideanMetric()
-	{
-	}
-
-	// Returns the distance between the two given vectors according to this metric
-	inline double distance(const cv::Mat &vector1_, const cv::Mat &vector2_) const
+	/**************************************************/
+	inline double distance(const cv::Mat &vector1_,
+						   const cv::Mat &vector2_) const
 	{
 		if (vector1_.cols != vector2_.cols || vector1_.rows != vector2_.rows)
 			throw std::runtime_error("Invalid matrix dimensions in distance");
@@ -29,8 +23,11 @@ public:
 		return cv::norm(vector1_, vector2_);
 	}
 
-	// Calculates the center of the given set of items, according to this metric
-	inline cv::Mat calculateMeans(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMeans_ = cv::Mat()) const
+	/**************************************************/
+	inline cv::Mat calculateMeans(const int clusterNumber_,
+								  const cv::Mat &items_,
+								  const cv::Mat &labels_,
+								  const cv::Mat &currentMeans_ = cv::Mat()) const
 	{
 		std::vector<int> itemCount = std::vector<int>(clusterNumber_, 0);
 		cv::Mat newCenters = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
@@ -50,19 +47,19 @@ public:
 		return newCenters;
 	}
 
-	// Returns the type of the current metric
+	/**************************************************/
 	inline MetricType getType() const
 	{
 		return METRIC_EUCLIDEAN;
 	}
 
-	// Returns the parameters used to construct the current instance
+	/**************************************************/
 	inline std::vector<std::string> getConstructionParams() const
 	{
 		return std::vector<std::string>();
 	}
 
-	// Validates and fixes the given means, according to the metric's definition
+	/**************************************************/
 	inline void validateMeans(cv::Mat &means_) const
 	{
 	}

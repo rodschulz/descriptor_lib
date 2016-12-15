@@ -6,7 +6,6 @@
 
 #include <string>
 #include <stdexcept>
-#include "ExecutionParams.hpp"
 #include <yaml-cpp/yaml.h>
 #include <yaml-cpp/node/parse.h>
 #include "DescriptorParams.hpp"
@@ -21,50 +20,49 @@
 class Config
 {
 public:
-	// Destructor
-	~Config();
+	~Config() {};
 
-	// Returns the instance of the singleton
+	/**************************************************/
 	static Config *getInstance()
 	{
 		static Config instance = Config();
 		return &instance;
 	}
 
-	// Returns the config root node
+	/**************************************************/
 	static YAML::Node get()
 	{
 		return getInstance()->config;
 	}
 
-	// Loads the configuration file
+	/**************************************************/
 	static bool load(const std::string &filename_);
 
-	// Returns a boolean value indicating if the debug generation is enabled
+	/**************************************************/
 	static bool debugEnabled()
 	{
 		return getInstance()->debug;
 	}
 
-	// Returns the target point for descriptor evaluation
+	/**************************************************/
 	static double getTargetPoint()
 	{
 		return getInstance()->targetPoint;
 	}
 
-	// Returns the normal estimation radius
+	/**************************************************/
 	static double getNormalEstimationRadius()
 	{
 		return getInstance()->normalEstimationRadius;
 	}
 
-	// Returns the normal estimation radius
+	/**************************************************/
 	static std::string getCacheDirectory()
 	{
 		return getInstance()->cacheLocation;
 	}
 
-	// Returns the descriptor calculation parameters
+	/**************************************************/
 	static DescriptorParamsPtr getDescriptorParams()
 	{
 		if (!getInstance()->descriptorParams)
@@ -73,7 +71,7 @@ public:
 		return getInstance()->descriptorParams;
 	}
 
-	// Returns the clustering parameters
+	/**************************************************/
 	static ClusteringParams getClusteringParams()
 	{
 		if (getInstance()->clusteringParams == NULL)
@@ -82,7 +80,7 @@ public:
 		return *getInstance()->clusteringParams;
 	}
 
-	// Returns the cloud smoothing parameters
+	/**************************************************/
 	static CloudSmoothingParams getCloudSmoothingParams()
 	{
 		if (getInstance()->cloudSmoothingParams == NULL)
@@ -91,7 +89,7 @@ public:
 		return *getInstance()->cloudSmoothingParams;
 	}
 
-	// Returns the cloud smoothing parameters
+	/**************************************************/
 	static SyntheticCloudsParams getSyntheticCloudParams()
 	{
 		if (getInstance()->syntheticCloudParams == NULL)

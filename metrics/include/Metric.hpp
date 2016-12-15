@@ -8,6 +8,7 @@
 #include <opencv2/core/core.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
+#include <plog/Log.h>
 
 
 enum MetricType
@@ -63,20 +64,16 @@ public:
 		else if (boost::iequals(type_, "closest_with_confidence"))
 			return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
 
-		std::cout << "WARNING: wrong metric type, assuming EUCLIDEAN";
+		LOGW << "Wrong metric type, assuming EUCLIDEAN";
 		return METRIC_EUCLIDEAN;
 	}
 
 protected:
-	// Constructor
 	Metric()
 	{
 		debugEnabled = false;
 	}
-	// Destructor
-	virtual ~Metric()
-	{
-	}
+	virtual ~Metric() {}
 
 	// Debug generation flag
 	bool debugEnabled;

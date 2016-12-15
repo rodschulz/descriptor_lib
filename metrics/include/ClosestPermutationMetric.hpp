@@ -10,11 +10,11 @@
 #include <boost/lexical_cast.hpp>
 #include "Utils.hpp"
 
-// Metric measuring the closest distance between two vectors, according to the given permutation size
+
 class ClosestPermutationMetric: public Metric
 {
 public:
-	// Structure defining the basic permutation
+	/**************************************************/
 	struct Permutation
 	{
 		double distance;
@@ -32,25 +32,25 @@ public:
 		}
 	};
 
-	// Constructor
+	/**************************************************/
 	ClosestPermutationMetric(const int permutationSize_)
 	{
 		permutationSize = permutationSize_;
 	}
+	~ClosestPermutationMetric() {}
 
-	// Destructor
-	~ClosestPermutationMetric()
-	{
-	}
-
-	// Returns the distance between the given vectors, according to the current metric
-	inline double distance(const cv::Mat &vector1_, const cv::Mat &vector2_) const
+	/**************************************************/
+	inline double distance(const cv::Mat &vector1_,
+						   const cv::Mat &vector2_) const
 	{
 		return getClosestPermutation(vector1_, vector2_).distance;
 	}
 
-	// Returns the central point amongst the given items, according to the given labels
-	inline cv::Mat calculateMeans(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMeans_ = cv::Mat()) const
+	/**************************************************/
+	inline cv::Mat calculateMeans(const int clusterNumber_,
+								  const cv::Mat &items_,
+								  const cv::Mat &labels_,
+								  const cv::Mat &currentMeans_ = cv::Mat()) const
 	{
 		std::vector<int> itemCount = std::vector<int>(clusterNumber_, 0);
 
@@ -92,19 +92,23 @@ public:
 		return newMeans;
 	}
 
-	// Returns the medoid point of the given items, according to the given labels
-	inline cv::Mat calculateMedoids(const int clusterNumber_, const cv::Mat &items_, const cv::Mat &labels_, const cv::Mat &currentMedoids_ = cv::Mat())
-	{
-		cv::Mat newMedoids = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
-		for (int i = 0; i < labels_.rows; i++)
-		{
-		}
+	/**************************************************/
+	// inline cv::Mat calculateMedoids(const int clusterNumber_,
+	// 								const cv::Mat &items_,
+	// 								const cv::Mat &labels_,
+	// 								const cv::Mat &currentMedoids_ = cv::Mat())
+	// {
+	// 	cv::Mat newMedoids = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
+	// 	for (int i = 0; i < labels_.rows; i++)
+	// 	{
+	// 	}
 
-		return newMedoids;
-	}
+	// 	return newMedoids;
+	// }
 
-	// Returns the closest permutation of vector2 with respect to vector1, according to this metric's params
-	inline Permutation getClosestPermutation(const cv::Mat &vector1_, const cv::Mat &vector2_) const
+	/**************************************************/
+	inline Permutation getClosestPermutation(const cv::Mat &vector1_,
+			const cv::Mat &vector2_) const
 	{
 		// Check if dimensions match
 		if (vector1_.cols != vector2_.cols || vector1_.rows != vector2_.rows)
@@ -149,13 +153,13 @@ public:
 		return Permutation(minDistance, minIndex);
 	}
 
-	// Returns the type of the current metric
+	/**************************************************/
 	MetricType getType() const
 	{
 		return METRIC_CLOSEST_PERMUTATION;
 	}
 
-	// Returns the parameters used to construct the current instance
+	/**************************************************/
 	std::vector<std::string> getConstructionParams() const
 	{
 		std::vector<std::string> params;
@@ -163,7 +167,7 @@ public:
 		return params;
 	}
 
-	// Validates and fixes the given means, according to the metric's definition
+	/**************************************************/
 	inline void validateMeans(cv::Mat &means_) const
 	{
 		bool valid;
@@ -203,5 +207,5 @@ public:
 	}
 
 protected:
-	int permutationSize; // Size of the permutation used by this metric (number of elements moved for each permutation)
+	int permutationSize;
 };

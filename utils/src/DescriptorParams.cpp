@@ -3,6 +3,7 @@
  * 2016
  */
 #include "DescriptorParams.hpp"
+#include <plog/Log.h>
 
 
 DescriptorType DescriptorParams::toType(const std::string &type_)
@@ -18,7 +19,7 @@ DescriptorType DescriptorParams::toType(const std::string &type_)
 	else if (boost::iequals(type_, "ROPS"))
 		return DESCRIPTOR_ROPS;
 
-	std::cout << "WARNING: wrong descriptor type, assuming DCH";
+	LOGW << "Wrong descriptor type, assuming DCH";
 	return DESCRIPTOR_DCH;
 }
 
@@ -28,7 +29,7 @@ DescriptorParamsPtr DescriptorParams::create(const DescriptorType type_)
 	{
 	default:
 	case DESCRIPTOR_UNKNOWN:
-		std::cout << "WARNING: bad descriptor type for params instantiation, assuming DCH" << std::endl;
+		LOGW << "Bad descriptor type for params instantiation, assuming DCH";
 
 	case DESCRIPTOR_DCH:
 		return DescriptorParamsPtr(new DCHParams());
