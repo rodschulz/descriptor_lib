@@ -25,10 +25,10 @@ public:
 			distance = index = -1;
 		}
 
-		Permutation(const double _distance, int _index)
+		Permutation(const double _distance, int index_)
 		{
 			distance = _distance;
-			index = _index;
+			index = index_;
 		}
 	};
 

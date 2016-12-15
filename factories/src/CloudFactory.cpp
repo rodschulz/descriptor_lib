@@ -5,21 +5,21 @@
 #include "CloudFactory.hpp"
 #include "PointFactory.hpp"
 
-pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCube(const double _size, const Eigen::Vector3f &_center, const int _npoints)
+pcl::PointCloud<pcl::PointNormal>::Ptr CloudFactory::createCube(const double size_, const Eigen::Vector3f &_center, const int _npoints)
 {
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 	int N = sqrt(_npoints / 6);
 
 
-	double minX = _center.x() - _size * 0.5;
-	double minY = _center.y() - _size * 0.5;
-	double minZ = _center.z() - _size * 0.5;
+	double minX = _center.x() - size_ * 0.5;
+	double minY = _center.y() - size_ * 0.5;
+	double minZ = _center.z() - size_ * 0.5;
 
-	double maxX = _center.x() + _size * 0.5;
-	double maxY = _center.y() + _size * 0.5;
-	double maxZ = _center.z() + _size * 0.5;
+	double maxX = _center.x() + size_ * 0.5;
+	double maxY = _center.y() + size_ * 0.5;
+	double maxZ = _center.z() + size_ * 0.5;
 
-	double step = _size / N;
+	double step = size_ / N;
 
 	// Generate faces fixed in X axis
 	for (double y = minY; y <= maxY; y += step)
@@ -145,7 +145,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(cons
 	return coloredCloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint8_t _r, uint8_t _g, uint8_t _b)
+pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint8_t r_, uint8_t g_, uint8_t b_)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
 	coloredCloud->reserve(cloud_->size());
@@ -153,7 +153,7 @@ pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr CloudFactory::createColorCloud(cons
 	for (unsigned int i = 0; i < cloud_->width; i++)
 	{
 		pcl::PointNormal p = cloud_->points[i];
-		coloredCloud->push_back(PointFactory::createPointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, _r, _g, _b));
+		coloredCloud->push_back(PointFactory::createPointXYZRGBNormal(p.x, p.y, p.z, p.normal_x, p.normal_y, p.normal_z, p.curvature, r_, g_, b_));
 	}
 
 	return coloredCloud;

@@ -11,7 +11,7 @@ class CloudFactory
 {
 public:
 	// Creates a cloud shaped as a cube
-	static pcl::PointCloud<pcl::PointNormal>::Ptr createCube(const double _size, const Eigen::Vector3f &_center, const int _npoints);
+	static pcl::PointCloud<pcl::PointNormal>::Ptr createCube(const double size_, const Eigen::Vector3f &_center, const int _npoints);
 
 	// Creates a cloud shaped as a cylinder
 	static pcl::PointCloud<pcl::PointNormal>::Ptr createCylinderSection(const float _angle, const float _radius, const float _height, const Eigen::Vector3f &_center, const int _npoints);
@@ -26,7 +26,7 @@ public:
 	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint32_t color_);
 
 	// Creates a cloud colored with the given color
-	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint8_t _r, uint8_t _g, uint8_t _b);
+	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr createColorCloud(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_, uint8_t r_, uint8_t g_, uint8_t b_);
 private:
 	CloudFactory();
 	~CloudFactory();

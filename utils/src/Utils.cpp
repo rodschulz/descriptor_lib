@@ -46,7 +46,7 @@ std::vector<T1> generateRandomSet(const unsigned int size_,
 	NumberType range(min_, max_);
 	boost::variate_generator<Generator&, NumberType> dist(generator, range);
 #else
-	Generator dist(_min, _max);
+	Generator dist(min_, max_);
 #endif
 
 	std::vector<T1> numbers;
@@ -84,13 +84,13 @@ std::string Utils::getWorkingDirectory()
 	return workingDir;
 }
 
-std::string Utils::getCalculationConfigHash(const std::string _inputCloudFile,
+std::string Utils::getCalculationConfigHash(const std::string inputCloudFile_,
 		const double normalEstimationRadius_,
 		const DescriptorParamsPtr &descriptorParams_,
 		const CloudSmoothingParams &smoothingParams_)
 {
 	std::string str = "";
-	str += "input=" + getFileChecksum(_inputCloudFile);
+	str += "input=" + getFileChecksum(inputCloudFile_);
 	str += "-normalEstimationRadius=" + boost::lexical_cast<std::string>(normalEstimationRadius_);
 	str += "-" + descriptorParams_->toString();
 	if (smoothingParams_.useSmoothing)
@@ -126,17 +126,17 @@ std::string Utils::getFileChecksum(const std::string filename_)
 	return stringMD5;
 }
 
-int Utils::getRandomNumber(const int _min,
-						   const int _max)
+int Utils::getRandomNumber(const int min_,
+						   const int max_)
 {
 	generator.seed(std::time(0));
 
 #if BOOST_MINOR_VERSION <= 46
-	boost::uniform_int<> range(_min, _max);
+	boost::uniform_int<> range(min_, max_);
 	boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dist(generator, range);
 	return dist();
 #else
-	boost::random::uniform_int_distribution<> dist(_min, _max);
+	boost::random::uniform_int_distribution<> dist(min_, max_);
 	return dist(generator);
 #endif
 }
@@ -165,10 +165,10 @@ std::vector<int> Utils::getRandomIntArray(const unsigned int size_,
 #endif
 }
 
-std::string Utils::num2Hex(const size_t _number)
+std::string Utils::num2Hex(const size_t number_)
 {
 	std::stringstream stream;
-	stream << std::hex << _number;
+	stream << std::hex << number_;
 	return stream.str();
 }
 

@@ -133,7 +133,7 @@ public:
 	static std::string getWorkingDirectory();
 
 	/**************************************************/
-	static std::string getCalculationConfigHash(const std::string _inputCloudFile,
+	static std::string getCalculationConfigHash(const std::string inputCloudFile_,
 			const double normalEstimationRadius_,
 			const DescriptorParamsPtr &descriptorParams_,
 			const CloudSmoothingParams &smoothingParams_);
@@ -142,8 +142,8 @@ public:
 	static std::string getFileChecksum(const std::string filename_);
 
 	/**************************************************/
-	static int getRandomNumber(const int _min,
-							   const int _max);
+	static int getRandomNumber(const int min_,
+							   const int max_);
 
 	/**************************************************/
 	static std::vector<float> getRandomRealArray(const unsigned int size_,
@@ -152,33 +152,33 @@ public:
 			const bool allowRepetition_);
 
 	/**************************************************/
-	static std::vector<int> getRandomIntArray(const unsigned int _size,
-			const int _min,
-			const int _max,
+	static std::vector<int> getRandomIntArray(const unsigned int size_,
+			const int min_,
+			const int max_,
 			const bool allowRepetition_);
 
 	/**************************************************/
-	static std::string num2Hex(const size_t _number);
+	static std::string num2Hex(const size_t number_);
 
 	/**************************************************/
-	static inline uint32_t getColor(const uint8_t _r,
-									const uint8_t _g,
-									const uint8_t _b)
+	static inline uint32_t getColor(const uint8_t r_,
+									const uint8_t g_,
+									const uint8_t b_)
 	{
-		uint32_t color = ((0x00 << 24) | (uint32_t) _r << 16 | (uint32_t) _g << 8 | (uint32_t) _b);
+		uint32_t color = ((0x00 << 24) | (uint32_t) r_ << 16 | (uint32_t) g_ << 8 | (uint32_t) b_);
 		return color;
 	}
 
 	/**************************************************/
-	static inline uint32_t palette12(const int _index)
+	static inline uint32_t palette12(const int index_)
 	{
-		return colorPalette12[_index % 12];
+		return colorPalette12[index_ % 12];
 	}
 
 	/**************************************************/
-	static inline uint32_t palette35(const int _index)
+	static inline uint32_t palette35(const int index_)
 	{
-		return colorPalette35[_index % 35];
+		return colorPalette35[index_ % 35];
 	}
 
 	/**************************************************/
@@ -186,14 +186,14 @@ public:
 			const Eigen::Vector3f &point_);
 
 	/**************************************************/
-	static inline double getSSE(const cv::Mat &_vectors,
+	static inline double getSSE(const cv::Mat &vectors_,
 								const cv::Mat &centers_,
 								const cv::Mat &labels_)
 	{
 		double sse = 0;
-		for (int i = 0; i < _vectors.rows; i++)
+		for (int i = 0; i < vectors_.rows; i++)
 		{
-			float norm = cv::norm(_vectors.row(i), centers_.row(labels_.at<int>(i)));
+			float norm = cv::norm(vectors_.row(i), centers_.row(labels_.at<int>(i)));
 			sse += (norm * norm);
 		}
 
@@ -201,24 +201,27 @@ public:
 	}
 
 	/**************************************************/
-	template<typename T> static inline int sign(T val)
+	template<typename T>
+	static inline int sign(T val)
 	{
 		return (T(0) < val) - (val < T(0));
 	}
 
 	/**************************************************/
-	template<class T> static inline double angle(const T &vector1_,
-			const T &vector2_)
+	template<class T>
+	static inline double angle(const T &vector1_,
+							   const T &vector2_)
 	{
 		return atan2(vector1_.cross(vector2_).norm(), vector1_.dot(vector2_));
 	}
 
 	/**************************************************/
-	template<class T> static inline double signedAngle(const T &vector1_,
-			const T &vector2_,
-			const T &_normal)
+	template<class T>
+	static inline double signedAngle(const T &vector1_,
+									 const T &vector2_,
+									 const T &normal_)
 	{
-		double direction = _normal.dot(vector1_.cross(vector2_));
+		double direction = normal_.dot(vector1_.cross(vector2_));
 
 		// Check if the cross product is not zero
 		if (fabs(direction) > 1E-7)

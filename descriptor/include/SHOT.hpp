@@ -13,6 +13,7 @@
 class SHOT
 {
 public:
+	/**************************************************/
 	static void computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							 const DescriptorParamsPtr &params_,
 							 cv::Mat &descriptors_)
@@ -43,6 +44,10 @@ public:
 	}
 
 private:
+	SHOT() {};
+	~SHOT() {};
+
+	/**************************************************/
 	static void removeNaN(pcl::PointCloud<pcl::SHOT352>::Ptr &descriptors_)
 	{
 		size_t size = sizeof(pcl::SHOT352::descriptor) / sizeof(float);
