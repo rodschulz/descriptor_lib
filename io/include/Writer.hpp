@@ -54,12 +54,14 @@ public:
 									 const CloudSmoothingParams &smoothingParams_);
 
 	/**************************************************/
-	static void writeBoW(const std::string &filename_,
-						 const cv::Mat &centers_,
-						 const ClusteringParams &clusteringParams_,
-						 const int nbands_,
-						 const int nbins_,
-						 const bool bidirectional_);
+	static void writeCodebook(const std::string &filename_,
+							  const cv::Mat &centers_,
+							  const ClusteringParams &clusteringParams_,
+							  const DescriptorType &type_,
+							  const float searchRadius_,
+							  const int nbands_ = -1,
+							  const int nbins_ = -1,
+							  const bool bidirectional_ = false);
 
 	/**************************************************/
 	static void writeDescriptorsCache(const cv::Mat &descriptors_,

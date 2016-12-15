@@ -8,15 +8,15 @@
 
 DescriptorType DescriptorParams::toType(const std::string &type_)
 {
-	if (boost::iequals(type_, "DCH"))
+	if (boost::iequals(type_, "DCH") || boost::iequals(type_, descType[DESCRIPTOR_DCH]))
 		return DESCRIPTOR_DCH;
-	else if (boost::iequals(type_, "SHOT"))
+	else if (boost::iequals(type_, "SHOT") || boost::iequals(type_, descType[DESCRIPTOR_SHOT]))
 		return DESCRIPTOR_SHOT;
-	else if (boost::iequals(type_, "USC"))
+	else if (boost::iequals(type_, "USC") || boost::iequals(type_, descType[DESCRIPTOR_USC]))
 		return DESCRIPTOR_USC;
-	else if (boost::iequals(type_, "PFH"))
+	else if (boost::iequals(type_, "PFH") || boost::iequals(type_, descType[DESCRIPTOR_PFH]))
 		return DESCRIPTOR_PFH;
-	else if (boost::iequals(type_, "ROPS"))
+	else if (boost::iequals(type_, "ROPS") || boost::iequals(type_, descType[DESCRIPTOR_ROPS]))
 		return DESCRIPTOR_ROPS;
 
 	LOGW << "Wrong descriptor type, assuming DCH";

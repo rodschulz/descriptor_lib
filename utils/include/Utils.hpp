@@ -130,6 +130,9 @@ class Utils
 {
 public:
 	/**************************************************/
+	static plog::Severity getLogLevel(const std::string &filename_);
+
+	/**************************************************/
 	static std::string getWorkingDirectory();
 
 	/**************************************************/

@@ -90,7 +90,7 @@ bool Loader::loadMatrix(const std::string &filename_,
 						}
 						catch (boost::bad_lexical_cast ex_)
 						{
-							LOGW << "NaN found at (r,c) = (" << row << ", " << col << "). Changing to zero.";
+							LOGW << "NaN found at (r,c) = (" << row << "," << col << "). Changing to zero.";
 						}
 
 						matrix_.at<float>(row, col) = value;

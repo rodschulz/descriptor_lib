@@ -13,6 +13,7 @@
 #include <pcl/io/pcd_io.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <plog/Log.h>
 #include "CloudFactory.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
@@ -92,7 +93,7 @@ void Writer::writeHistogram(const std::string &filename_,
 		std::string cmd = "gnuplot ";
 		cmd += SCRIPT_HISTOGRAM_NAME;
 		if (system(cmd.c_str()) != 0)
-			std::cout << "WARNING, bad return for command: " << cmd << "\n";
+			LOGW << "Bad return for command: " << cmd;
 	}
 }
 
@@ -193,7 +194,7 @@ void Writer::writePlotSSE(const std::string &filename_,
 {
 	if (sse_.empty())
 	{
-		std::cout << "WARNING: array SSE empty, can't generate SSE plot" << std::endl;
+		LOGW << "Array SSE empty, can't generate SSE plot";
 		return;
 	}
 
@@ -226,7 +227,7 @@ void Writer::writePlotSSE(const std::string &filename_,
 	std::string cmd = "gnuplot ";
 	cmd += SCRIPT_SSE_NAME;
 	if (system(cmd.c_str()) != 0)
-		std::cout << "WARNING, bad return for command: " << cmd << "\n";
+		LOGW << "Bad return for command: " << cmd;
 }
 
 void Writer::writeClusteredCloud(const std::string &filename_,
@@ -261,7 +262,7 @@ void Writer::writeClusteredCloud(const std::string &filename_,
 			break;
 
 		default:
-			std::cout << "WARNING: wrong label type" << std::endl;
+			LOGW << "Wrong label type";
 		}
 
 		(*colored)[i].rgba = Utils::palette35(index);
@@ -335,7 +336,7 @@ void Writer::writeDescriptorsCache(const cv::Mat &descriptors_,
 {
 	if (!boost::filesystem::exists(cacheLocation_))
 		if (system(("mkdir " + cacheLocation_).c_str()) != 0)
-			std::cout << "WARNING: can't create cache folder" << std::endl;
+			LOGW << "Can't create cache folder";
 
 	std::string destination = cacheLocation_ + Utils::getCalculationConfigHash(cloudInputFilename_, normalEstimationRadius_, descriptorParams_, smoothingParams_);
 
@@ -361,14 +362,35 @@ void Writer::writeClustersCenters(const std::string &filename_,
 	writeMatrix(filename_, centers_, metadata);
 }
 
-void Writer::writeBoW(const std::string &filename_,
-					  const cv::Mat &centers_,
-					  const ClusteringParams &clusteringParams_,
-					  const int nbands_,
-					  const int nbins_,
-					  const bool bidirectional_)
+void Writer::writeCodebook(const std::string &filename_,
+						   const cv::Mat &centers_,
+						   const ClusteringParams &clusteringParams_,
+						   const DescriptorType &type_,
+						   const float searchRadius_,
+						   const int nbands_,
+						   const int nbins_,
+						   const bool bidirectional_)
 {
-	std::string str = "bandNumber: " + boost::lexical_cast<std::string>(nbands_) + " binNumber: " + boost::lexical_cast<std::string>(nbins_) + " bidirectional: " + (bidirectional_ ? "true" : "false");
+	std::string str = "type:" + descType[type_];
+	switch (type_)
+	{
+	default:
+		std::runtime_error("Wrong descriptor type to generate codebook");
+
+	case DESCRIPTOR_DCH:
+		str += " searchRadius:" + boost::lexical_cast<std::string>(searchRadius_)
+			   + " bandNumber:" + boost::lexical_cast<std::string>(nbands_)
+			   + " binNumber:" + boost::lexical_cast<std::string>(nbins_)
+			   + " bidirectional:" + (bidirectional_ ? "true" : "false");
+		break;
+
+	case DESCRIPTOR_SHOT:
+	case DESCRIPTOR_USC:
+	case DESCRIPTOR_PFH:
+	case DESCRIPTOR_ROPS:
+		str += " searchRadius:" + boost::lexical_cast<std::string>(searchRadius_);
+		break;
+	}
 
 	std::vector<std::string> metadata;
 	metadata.push_back(clusteringParams_.toString());

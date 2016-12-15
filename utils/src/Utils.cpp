@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <plog/Log.h>
+#include <yaml-cpp/yaml.h>
 
 
 // Extract the current boost's minor version
@@ -70,6 +71,12 @@ std::vector<T1> generateRandomSet(const unsigned int size_,
 	}
 
 	return numbers;
+}
+
+plog::Severity Utils::getLogLevel(const std::string &filename_)
+{
+	YAML::Node logging = YAML::LoadFile(filename_);
+	return plog::severityFromString(logging["level"].as<std::string>().c_str());
 }
 
 std::string Utils::getWorkingDirectory()
