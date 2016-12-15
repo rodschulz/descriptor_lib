@@ -30,363 +30,391 @@
 
 namespace plog
 {
-    namespace util
-    {
+namespace util
+{
 #ifdef _WIN32
-        typedef std::wstring nstring;
-        typedef std::wstringstream nstringstream;
-        typedef wchar_t nchar;
+typedef std::wstring nstring;
+typedef std::wstringstream nstringstream;
+typedef wchar_t nchar;
 #else
-        typedef std::string nstring;
-        typedef std::stringstream nstringstream;
-        typedef char nchar;
+typedef std::string nstring;
+typedef std::stringstream nstringstream;
+typedef char nchar;
 #endif
 
-        inline void localtime_s(struct tm* t, const time_t* time)
-        {
+inline void localtime_s(struct tm* t, const time_t* time)
+{
 #if defined(_WIN32) && defined(__BORLANDC__)
-            ::localtime_s(time, t);
+	::localtime_s(time, t);
 #elif defined(_WIN32) && defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)
-            *t = *::localtime(time);
+	*t = *::localtime(time);
 #elif defined(_WIN32)
-            ::localtime_s(t, time);
+	::localtime_s(t, time);
 #else
-            ::localtime_r(time, t);
+	::localtime_r(time, t);
 #endif
-        }
+}
 
 #ifdef _WIN32
-        typedef timeb Time;
+typedef timeb Time;
 
-        inline void ftime(Time* t)
-        {
-            ::ftime(t);
-        }
+inline void ftime(Time* t)
+{
+	::ftime(t);
+}
 #else
-        struct Time
-        {
-            time_t time;
-            unsigned short millitm;
-        };
+struct Time
+{
+	time_t time;
+	unsigned short millitm;
+};
 
-        inline void ftime(Time* t)
-        {
-            timeval tv;
-            ::gettimeofday(&tv, NULL);
+inline void ftime(Time* t)
+{
+	timeval tv;
+	::gettimeofday(&tv, NULL);
 
-            t->time = tv.tv_sec;
-            t->millitm = static_cast<unsigned short>(tv.tv_usec / 1000);
-        }
+	t->time = tv.tv_sec;
+	t->millitm = static_cast<unsigned short>(tv.tv_usec / 1000);
+}
 #endif
 
-        inline unsigned int gettid()
-        {
+inline unsigned int gettid()
+{
 #ifdef _WIN32
-            return ::GetCurrentThreadId();
+	return ::GetCurrentThreadId();
 #elif defined(__unix__)
-            return static_cast<unsigned int>(::syscall(__NR_gettid));
+	return static_cast<unsigned int>(::syscall(__NR_gettid));
 #elif defined(__APPLE__)
-            return static_cast<unsigned int>(::syscall(SYS_thread_selfid));
+	return static_cast<unsigned int>(::syscall(SYS_thread_selfid));
 #endif
-        }
+}
 
 #if !defined(__ANDROID__) && !defined(_WIN32)
-        inline std::string toNarrow(const wchar_t* wstr)
-        {
-            size_t wlen = ::wcslen(wstr);
-            std::string str(wlen * sizeof(wchar_t), 0);
+inline std::string toNarrow(const wchar_t* wstr)
+{
+	size_t wlen = ::wcslen(wstr);
+	std::string str(wlen * sizeof(wchar_t), 0);
 
-            if (!str.empty())
-            {
-                const char* in = reinterpret_cast<const char*>(&wstr[0]);
-                char* out = &str[0];
-                size_t inBytes = wlen * sizeof(wchar_t);
-                size_t outBytes = str.size();
+	if (!str.empty())
+	{
+		const char* in = reinterpret_cast<const char*>(&wstr[0]);
+		char* out = &str[0];
+		size_t inBytes = wlen * sizeof(wchar_t);
+		size_t outBytes = str.size();
 
-                iconv_t cd = ::iconv_open("UTF-8", "WCHAR_T");
-                ::iconv(cd, const_cast<char**>(&in), &inBytes, &out, &outBytes);
-                ::iconv_close(cd);
+		iconv_t cd = ::iconv_open("UTF-8", "WCHAR_T");
+		::iconv(cd, const_cast<char**>(&in), &inBytes, &out, &outBytes);
+		::iconv_close(cd);
 
-                str.resize(str.size() - outBytes);
-            }
+		str.resize(str.size() - outBytes);
+	}
 
-            return str;
-        }
+	return str;
+}
 #endif
 
 #ifdef _WIN32
-        inline std::wstring toWide(const char* str)
-        {
-            size_t len = ::strlen(str);
-            std::wstring wstr(len, 0);
+inline std::wstring toWide(const char* str)
+{
+	size_t len = ::strlen(str);
+	std::wstring wstr(len, 0);
 
-            if (!wstr.empty())
-            {
-                int wlen = ::MultiByteToWideChar(CP_ACP, 0, str, static_cast<int>(len), &wstr[0], static_cast<int>(wstr.size()));
-                wstr.resize(wlen);
-            }
+	if (!wstr.empty())
+	{
+		int wlen = ::MultiByteToWideChar(CP_ACP, 0, str, static_cast<int>(len), &wstr[0], static_cast<int>(wstr.size()));
+		wstr.resize(wlen);
+	}
 
-            return wstr;
-        }
+	return wstr;
+}
 
-        inline std::string toUTF8(const std::wstring& wstr)
-        {
-            std::string str(wstr.size() * sizeof(wchar_t), 0);
+inline std::string toUTF8(const std::wstring& wstr)
+{
+	std::string str(wstr.size() * sizeof(wchar_t), 0);
 
-            if (!str.empty())
-            {
-                int len = ::WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.size()), &str[0], static_cast<int>(str.size()), 0, 0);
-                str.resize(len);
-            }
+	if (!str.empty())
+	{
+		int len = ::WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.size()), &str[0], static_cast<int>(str.size()), 0, 0);
+		str.resize(len);
+	}
 
-            return str;
-        }
+	return str;
+}
 #endif
 
-        inline std::string processFuncName(const char* func)
-        {
+inline std::string processFuncName(const char* func)
+{
 #if (defined(_WIN32) && !defined(__MINGW32__)) || defined(__OBJC__)
-            return std::string(func);
+	return std::string(func);
 #else
-            const char* funcBegin = func;
-            const char* funcEnd = ::strchr(funcBegin, '(');
+	const char* funcBegin = func;
+	const char* funcEnd = ::strchr(funcBegin, '(');
 
-            if (!funcEnd)
-            {
-                return std::string(func);
-            }
+	if (!funcEnd)
+	{
+		return std::string(func);
+	}
 
-            for (const char* i = funcEnd - 1; i >= funcBegin; --i) // search backwards for the first space char
-            {
-                if (*i == ' ')
-                {
-                    funcBegin = i + 1;
-                    break;
-                }
-            }
+	for (const char* i = funcEnd - 1; i >= funcBegin; --i) // search backwards for the first space char
+	{
+		if (*i == ' ')
+		{
+			funcBegin = i + 1;
+			break;
+		}
+	}
 
-            return std::string(funcBegin, funcEnd);
+	return std::string(funcBegin, funcEnd);
 #endif
-        }
+}
 
-        inline const nchar* findExtensionDot(const nchar* fileName)
-        {
+
+inline std::string processClassName(const char* func)
+{
+#if (defined(_WIN32) && !defined(__MINGW32__)) || defined(__OBJC__)
+	return std::string(func);
+#else
+	const char* funcBegin = func;
+	const char* funcEnd = ::strchr(funcBegin, ':');
+
+	if (!funcEnd)
+	{
+		return std::string(func);
+	}
+
+	// for (const char* i = funcBegin; i < funcEnd; i++) // search backwards for the first space char
+	// {
+	// 	if (*i == ':')
+	// 	{
+	// 		funcEnd = i;
+	// 		break;
+	// 	}
+	// }
+
+	return std::string(funcBegin, funcEnd);
+#endif
+}
+
+
+inline const nchar* findExtensionDot(const nchar* fileName)
+{
 #ifdef _WIN32
-            return std::wcsrchr(fileName, L'.');
+	return std::wcsrchr(fileName, L'.');
 #else
-            return std::strrchr(fileName, '.');
+	return std::strrchr(fileName, '.');
 #endif
-        }
+}
 
-        inline void splitFileName(const nchar* fileName, nstring& fileNameNoExt, nstring& fileExt)
-        {
-            const nchar* dot = findExtensionDot(fileName);
+inline void splitFileName(const nchar* fileName, nstring& fileNameNoExt, nstring& fileExt)
+{
+	const nchar* dot = findExtensionDot(fileName);
 
-            if (dot)
-            {
-                fileNameNoExt.assign(fileName, dot);
-                fileExt.assign(dot + 1);
-            }
-            else
-            {
-                fileNameNoExt.assign(fileName);
-                fileExt.clear();
-            }
-        }
+	if (dot)
+	{
+		fileNameNoExt.assign(fileName, dot);
+		fileExt.assign(dot + 1);
+	}
+	else
+	{
+		fileNameNoExt.assign(fileName);
+		fileExt.clear();
+	}
+}
 
-        class NonCopyable
-        {
-        protected:
-            NonCopyable()
-            {
-            }
+class NonCopyable
+{
+protected:
+	NonCopyable()
+	{
+	}
 
-        private:
-            NonCopyable(const NonCopyable&);
-            NonCopyable& operator=(const NonCopyable&);
-        };
+private:
+	NonCopyable(const NonCopyable&);
+	NonCopyable& operator=(const NonCopyable&);
+};
 
-        class File : NonCopyable
-        {
-        public:
-            File() : m_file(-1)
-            {
-            }
+class File : NonCopyable
+{
+public:
+	File() : m_file(-1)
+	{
+	}
 
-            File(const nchar* fileName) : m_file(-1)
-            {
-                open(fileName);
-            }
+	File(const nchar* fileName) : m_file(-1)
+	{
+		open(fileName);
+	}
 
-            ~File()
-            {
-                close();
-            }
+	~File()
+	{
+		close();
+	}
 
-            off_t open(const nchar* fileName)
-            {
+	off_t open(const nchar* fileName)
+	{
 #if defined(_WIN32) && (defined(__BORLANDC__) || defined(__MINGW32__))
-                m_file = ::_wsopen(fileName, _O_CREAT | _O_WRONLY | _O_BINARY, SH_DENYWR, _S_IREAD | _S_IWRITE);
+		m_file = ::_wsopen(fileName, _O_CREAT | _O_WRONLY | _O_BINARY, SH_DENYWR, _S_IREAD | _S_IWRITE);
 #elif defined(_WIN32)
-                ::_wsopen_s(&m_file, fileName, _O_CREAT | _O_WRONLY | _O_BINARY, _SH_DENYWR, _S_IREAD | _S_IWRITE);
+		::_wsopen_s(&m_file, fileName, _O_CREAT | _O_WRONLY | _O_BINARY, _SH_DENYWR, _S_IREAD | _S_IWRITE);
 #else
-                m_file = ::open(fileName, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		m_file = ::open(fileName, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 #endif
-                return seek(0, SEEK_END);
-            }
+		return seek(0, SEEK_END);
+	}
 
-            int write(const void* buf, size_t count)
-            {
+	int write(const void* buf, size_t count)
+	{
 #ifdef _WIN32
-                return m_file != -1 ? ::_write(m_file, buf, static_cast<unsigned int>(count)) : -1;
+		return m_file != -1 ? ::_write(m_file, buf, static_cast<unsigned int>(count)) : -1;
 #else
-                return m_file != -1 ? static_cast<int>(::write(m_file, buf, count)) : -1;
+		return m_file != -1 ? static_cast<int>(::write(m_file, buf, count)) : -1;
 #endif
-            }
+	}
 
-            template<class CharType>
-            int write(const std::basic_string<CharType>& str)
-            {
-                return write(str.data(), str.size() * sizeof(CharType));
-            }
+	template<class CharType>
+	int write(const std::basic_string<CharType>& str)
+	{
+		return write(str.data(), str.size() * sizeof(CharType));
+	}
 
-            off_t seek(off_t offset, int whence)
-            {
+	off_t seek(off_t offset, int whence)
+	{
 #ifdef _WIN32
-                return m_file != -1 ? ::_lseek(m_file, offset, whence) : -1;
+		return m_file != -1 ? ::_lseek(m_file, offset, whence) : -1;
 #else
-                return m_file != -1 ? ::lseek(m_file, offset, whence) : -1;
+		return m_file != -1 ? ::lseek(m_file, offset, whence) : -1;
 #endif
-            }
+	}
 
-            void close()
-            {
-                if (m_file != -1)
-                {
+	void close()
+	{
+		if (m_file != -1)
+		{
 #ifdef _WIN32
-                    ::_close(m_file);
+			::_close(m_file);
 #else
-                    ::close(m_file);
+			::close(m_file);
 #endif
-                    m_file = -1;
-                }
-            }
+			m_file = -1;
+		}
+	}
 
-            static int unlink(const nchar* fileName)
-            {
+	static int unlink(const nchar* fileName)
+	{
 #ifdef _WIN32
-                return ::_wunlink(fileName);
+		return ::_wunlink(fileName);
 #else
-                return ::unlink(fileName);
+		return ::unlink(fileName);
 #endif
-            }
+	}
 
-            static int rename(const nchar* oldFilename, const nchar* newFilename)
-            {
+	static int rename(const nchar* oldFilename, const nchar* newFilename)
+	{
 #ifdef _WIN32
-                return ::MoveFileW(oldFilename, newFilename);
+		return ::MoveFileW(oldFilename, newFilename);
 #else
-                return ::rename(oldFilename, newFilename);
+		return ::rename(oldFilename, newFilename);
 #endif
-            }
+	}
 
-        private:
-            int m_file;
-        };
+private:
+	int m_file;
+};
 
-        class Mutex : NonCopyable
-        {
-        public:
-            Mutex()
-            {
+class Mutex : NonCopyable
+{
+public:
+	Mutex()
+	{
 #ifdef _WIN32
-                ::InitializeCriticalSection(&m_sync);
+		::InitializeCriticalSection(&m_sync);
 #else
-                ::pthread_mutex_init(&m_sync, 0);
+		::pthread_mutex_init(&m_sync, 0);
 #endif
-            }
+	}
 
-            ~Mutex()
-            {
+	~Mutex()
+	{
 #ifdef _WIN32
-                ::DeleteCriticalSection(&m_sync);
+		::DeleteCriticalSection(&m_sync);
 #else
-                ::pthread_mutex_destroy(&m_sync);
+		::pthread_mutex_destroy(&m_sync);
 #endif
-            }
+	}
 
-            friend class MutexLock;
+	friend class MutexLock;
 
-        private:
-            void lock()
-            {
+private:
+	void lock()
+	{
 #ifdef _WIN32
-                ::EnterCriticalSection(&m_sync);
+		::EnterCriticalSection(&m_sync);
 #else
-                ::pthread_mutex_lock(&m_sync);
+		::pthread_mutex_lock(&m_sync);
 #endif
-            }
+	}
 
-            void unlock()
-            {
+	void unlock()
+	{
 #ifdef _WIN32
-                ::LeaveCriticalSection(&m_sync);
+		::LeaveCriticalSection(&m_sync);
 #else
-                ::pthread_mutex_unlock(&m_sync);
+		::pthread_mutex_unlock(&m_sync);
 #endif
-            }
+	}
 
-        private:
+private:
 #ifdef _WIN32
-            CRITICAL_SECTION m_sync;
+	CRITICAL_SECTION m_sync;
 #else
-            pthread_mutex_t m_sync;
+	pthread_mutex_t m_sync;
 #endif
-        };
+};
 
-        class MutexLock : NonCopyable
-        {
-        public:
-            MutexLock(Mutex& mutex) : m_mutex(mutex)
-            {
-                m_mutex.lock();
-            }
+class MutexLock : NonCopyable
+{
+public:
+	MutexLock(Mutex& mutex) : m_mutex(mutex)
+	{
+		m_mutex.lock();
+	}
 
-            ~MutexLock()
-            {
-                m_mutex.unlock();
-            }
+	~MutexLock()
+	{
+		m_mutex.unlock();
+	}
 
-        private:
-            Mutex& m_mutex;
-        };
+private:
+	Mutex& m_mutex;
+};
 
-        template<class T>
-        class Singleton : NonCopyable
-        {
-        public:
-            Singleton()
-            {
-                assert(!m_instance);
-                m_instance = static_cast<T*>(this);
-            }
+template<class T>
+class Singleton : NonCopyable
+{
+public:
+	Singleton()
+	{
+		assert(!m_instance);
+		m_instance = static_cast<T*>(this);
+	}
 
-            ~Singleton()
-            {
-                assert(m_instance);
-                m_instance = 0;
-            }
+	~Singleton()
+	{
+		assert(m_instance);
+		m_instance = 0;
+	}
 
-            static T* getInstance()
-            {
-                return m_instance;
-            }
+	static T* getInstance()
+	{
+		return m_instance;
+	}
 
-        private:
-            static T* m_instance;
-        };
+private:
+	static T* m_instance;
+};
 
-        template<class T>
-        T* Singleton<T>::m_instance = NULL;
-    }
+template<class T>
+T* Singleton<T>::m_instance = NULL;
+}
 }
