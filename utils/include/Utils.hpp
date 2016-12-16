@@ -133,6 +133,9 @@ public:
 	static plog::Severity getLogLevel(const std::string &filename_);
 
 	/**************************************************/
+	static void cleanDirectories(const std::string &workingDir_);
+
+	/**************************************************/
 	static std::string getWorkingDirectory();
 
 	/**************************************************/

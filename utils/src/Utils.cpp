@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <plog/Log.h>
 #include <yaml-cpp/yaml.h>
+#include "Config.hpp"
 
 
 // Extract the current boost's minor version
@@ -77,6 +78,21 @@ plog::Severity Utils::getLogLevel(const std::string &filename_)
 {
 	YAML::Node logging = YAML::LoadFile(filename_);
 	return plog::severityFromString(logging["level"].as<std::string>().c_str());
+}
+
+void Utils::cleanDirectories(const std::string &workingDir_)
+{
+	// Create output and debug directories if don't exist
+	if (system("mkdir -p " OUTPUT_DIR) != 0)
+		throw std::runtime_error("Can't create directory: " + workingDir_ + OUTPUT_DIR);
+	if (system("mkdir -p " DEBUG_DIR) != 0)
+		throw std::runtime_error("Can't create directory: " + workingDir_ + DEBUG_DIR);
+
+	// Clean output and debug directories
+	if (system("rm -rf " OUTPUT_DIR "*") != 0)
+		LOGW << "Can't clean directory: " + workingDir_ + OUTPUT_DIR;
+	if (system("rm -rf " DEBUG_DIR "*") != 0)
+		LOGW << "Can't clean directory: " + workingDir_ + DEBUG_DIR;
 }
 
 std::string Utils::getWorkingDirectory()
