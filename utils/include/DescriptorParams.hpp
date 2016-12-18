@@ -52,6 +52,9 @@ struct DescriptorParams
 	virtual std::string toString() const = 0;
 
 	/**************************************************/
+	virtual YAML::Node toNode() const = 0;
+
+	/**************************************************/
 	static DescriptorType toType(const std::string &type_);
 
 	/**************************************************/
@@ -91,6 +94,9 @@ struct DCHParams: public DescriptorParams
 	std::string toString() const;
 
 	/**************************************************/
+	YAML::Node toNode() const;
+
+	/**************************************************/
 	int getSequenceLength() const;
 
 	/**************************************************/
@@ -118,4 +124,7 @@ struct SHOTParams: public DescriptorParams
 
 	/**************************************************/
 	std::string toString() const;
+
+	/**************************************************/
+	YAML::Node toNode() const;
 };

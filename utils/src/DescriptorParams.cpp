@@ -77,6 +77,24 @@ std::string DCHParams::toString() const
 	return stream.str();
 }
 
+YAML::Node DCHParams::toNode() const
+{
+	std::string sType = descType[type].substr(11);
+	std::string stat = sequenceStat == STAT_MEAN ? "mean" : "median";
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+	node[sType]["bandNumber"] = bandNumber;
+	node[sType]["bandWidth"] = bandWidth;
+	node[sType]["bidirectional"] = bidirectional;
+	node[sType]["useProjection"] = useProjection;
+	node[sType]["sequenceBin"] = sequenceBin;
+	node[sType]["sequenceStat"] = stat;
+
+	return node;
+}
+
 int DCHParams::getSequenceLength() const
 {
 	return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
@@ -110,4 +128,15 @@ std::string SHOTParams::toString() const
 		   << "type:" << descType[type]
 		   << " searchRadius:" << searchRadius;
 	return stream.str();
+}
+
+YAML::Node SHOTParams::toNode() const
+{
+	std::string sType = descType[type].substr(11);
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+
+	return node;
 }
