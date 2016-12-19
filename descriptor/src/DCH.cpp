@@ -36,9 +36,9 @@ std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNo
 	return bands;
 }
 
-void DCH::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-							   const DescriptorParamsPtr &params_,
-							   cv::Mat &descriptors_)
+void DCH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+					   const DescriptorParamsPtr &params_,
+					   cv::Mat &descriptors_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 	int sequenceSize = params->getSequenceLength();

@@ -24,9 +24,9 @@ public:
 			const pcl::PointNormal &target_);
 
 	/**************************************************/
-	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									 const DescriptorParamsPtr &params_,
-									 cv::Mat &descriptors_);
+	static void computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+							 const DescriptorParamsPtr &params_,
+							 cv::Mat &descriptors_);
 
 	/**************************************************/
 	static void computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
