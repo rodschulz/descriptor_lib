@@ -8,6 +8,8 @@
 #include <boost/accumulators/statistics/count.hpp>
 #include <map>
 
+#include <plog/Log.h>
+
 
 using namespace boost::accumulators;
 
@@ -57,6 +59,22 @@ void DCH::calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &clo
 		for (size_t j = 0; j < bands.size(); j++)
 			memcpy(&descriptors_.at<float>(i, j * sequenceSize), &bands[j]->sequenceVector[0], sizeof(float) * sequenceSize);
 	}
+}
+
+void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+					   const DescriptorParamsPtr &params_,
+					   const int target_,
+					   Eigen::VectorXf &descriptor_)
+{
+	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
+	int sequenceSize = params->getSequenceLength();
+
+	std::vector<BandPtr> bands = DCH::calculateDescriptor(cloud_, params_, target_);
+	descriptor_.resize(sequenceSize * bands.size(), 1);
+
+	for (size_t j = 0; j < bands.size(); j++)
+		for (size_t k = 0; k < bands[j]->sequenceVector.size(); k++)
+			descriptor_(j * sequenceSize + k) = bands[j]->sequenceVector[k];
 }
 
 std::vector<Hist> DCH::generateAngleHistograms(const Descriptor &descriptor_,
