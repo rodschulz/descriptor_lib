@@ -8,23 +8,21 @@
 #include <boost/accumulators/statistics/count.hpp>
 #include <map>
 
-#include <plog/Log.h>
-
 
 using namespace boost::accumulators;
 
 
-Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									const DescriptorParamsPtr &params_,
-									const int targetPointIndex_)
+std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+		const DescriptorParamsPtr &params_,
+		const int targetPointIndex_)
 {
 	pcl::PointNormal target = cloud_->at(targetPointIndex_);
 	return calculateDescriptor(cloud_, params_, target);
 }
 
-Descriptor DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-									const DescriptorParamsPtr &params_,
-									const pcl::PointNormal &target_)
+std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+		const DescriptorParamsPtr &params_,
+		const pcl::PointNormal &target_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 
@@ -77,7 +75,7 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 			descriptor_(j * sequenceSize + k) = bands[j]->sequenceVector[k];
 }
 
-std::vector<Hist> DCH::generateAngleHistograms(const Descriptor &descriptor_,
+std::vector<Hist> DCH::generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
 		const bool useProjection_)
 {
 	// TODO move this method to the output class, since this is only to generate the histogram generated as output
@@ -101,7 +99,7 @@ std::vector<Hist> DCH::generateAngleHistograms(const Descriptor &descriptor_,
 	return histograms;
 }
 
-void DCH::fillSequences(Descriptor &descriptor_,
+void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 						const DescriptorParamsPtr &params_,
 						const double sequenceStep_)
 {

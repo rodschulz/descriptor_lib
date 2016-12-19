@@ -54,8 +54,8 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, DCHFixture)
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createHorizontalPlane(-50, 50, 200, 300, 30, 20000);
 	pcl::PointNormal point = cloud->at(targetPoint);
 
-	Descriptor descriptor1 = DCH::calculateDescriptor(cloud, paramsPtr, targetPoint);
-	Descriptor descriptor2 = DCH::calculateDescriptor(cloud, paramsPtr, point);
+	std::vector<BandPtr> descriptor1 = DCH::calculateDescriptor(cloud, paramsPtr, targetPoint);
+	std::vector<BandPtr> descriptor2 = DCH::calculateDescriptor(cloud, paramsPtr, point);
 
 	// Check sizes
 	BOOST_CHECK_EQUAL(descriptor1.size(), params->bandNumber);

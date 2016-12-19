@@ -9,21 +9,19 @@
 #include "Extractor.hpp"
 #include "Hist.hpp"
 
-// Type definition declaring the descriptor's structure
-typedef std::vector<BandPtr> Descriptor;
 
 class DCH
 {
 public:
 	/**************************************************/
-	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-										  const DescriptorParamsPtr &params_,
-										  const int targetPointIndex_);
+	static std::vector<BandPtr> calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+			const DescriptorParamsPtr &params_,
+			const int targetPointIndex_);
 
 	/**************************************************/
-	static Descriptor calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-										  const DescriptorParamsPtr &params_,
-										  const pcl::PointNormal &target_);
+	static std::vector<BandPtr> calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+			const DescriptorParamsPtr &params_,
+			const pcl::PointNormal &target_);
 
 	/**************************************************/
 	static void calculateDescriptors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
@@ -37,11 +35,11 @@ public:
 							 Eigen::VectorXf &descriptor_);
 
 	/**************************************************/
-	static std::vector<Hist> generateAngleHistograms(const Descriptor &descriptor_,
+	static std::vector<Hist> generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
 			const bool useProjection_);
 
 	/**************************************************/
-	static void fillSequences(Descriptor &descriptor_,
+	static void fillSequences(std::vector<BandPtr> &descriptor_,
 							  const DescriptorParamsPtr &params_,
 							  const double sequenceStep_);
 
