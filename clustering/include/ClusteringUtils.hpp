@@ -20,7 +20,7 @@ typedef boost::shared_ptr<cv::NeuralNet_MLP> NeuralNetworkPtr;
 class ClusteringUtils
 {
 public:
-	// Prints a matrix in a formated way
+	/**************************************************/
 	template<typename T>
 	static void print(cv::Mat mat, const int precision_ = 3)
 	{
@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	// Generates a permutation of the given matrix
+	/**************************************************/
 	static inline void generatePermutation(const cv::Mat &matrix_,
 										   const int permutationSize_,
 										   const int permutationNumber_,
@@ -66,7 +66,7 @@ public:
 			matrix_.colRange(begin, end).copyTo(permutation_.colRange(permutation_.cols - (end - begin), permutation_.cols));
 	}
 
-	// Labels the given data using the given centers
+	/**************************************************/
 	static inline void labelData(const cv::Mat &items_,
 								 const cv::Mat &centers_,
 								 const MetricPtr &metric_,
@@ -88,7 +88,7 @@ public:
 		}
 	}
 
-	// Labels the given data using the given SVN as a classifier indicating the label
+	/**************************************************/
 	static inline void labelData(const cv::Mat &items_,
 								 const SVMPtr &classifier_,
 								 cv::Mat &labels_)
@@ -96,7 +96,7 @@ public:
 		classifier_->predict(items_, labels_);
 	}
 
-	// Prepares the classifier for the labeling process
+	/**************************************************/
 	static SVMPtr prepareClassifier(const cv::Mat &centers_,
 									const std::map<std::string,
 									std::string> &centersParams_)
@@ -142,7 +142,7 @@ public:
 		return svm;
 	}
 
-	// Calculates the Sum of Squared Errors for the given centers and labels, using the given metric
+	/**************************************************/
 	static inline double getSSE(const cv::Mat &items_,
 								const cv::Mat &labels_,
 								const cv::Mat &centers_,
@@ -158,7 +158,7 @@ public:
 		return sse;
 	}
 
-	// Retrieves a sample of data from the given items matrix
+	/**************************************************/
 	static inline void getSampleItems(const cv::Mat &items_,
 									  cv::Mat &_sample)
 	{
@@ -167,7 +167,7 @@ public:
 			items_.row(randomSet[j]).copyTo(_sample.row(j));
 	}
 
-	// Counts the number of items per centers according to the given labeling
+	/**************************************************/
 	static inline std::vector<int> itemsPerCluster(const int clusterNumber_,
 			const cv::Mat &labels_)
 	{
@@ -177,7 +177,7 @@ public:
 		return count;
 	}
 
-	// Evaluates if the stop condition has been met for the current data
+	/**************************************************/
 	static inline bool evaluateStopCondition(const cv::Mat &oldCenters_,
 			const cv::Mat &newCenters_,
 			const double stopThreshold_,
