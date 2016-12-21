@@ -188,7 +188,7 @@ public:
 	}
 
 	/**************************************************/
-	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_,
+	static std::pair<Eigen::Vector3f, Eigen::Vector3f> generateAxes(const Eigen::Hyperplane<float, 3> &plane_,
 			const Eigen::Vector3f &point_);
 
 	/**************************************************/

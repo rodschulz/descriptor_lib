@@ -196,8 +196,9 @@ std::string Utils::num2Hex(const size_t number_)
 	return stream.str();
 }
 
-std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsInPlane(const Eigen::Hyperplane<float, 3> &plane_,
-		const Eigen::Vector3f &point_)
+std::pair<Eigen::Vector3f, Eigen::Vector3f>
+Utils::generateAxes(const Eigen::Hyperplane<float, 3> &plane_,
+					const Eigen::Vector3f &point_)
 {
 	Eigen::Vector3f normal = plane_.normal();
 
@@ -207,7 +208,7 @@ std::pair<Eigen::Vector3f, Eigen::Vector3f> Utils::generatePerpendicularPointsIn
 	// Project that arbitrary point into the plane to get the first axis inside the plane
 	Eigen::Vector3f v1 = plane_.projection(u).normalized();
 
-	// Generate the seconde unitary vector
+	// Generate the second unitary vector
 	Eigen::Vector3f v2 = normal.cross(v1).normalized();
 
 	// Return the axes

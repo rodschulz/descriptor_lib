@@ -74,6 +74,9 @@ struct DCHParams: public DescriptorParams
 	float sequenceBin; // Size of the bins used in the sequence construction
 	SequenceStat sequenceStat; // Statistic used in the descriptor
 
+	float angle; // Orientation of the zero band (run time parameter)
+
+
 	/**************************************************/
 	DCHParams()
 	{
@@ -85,6 +88,8 @@ struct DCHParams: public DescriptorParams
 		useProjection = true;
 		sequenceBin = 0.01;
 		sequenceStat = STAT_MEAN;
+
+		angle  = 0;
 	}
 
 	/**************************************************/

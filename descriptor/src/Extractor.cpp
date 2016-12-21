@@ -13,11 +13,12 @@
 #include "PointFactory.hpp"
 
 
-pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-		const pcl::PointNormal &searchPoint_,
-		const double searchRadius_)
+pcl::PointCloud<pcl::PointNormal>::Ptr
+Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+						const pcl::PointNormal &searchPoint_,
+						const double searchRadius_)
 {
-	pcl::PointCloud<pcl::PointNormal>::Ptr surfacePatch(new pcl::PointCloud<pcl::PointNormal>());
+	pcl::PointCloud<pcl::PointNormal>::Ptr neighborhood(new pcl::PointCloud<pcl::PointNormal>());
 
 	pcl::KdTreeFLANN<pcl::PointNormal> kdtree;
 	kdtree.setInputCloud(cloud_);
@@ -26,18 +27,24 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 	std::vector<float> pointRadiusSquaredDistance;
 	kdtree.radiusSearch(searchPoint_, searchRadius_, pointIndices, pointRadiusSquaredDistance);
 
-	surfacePatch->reserve(pointIndices.size());
+	neighborhood->reserve(pointIndices.size());
 	for (size_t i = 0; i < pointIndices.size(); i++)
-		surfacePatch->push_back(cloud_->points[pointIndices[i]]);
+		neighborhood->push_back(cloud_->points[pointIndices[i]]);
+
+	// Copy the viewpoint (just in case it's needed afterwards)
+	neighborhood->sensor_origin_ = cloud_->sensor_origin_;
+
 
 	// TODO check the extraction of a continuous surface
 
-	return surfacePatch;
+
+	return neighborhood;
 }
 
-std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-		const pcl::PointNormal &point_,
-		const DCHParams *params_)
+std::vector<BandPtr>
+Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+					const pcl::PointNormal &point_,
+					const DCHParams *params_)
 {
 	std::vector<BandPtr> bands;
 	bands.reserve(params_->bandNumber);
@@ -45,26 +52,25 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 	Eigen::Vector3f p = point_.getVector3fMap();
 	Eigen::Vector3f n = ((Eigen::Vector3f) point_.getNormalVector3fMap()).normalized();
 	Eigen::Hyperplane<float, 3> plane = Eigen::Hyperplane<float, 3>(n, p);
+	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Extractor::generateAxes(p, n, plane, params_->angle);
 
-	// Create a pair of perpendicular point from the given point to be used as axes in the plane
-	std::pair<Eigen::Vector3f, Eigen::Vector3f> axes = Utils::generatePerpendicularPointsInPlane(plane, p);
 
 	/********** Debug **********/
-	float debugLimit = DEBUG_getDebugGenerationLimit(cloud_).second;
+	float debugLimit = DEBUG_getLimits(cloud_).second;
 	if (Config::debugEnabled())
 	{
-		DEBUG_generatePointPlane(plane, p, n, debugLimit, "pointPlane", COLOR_TURQUOISE);
-		DEBUG_generateExtractedLine(Eigen::ParametrizedLine<float, 3>(p, axes.first), debugLimit, "axis1", COLOR_RED);
-		DEBUG_generateExtractedLine(Eigen::ParametrizedLine<float, 3>(p, axes.second), debugLimit, "axis2", COLOR_GREEN);
+		DEBUG_genPlane(plane, p, n, debugLimit, "plane", COLOR_TURQUOISE);
+		DEBUG_genLine(Eigen::ParametrizedLine<float, 3>(p, axes.first), debugLimit, "x", COLOR_RED, false);
+		DEBUG_genLine(Eigen::ParametrizedLine<float, 3>(p, axes.second), debugLimit, "y", COLOR_GREEN, false);
+		DEBUG_genLine(Eigen::ParametrizedLine<float, 3>(p, n), debugLimit, "z", COLOR_BLUE, false);
 	}
 	/********** Debug **********/
 
-	// Angular step for bands definitions
-	double angleStep = params_->getBandsAngularStep();
 
 	// Create the lines defining each band and also each band's longitudinal plane
 	std::vector<Eigen::ParametrizedLine<float, 3> > lines;
 	std::vector<Eigen::Vector3f> normals, directors;
+	double angleStep = params_->getBandsAngularStep();
 	for (int i = 0; i < params_->bandNumber; i++)
 	{
 		// Calculate the line's director std::vector and define the line
@@ -76,13 +82,13 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 		bands.push_back(BandPtr(new Band(point_, Eigen::Hyperplane<float, 3>(normals.back(), p))));
 	}
 
+
 	/********** Debug **********/
 	if (Config::debugEnabled())
 		for (size_t l = 0; l < lines.size(); l++)
-			DEBUG_generateExtractedLine(lines[l], debugLimit, "line" + boost::lexical_cast<std::string>(l), COLOR_YELLOW);
+			DEBUG_genLine(lines[l], debugLimit, "line" + boost::lexical_cast<std::string>(l), COLOR_YELLOW);
 	/********** Debug **********/
 
-	// TODO check if it's better to measure the distance between the projected point on the plane and the projection of the projection of the point over the line
 
 	// Extracting points for each band (.52 to give a little extra room)
 	double halfBand = params_->bandWidth * 0.52;
@@ -106,7 +112,7 @@ std::vector<BandPtr> Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>
 				 * points to the same direction that the director vector (which is a vector inside the band's plane).
 				 *
 				 * If the points as vector points to the same direction as the director vector, then the point belongs
-				 * to that band (if not then it would belong to the oppposite band).
+				 * to that band (if not then it would belong to the opposite band).
 				 */
 
 				// Vector inside the original plane (the point's plane), defining point p1
@@ -160,12 +166,28 @@ std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> Extractor::generatePlaneClou
 	return planes;
 }
 
-void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &plane_,
-		const Eigen::Vector3f &p_,
-		const Eigen::Vector3f &n_,
-		const float limit_,
-		const std::string &filename_,
-		const PointColor &color_)
+std::pair<Eigen::Vector3f, Eigen::Vector3f>
+Extractor::generateAxes(const Eigen::Vector3f point_,
+						const Eigen::Vector3f normal_,
+						const Eigen::Hyperplane<float, 3> plane_,
+						const float angle_)
+{
+	Eigen::Vector3f u = point_ + Eigen::Vector3f(0, -1e15, 0);
+	Eigen::Vector3f v1 = plane_.projection(u).normalized();
+	v1 = Eigen::AngleAxisf(angle_, normal_) * v1;
+	v1.normalize();
+
+	Eigen::Vector3f v2 = normal_.cross(v1).normalized();
+
+	return std::make_pair(v1, v2);
+}
+
+void Extractor::DEBUG_genPlane(const Eigen::Hyperplane<float, 3> &plane_,
+							   const Eigen::Vector3f &p_,
+							   const Eigen::Vector3f &n_,
+							   const float limit_,
+							   const std::string &filename_,
+							   const PointColor &color_)
 {
 
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr targetPlane = pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
@@ -184,15 +206,16 @@ void Extractor::DEBUG_generatePointPlane(const Eigen::Hyperplane<float, 3> &plan
 	pcl::io::savePCDFileASCII(OUTPUT_DIR DEBUG_PREFIX + filename_ + CLOUD_FILE_EXTENSION, *targetPlane);
 }
 
-void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float, 3> &line_,
-		const float limit_,
-		const std::string &filename_,
-		const PointColor &color_)
+void Extractor::DEBUG_genLine(const Eigen::ParametrizedLine<float, 3> &line_,
+							  const float limit_,
+							  const std::string &filename_,
+							  const PointColor &color_,
+							  const bool full_)
 {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr lineCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud<pcl::PointXYZRGB>());
 
 	float step = limit_ / 50;
-	for (float t = -limit_; t <= limit_; t += step)
+	for (float t = (full_ ? -limit_ : 0); t <= limit_; t += step)
 	{
 		Eigen::Vector3f point = line_.pointAt(t);
 		lineCloud->push_back(PointFactory::createPointXYZRGB(point.x(), point.y(), point.z(), color_));
@@ -201,7 +224,7 @@ void Extractor::DEBUG_generateExtractedLine(const Eigen::ParametrizedLine<float,
 	pcl::io::savePCDFileASCII(OUTPUT_DIR DEBUG_PREFIX + filename_ + CLOUD_FILE_EXTENSION, *lineCloud);
 }
 
-std::pair<float, float> Extractor::DEBUG_getDebugGenerationLimit(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
+std::pair<float, float> Extractor::DEBUG_getLimits(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_)
 {
 	pcl::PointNormal minData, maxData;
 	pcl::getMinMax3D(*cloud_, minData, maxData);

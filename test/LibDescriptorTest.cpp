@@ -9,7 +9,7 @@
 #include <pcl/io/pcd_io.h>
 
 /**************************************************/
-// Auxiliar method defined to be used while testing
+// Auxiliary method defined to be used while testing
 static bool diffThanZero(const float value_)
 {
 	return value_ > 0 || value_ < 0;
@@ -189,7 +189,7 @@ BOOST_FIXTURE_TEST_CASE(getBands_bidirectional, DCHFixture)
 
 		// Check the angular difference is less than a 0.5 percent
 		BOOST_CHECK_CLOSE(Utils::angle(normal, nextNormal), step, 0.5);
-		// Check the angular difference is less than 0.005 radians (0.28 degrees aprox)
+		// Check the angular difference is less than 0.005 radians (0.28 degrees approx)
 		BOOST_CHECK_SMALL(fabs(Utils::angle(normal, nextNormal) - step), 5E-3);
 
 		// Check each band's plane is perpendicular (goes along splitting the band in two)

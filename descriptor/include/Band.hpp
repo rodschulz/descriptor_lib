@@ -26,14 +26,6 @@ public:
 		point = point_;
 		plane = plane_;
 	}
-
-	/**************************************************/
-	Band(const pcl::PointNormal &point_)
-	{
-		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		point = point_;
-		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
-	}
 };
 
 // Declaration to define a band's shared pointer

@@ -148,6 +148,7 @@ bool Loader::loadCloud(const std::string &filename_,
 		// Deliver the cloud
 		cloud_->clear();
 		pcl::concatenateFields(*cloudXYZ, *normals, *cloud_);
+		cloud_->sensor_origin_ = cloudXYZ->sensor_origin_;
 	}
 
 	return loadOk;
