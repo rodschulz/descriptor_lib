@@ -31,6 +31,9 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr CloudUtils::gaussianSmoothing(const pcl::Poi
 	convolution.setRadiusSearch(radius_);
 	convolution.convolve(*smoothedCloud);
 
+	// Copy the viewpoint
+	smoothedCloud->sensor_origin_ = cloud_->sensor_origin_;
+
 	return smoothedCloud;
 }
 
@@ -50,6 +53,10 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr CloudUtils::MLSSmoothing(const pcl::PointClo
 	mls.process(*MLSPoints);
 
 	pcl::copyPointCloud<pcl::PointNormal, pcl::PointXYZ>(*MLSPoints, *smoothedCloud);
+
+	// Copy the viewpoint
+	smoothedCloud->sensor_origin_ = cloud_->sensor_origin_;
+
 	return smoothedCloud;
 }
 
