@@ -130,18 +130,18 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 			dataMap[index](theta);
 		}
 
-		band->sequenceString = "";
+		// band->sequenceString = "";
 		for (int j = 0; j < binsNumber; j++)
 		{
 			if (dataMap.find(j) != dataMap.end())
 			{
 				float value = params->sequenceStat == STAT_MEAN ? (float) mean(dataMap[j]) : (float) median(dataMap[j]);
-				band->sequenceString += getSequenceChar(value, sequenceStep_);
+				// band->sequenceString += getSequenceChar(value, sequenceStep_);
 				band->sequenceVector.push_back(value);
 			}
 			else
 			{
-				band->sequenceString += '-';
+				// band->sequenceString += '-';
 				band->sequenceVector.push_back(5);
 			}
 		}

@@ -7,6 +7,7 @@
 #include <vector>
 #include "DescriptorParams.hpp"
 #include "Band.hpp"
+#include "Utils.hpp"
 
 class Extractor
 {

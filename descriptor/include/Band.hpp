@@ -8,49 +8,31 @@
 #include <pcl/point_types.h>
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include <eigen3/Eigen/src/Geometry/Hyperplane.h>
-#include "PointFactory.hpp"
 
 class Band
 {
 public:
-	// Vector holding the data which generated the current band
-	pcl::PointCloud<pcl::PointNormal>::Ptr data;
+	pcl::PointCloud<pcl::PointNormal>::Ptr data; // Band's points
+	pcl::PointNormal point; // Band's origin
+	Eigen::Hyperplane<float, 3> plane; // Plane perpendicular which splits the band in 2 along it
+	std::vector<float> sequenceVector; // Band's descriptor vector
 
-	// Band's generator point
-	pcl::PointNormal point;
 
-	// Plane going along the band and splitting the band in two (is perpendicular to the band, the point's normal is in the plane)
-	Eigen::Hyperplane<float, 3> plane;
-
-	// String representing the sequence of the current band
-	std::string sequenceString;
-
-	// Vector corresponding to the numeric sequence representation
-	std::vector<float> sequenceVector;
-
+	/**************************************************/
 	Band(const pcl::PointNormal &point_,
 		 const Eigen::Hyperplane<float, 3> &plane_)
 	{
 		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 		point = point_;
 		plane = plane_;
-		sequenceString = "";
 	}
 
+	/**************************************************/
 	Band(const pcl::PointNormal &point_)
 	{
 		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
 		point = point_;
 		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
-		sequenceString = "";
-	}
-
-	Band()
-	{
-		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		point = PointFactory::createPointNormal(1, 0, 0, 1, 0, 0);
-		plane = Eigen::Hyperplane<float, 3>(Eigen::Vector3f(0, 1, 0), Eigen::Vector3f(0, 0, 0));
-		sequenceString = "";
 	}
 };
 

@@ -46,7 +46,7 @@ struct DCHFixture
 /**************************************************/
 
 /**************************************************/
-BOOST_AUTO_TEST_SUITE(Calculator_class_suite)
+BOOST_AUTO_TEST_SUITE(DCH_class_suite)
 
 BOOST_FIXTURE_TEST_CASE(calculateDescriptor, DCHFixture)
 {
@@ -63,10 +63,7 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, DCHFixture)
 
 	// Check the fields are being filled
 	for (int i = 0; i < params->bandNumber; i++)
-	{
-		BOOST_CHECK(!descriptor1[i]->sequenceString.empty());
 		BOOST_CHECK(!descriptor1[i]->sequenceVector.empty());
-	}
 }
 
 BOOST_FIXTURE_TEST_CASE(fillSequences_plane, DCHFixture)
@@ -87,8 +84,6 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_plane, DCHFixture)
 	for (int i = 0; i < params->bandNumber; i++)
 	{
 		BOOST_CHECK_EQUAL(bands[i]->sequenceVector.size(), sequenceSize);
-		BOOST_CHECK_EQUAL(bands[i]->sequenceString.size(), sequenceSize);
-		BOOST_CHECK_EQUAL(bands[i]->sequenceString, zeroSequence);
 		BOOST_CHECK(std::find_if(bands[i]->sequenceVector.begin(), bands[i]->sequenceVector.end(), diffThanZero) == bands[i]->sequenceVector.end());
 	}
 }
@@ -111,8 +106,6 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, DCHFixture)
 	for (int i = 0; i < params->bandNumber; i++)
 	{
 		BOOST_CHECK_EQUAL(bands[i]->sequenceVector.size(), sequenceSize);
-		BOOST_CHECK_EQUAL(bands[i]->sequenceString.size(), sequenceSize);
-		BOOST_CHECK_EQUAL(bands[i]->sequenceString, sequence);
 		BOOST_CHECK(std::find_if(bands[i]->sequenceVector.begin(), bands[i]->sequenceVector.end(), diffThanZero) != bands[i]->sequenceVector.end());
 	}
 }

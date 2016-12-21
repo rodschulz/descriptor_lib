@@ -10,6 +10,7 @@
 #include <boost/algorithm/minmax_element.hpp>
 #include "Utils.hpp"
 #include "Config.hpp"
+#include "PointFactory.hpp"
 
 
 pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
@@ -28,6 +29,8 @@ pcl::PointCloud<pcl::PointNormal>::Ptr Extractor::getNeighbors(const pcl::PointC
 	surfacePatch->reserve(pointIndices.size());
 	for (size_t i = 0; i < pointIndices.size(); i++)
 		surfacePatch->push_back(cloud_->points[pointIndices[i]]);
+
+	// TODO check the extraction of a continuous surface
 
 	return surfacePatch;
 }

@@ -163,8 +163,6 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, cloud_->at(targetPoint_), params->searchRadius);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "patch.pcd", *patch);
 
-	std::ofstream sequences;
-	sequences.open(OUTPUT_DIR "sequences", std::fstream::out);
 
 	for (size_t i = 0; i < bands_.size(); i++)
 	{
@@ -174,14 +172,10 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 			sprintf(name, OUTPUT_DIR "band%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(bands_[i]->data, Utils::palette12(i + 1)));
 
-			sequences << "band " << i << ": " << bands_[i]->sequenceString << "\n";
-
 			sprintf(name, OUTPUT_DIR "planeBand%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *planes[i]);
 		}
 	}
-
-	sequences.close();
 
 	// Write histogram data
 	double limit = M_PI;
