@@ -40,8 +40,7 @@ public:
 
 	/**************************************************/
 	static void fillSequences(std::vector<BandPtr> &descriptor_,
-							  const DescriptorParamsPtr &params_,
-							  const double sequenceStep_);
+							  const DescriptorParamsPtr &params_);
 
 	/**************************************************/
 	static inline char getSequenceChar(const double value_,

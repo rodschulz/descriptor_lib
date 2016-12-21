@@ -76,11 +76,9 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_plane, DCHFixture)
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	DCH::fillSequences(bands, paramsPtr, M_PI / 18);
+	DCH::fillSequences(bands, paramsPtr);
 
 	int sequenceSize = params->getSequenceLength();
-	std::string zeroSequence = "";
-	zeroSequence.resize(sequenceSize, '0');
 	for (int i = 0; i < params->bandNumber; i++)
 	{
 		BOOST_CHECK_EQUAL(bands[i]->sequenceVector.size(), sequenceSize);
@@ -99,10 +97,9 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, DCHFixture)
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	DCH::fillSequences(bands, paramsPtr, M_PI / 18);
+	DCH::fillSequences(bands, paramsPtr);
 
 	int sequenceSize = params->getSequenceLength();
-	std::string sequence = "000AAAABBB";
 	for (int i = 0; i < params->bandNumber; i++)
 	{
 		BOOST_CHECK_EQUAL(bands[i]->sequenceVector.size(), sequenceSize);

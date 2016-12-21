@@ -31,7 +31,7 @@ std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNo
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(patch, target_, params);
-	DCH::fillSequences(bands, params_, M_PI / 18);
+	DCH::fillSequences(bands, params_);
 
 	return bands;
 }
@@ -100,12 +100,12 @@ std::vector<Hist> DCH::generateAngleHistograms(const std::vector<BandPtr> &descr
 }
 
 void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
-						const DescriptorParamsPtr &params_,
-						const double sequenceStep_)
+						const DescriptorParamsPtr &params_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 	double binSize = params->sequenceBin;
 	int binsNumber = params->getSequenceLength();
+
 
 	for (size_t i = 0; i < descriptor_.size(); i++)
 	{
@@ -136,14 +136,10 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 			if (dataMap.find(j) != dataMap.end())
 			{
 				float value = params->sequenceStat == STAT_MEAN ? (float) mean(dataMap[j]) : (float) median(dataMap[j]);
-				// band->sequenceString += getSequenceChar(value, sequenceStep_);
 				band->sequenceVector.push_back(value);
 			}
 			else
-			{
-				// band->sequenceString += '-';
 				band->sequenceVector.push_back(5);
-			}
 		}
 	}
 }
