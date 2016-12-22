@@ -44,9 +44,9 @@ void Writer::writeHistogram(const std::string &filename_,
 		// Generate data to plot
 		for (size_t i = 0; i < histograms_.size(); i++)
 		{
-			Bins bins = (lowerBound_ == -1 || upperBound_ == -1)
-						? histograms_[i].getBins(binSize_)
-						: histograms_[i].getBins(binSize_, lowerBound_, upperBound_);
+			Bins b = (lowerBound_ == -1 || upperBound_ == -1)
+					 ? histograms_[i].getBins(binSize_)
+					 : histograms_[i].getBins(binSize_, lowerBound_, upperBound_);
 			int binsNumber = b.bins.size();
 
 			// Create axes if not already created
@@ -155,7 +155,7 @@ Writer::generatePlanes(const std::vector<BandPtr> &bands_,
 
 	for (size_t i = 0; i < bands_.size(); i++)
 	{
-		Eigen::Vector3f point = bands_[i]->point.getVector3fMap();
+		Eigen::Vector3f point = bands_[i]->origin.getVector3fMap();
 		Eigen::Vector3f normal = bands_[i]->plane.normal();
 		planes.push_back(pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>()));
 
@@ -199,11 +199,11 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = generatePlanes(bands_, params);
 	for (size_t i = 0; i < bands_.size(); i++)
 	{
-		if (!bands_[i]->data->empty())
+		if (!bands_[i]->points->empty())
 		{
 			char name[100];
 			sprintf(name, OUTPUT_DIR "band%d.pcd", (int) i);
-			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(bands_[i]->data, Utils::palette12(i + 1)));
+			pcl::io::savePCDFileASCII(name, *CloudFactory::createColorCloud(bands_[i]->points, Utils::palette12(i + 1)));
 
 			sprintf(name, OUTPUT_DIR "planeBand%d.pcd", (int) i);
 			pcl::io::savePCDFileASCII(name, *planes[i]);

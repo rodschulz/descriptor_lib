@@ -12,18 +12,18 @@
 class Band
 {
 public:
-	pcl::PointCloud<pcl::PointNormal>::Ptr data; // Band's points
-	pcl::PointNormal point; // Band's origin
+	pcl::PointCloud<pcl::PointNormal>::Ptr points; // Band's points
+	pcl::PointNormal origin; // Band's origin
 	Eigen::Hyperplane<float, 3> plane; // Perpendicular plane splitting the band in along it
-	std::vector<float> sequenceVector; // Band's descriptor vector
+	std::vector<float> descriptor; // Band's descriptor data
 
 
 	/**************************************************/
 	Band(const pcl::PointNormal &point_,
 		 const Eigen::Hyperplane<float, 3> &plane_)
 	{
-		data = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
-		point = point_;
+		points = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>());
+		origin = point_;
 		plane = plane_;
 	}
 };

@@ -105,7 +105,7 @@ Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 			if (params_->bidirectional)
 			{
 				if (lines[j].distance(projection) <= halfBand)
-					bands[j]->data->push_back(cloud_->points[i]);
+					bands[j]->points->push_back(cloud_->points[i]);
 			}
 			else
 			{
@@ -129,7 +129,7 @@ Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 
 				// Add the point if the point is at the correct side of the plane and if it's in the band's limits
 				if (orientation >= 0 && lines[j].distance(projection) <= halfBand)
-					bands[j]->data->push_back(cloud_->points[i]);
+					bands[j]->points->push_back(cloud_->points[i]);
 			}
 		}
 	}

@@ -14,7 +14,7 @@ enum Dimension
 
 struct Bins
 {
-	std::vector<double> bins;
+	std::vector<float> bins;
 	double step;
 	Dimension dimension;
 

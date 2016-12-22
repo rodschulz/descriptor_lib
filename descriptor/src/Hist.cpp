@@ -61,15 +61,20 @@ Bins Hist::getBins(const double binSize_,
 	b.step = binSize_;
 	b.dimension = dimension;
 
+	// Put elements in bins
+	int outElements = 0;
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index = ((data[i] - lowerBound_) / binSize_);
-		index = index >= binNumber ? binNumber - 1 : index;
-
-		b.bins[index]++;
+		if (index >= binNumber)
+			outElements++;
+		else
+			b.bins[index]++;
 	}
+
+	// Normalize
 	for (int i = 0; i < binNumber; i++)
-		b.bins[i] /= data.size();
+		b.bins[i] /= (data.size() - outElements);
 
 	return b;
 }
