@@ -44,21 +44,18 @@ void Writer::writeHistogram(const std::string &filename_,
 		// Generate data to plot
 		for (size_t i = 0; i < histograms_.size(); i++)
 		{
-			Bins bins;
-			if (lowerBound_ == -1 || upperBound_ == -1)
-				histograms_[i].getBins(binSize_, bins);
-			else
-				histograms_[i].getBins(binSize_, lowerBound_, upperBound_, bins);
-
-			int binsNumber = bins.bins.size();
+			Bins bins = (lowerBound_ == -1 || upperBound_ == -1)
+						? histograms_[i].getBins(binSize_)
+						: histograms_[i].getBins(binSize_, lowerBound_, upperBound_);
+			int binsNumber = b.bins.size();
 
 			// Create axes if not already created
 			if (!axesCreated)
 			{
 				rows.resize(binsNumber);
-				dimension = bins.dimension;
+				dimension = b.dimension;
 
-				double step = dimension == ANGLE ? RAD2DEG(bins.step) : bins.step;
+				double step = dimension == ANGLE ? RAD2DEG(b.step) : b.step;
 				double boundary = dimension == ANGLE ? RAD2DEG(lowerBound_) : lowerBound_;
 				for (int j = 0; j < binsNumber; j++)
 				{
@@ -72,7 +69,7 @@ void Writer::writeHistogram(const std::string &filename_,
 			for (int j = 0; j < binsNumber; j++)
 			{
 				stream.str(std::string());
-				stream << "\t" << bins.bins[j];
+				stream << "\t" << b.bins[j];
 				rows[j] += stream.str();
 			}
 		}
@@ -121,7 +118,7 @@ void Writer::generateHistogramScript(const std::string &filename_,
 	output << "set xtics rotate by -50\n";
 	output << "set xtics (";
 
-	int binNumber = ceil((upperLimit_ - lowerLimit_) / binSize_);
+	// int binNumber = ceil((upperLimit_ - lowerLimit_) / binSize_);
 	// double offset = binNumber % 2 > 0 ? 0 : -0.5 * binSize_;
 	double offset = 0;
 

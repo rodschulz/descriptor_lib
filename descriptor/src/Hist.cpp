@@ -49,31 +49,32 @@ void Hist::add(const double _element)
 	maxData = maxData < _element ? _element : maxData;
 }
 
-void Hist::getBins(const double binSize_,
+Bins Hist::getBins(const double binSize_,
 				   const double lowerBound_,
-				   const double upperBound_,
-				   Bins &_bins) const
+				   const double upperBound_) const
 {
 	int binNumber = ceil((upperBound_ - lowerBound_) / binSize_);
 	// binNumber = binNumber % 2 > 0 ? binNumber : binNumber + 1;
 
-	_bins.bins.clear();
-	_bins.bins.resize(binNumber, 0);
-	_bins.step = binSize_;
-	_bins.dimension = dimension;
+	Bins b;
+	b.bins.resize(binNumber, 0);
+	b.step = binSize_;
+	b.dimension = dimension;
 
 	for (size_t i = 0; i < data.size(); i++)
 	{
 		int index = ((data[i] - lowerBound_) / binSize_);
 		index = index >= binNumber ? binNumber - 1 : index;
 
-		_bins.bins[index]++;
+		b.bins[index]++;
 	}
 	for (int i = 0; i < binNumber; i++)
-		_bins.bins[i] /= data.size();
+		b.bins[i] /= data.size();
+
+	return b;
 }
 
-void Hist::getBins(const double binSize_, Bins &_bins) const
+Bins Hist::getBins(const double binSize_) const
 {
-	getBins(binSize_, minData, maxData, _bins);
+	return getBins(binSize_, minData, maxData);
 }

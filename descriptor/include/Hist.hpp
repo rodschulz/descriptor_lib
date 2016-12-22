@@ -24,6 +24,13 @@ struct Bins
 		step = 0;
 		dimension = OTHER;
 	}
+
+	Bins(const Bins &other_)
+	{
+		bins = other_.bins;
+		step = other_.step;
+		dimension = other_.dimension;
+	}
 };
 
 class Hist
@@ -36,14 +43,12 @@ public:
 	void add(const double _element);
 
 	/**************************************************/
-	void getBins(const double binSize_,
+	Bins getBins(const double binSize_,
 				 const double lowerBound_,
-				 const double upperBound_,
-				 Bins &_bins) const;
+				 const double upperBound_) const;
 
 	/**************************************************/
-	void getBins(const double binSize_,
-				 Bins &_bins) const;
+	Bins getBins(const double binSize_) const;
 
 private:
 	std::vector<double> data;
