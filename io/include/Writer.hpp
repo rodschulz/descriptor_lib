@@ -94,6 +94,10 @@ private:
 										const double lowerLimit_,
 										const double upperLimit_);
 
+	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr>
+	generatePlanes(const std::vector<BandPtr> &bands_,
+				   const DCHParams *params_);
+
 	/**************************************************/
 	static bool comparePairs(const std::pair<int, int> &item1_,
 							 const std::pair<int, int> &item2_)

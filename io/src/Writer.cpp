@@ -15,6 +15,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <plog/Log.h>
 #include "CloudFactory.hpp"
+#include "PointFactory.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
 
@@ -143,6 +144,39 @@ void Writer::generateHistogramScript(const std::string &filename_,
 	output.close();
 }
 
+std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr>
+Writer::generatePlanes(const std::vector<BandPtr> &bands_,
+					   const DCHParams *params_)
+{
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes;
+	planes.reserve(bands_.size());
+
+	float delta = params_->searchRadius;
+	float begin = params_->bidirectional ? -delta : 0;
+	float step = (delta - begin) / 10;
+
+	for (size_t i = 0; i < bands_.size(); i++)
+	{
+		Eigen::Vector3f point = bands_[i]->point.getVector3fMap();
+		Eigen::Vector3f normal = bands_[i]->plane.normal();
+		planes.push_back(pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>()));
+
+		for (float x = begin; x <= delta; x += step)
+		{
+			for (float y = begin; y <= delta; y += step)
+			{
+				for (float z = begin; z <= delta; z += step)
+				{
+					Eigen::Vector3f p = bands_[i]->plane.projection(point + Eigen::Vector3f(x, y, z));
+					planes.back()->push_back((pcl::PointNormal) PointFactory::createPointNormal(p.x(), p.y(), p.z(), normal[0], normal[1], normal[2]));
+				}
+			}
+		}
+	}
+
+	return planes;
+}
+
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							const std::vector<BandPtr> &bands_,
 							const std::vector<Hist> &angleHistograms_,
@@ -152,18 +186,19 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get()); // FIX THIS !! => do something when the cast fails because is another descriptor
 
 
-	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr coloredCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
-	pcl::io::savePCDFileASCII(OUTPUT_DIR "cloud.pcd", *coloredCloud);
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colorCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
+	pcl::io::savePCDFileASCII(OUTPUT_DIR "cloud.pcd", *colorCloud);
 
-	(*coloredCloud)[targetPoint_].rgba = Utils::getColor(255, 0, 0);
-	pcl::io::savePCDFileASCII(OUTPUT_DIR "pointPosition.pcd", *coloredCloud);
 
-	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = Extractor::generatePlaneClouds(bands_, params);
+	(*colorCloud)[targetPoint_].rgba = Utils::getColor(255, 0, 0);
+	pcl::io::savePCDFileASCII(OUTPUT_DIR "pointPosition.pcd", *colorCloud);
+
 
 	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, cloud_->at(targetPoint_), params->searchRadius);
 	pcl::io::savePCDFileASCII(OUTPUT_DIR "patch.pcd", *patch);
 
 
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> planes = generatePlanes(bands_, params);
 	for (size_t i = 0; i < bands_.size(); i++)
 	{
 		if (!bands_[i]->data->empty())

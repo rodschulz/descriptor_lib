@@ -14,7 +14,7 @@ class Band
 public:
 	pcl::PointCloud<pcl::PointNormal>::Ptr data; // Band's points
 	pcl::PointNormal point; // Band's origin
-	Eigen::Hyperplane<float, 3> plane; // Plane perpendicular which splits the band in 2 along it
+	Eigen::Hyperplane<float, 3> plane; // Perpendicular plane splitting the band in along it
 	std::vector<float> sequenceVector; // Band's descriptor vector
 
 

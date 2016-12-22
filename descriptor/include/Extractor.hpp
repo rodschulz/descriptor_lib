@@ -23,11 +23,6 @@ public:
 										 const pcl::PointNormal &point_,
 										 const DCHParams *params_);
 
-	/**************************************************/
-	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr>
-	generatePlaneClouds(const std::vector<BandPtr> &bands_,
-						const DCHParams *params_);
-
 private:
 	Extractor();
 	~Extractor();
