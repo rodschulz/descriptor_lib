@@ -18,6 +18,7 @@
 #include "PointFactory.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
+#include "DCH.hpp"
 
 
 #define MATRIX_DIMENSIONS			"dims"
@@ -40,6 +41,11 @@ void Writer::writeHistogram(const std::string &filename_,
 		std::vector<std::string> rows;
 		std::ostringstream stream;
 		Dimension dimension = ANGLE;
+
+
+		// Precision for the plot data
+		stream << std::fixed << std::setprecision(4);
+
 
 		// Generate data to plot
 		for (size_t i = 0; i < histograms_.size(); i++)
@@ -177,7 +183,6 @@ Writer::generatePlanes(const std::vector<BandPtr> &bands_,
 
 void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							const std::vector<BandPtr> &bands_,
-							const std::vector<Hist> &angleHistograms_,
 							const DescriptorParamsPtr &params_,
 							const int targetPoint_)
 {
@@ -210,9 +215,24 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 		}
 	}
 
+
 	// Write histogram data
-	double limit = M_PI;
-	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms_, DEG2RAD(10), -limit, limit);
+	std::vector<Hist> angleHistograms = DCH::generateAngleHistograms(bands_, params->useProjection);
+	// getBins(DEG2RAD(20), -M_PI / 2, M_PI / 2)
+	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, DEG2RAD(20), -M_PI / 2, M_PI / 2);
+
+
+	// Write the descriptor to a file
+	std::ofstream output;
+	output.open(OUTPUT_DIR "descriptor.dat", std::fstream::out);
+	output << std::fixed << std::setprecision(4);
+	for (size_t i = 0; i < bands_.size(); i++)
+	{
+		for (size_t j = 0; j < bands_.at(i)->descriptor.size(); j++)
+			output << bands_.at(i)->descriptor[j] << "\t";
+		output << "\n";
+	}
+	output.close();
 }
 
 void Writer::writePlotSSE(const std::string &filename_,

@@ -111,7 +111,8 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 		for (size_t i = 0; i < histograms.size(); i++)
 		{
 			Bins b = histograms[i].getBins(DEG2RAD(20), -M_PI / 2, M_PI / 2);
-			descriptor_[i]->descriptor = b.bins;
+			descriptor_[i]->descriptor.clear();
+			descriptor_[i]->descriptor.insert(descriptor_[i]->descriptor.begin(), b.bins.begin(), b.bins.end());
 		}
 	}
 	else

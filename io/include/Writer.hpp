@@ -25,7 +25,6 @@ public:
 	/**************************************************/
 	static void writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							   const std::vector<BandPtr> &bands_,
-							   const std::vector<Hist> &angleHistograms_,
 							   const DescriptorParamsPtr &params_,
 							   const int targetPoint_);
 
