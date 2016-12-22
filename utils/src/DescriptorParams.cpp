@@ -80,7 +80,17 @@ std::string DCHParams::toString() const
 YAML::Node DCHParams::toNode() const
 {
 	std::string sType = descType[type].substr(11);
-	std::string stat = sequenceStat == STAT_MEAN ? "mean" : "median";
+	std::string stat;
+	switch (sequenceStat)
+	{
+	default:
+	case STAT_MEAN:
+		stat = "mean";
+	case STAT_MEDIAN:
+		stat = "median";
+	case STAT_HISTOGRAM:
+		stat = "histogram";
+	}
 
 	YAML::Node node;
 	node["type"] = sType;

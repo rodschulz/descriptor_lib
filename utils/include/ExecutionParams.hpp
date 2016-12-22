@@ -21,12 +21,14 @@
 enum SequenceStat
 {
 	STAT_MEAN,
-	STAT_MEDIAN
+	STAT_MEDIAN,
+	STAT_HISTOGRAM
 };
 static std::string seqStat[] =
 {
 	BOOST_STRINGIZE(STAT_MEAN),
-	BOOST_STRINGIZE(STAT_MEDIAN)
+	BOOST_STRINGIZE(STAT_MEDIAN),
+	BOOST_STRINGIZE(STAT_HISTOGRAM)
 };
 
 static inline SequenceStat toStatType(const std::string &type_)
@@ -35,6 +37,8 @@ static inline SequenceStat toStatType(const std::string &type_)
 		return STAT_MEAN;
 	else if (boost::iequals(type_, "median"))
 		return STAT_MEDIAN;
+	else if (boost::iequals(type_, "histogram"))
+		return STAT_HISTOGRAM;
 
 	LOGW << "Wrong stat type, assuming MEAN";
 	return STAT_MEAN;

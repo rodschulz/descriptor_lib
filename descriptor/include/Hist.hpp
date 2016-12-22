@@ -29,23 +29,21 @@ struct Bins
 class Hist
 {
 public:
-	// Constructor
 	Hist(const Dimension _dimension = OTHER);
+	~Hist() {};
 
-	// Constructor
-	Hist(const std::vector<double> &_data);
-
-	// Destructor
-	~Hist();
-
-	// Adds a new number to the histogram
+	/**************************************************/
 	void add(const double _element);
 
-	// Fills up the given bins structure with the bins in the current histogram
-	void getBins(const double binSize_, const double lowerBound_, const double upperBound_, Bins &_bins) const;
+	/**************************************************/
+	void getBins(const double binSize_,
+				 const double lowerBound_,
+				 const double upperBound_,
+				 Bins &_bins) const;
 
-	// Fills up the given bins structure with the bins in the current histogram
-	void getBins(const double binSize_, Bins &_bins) const;
+	/**************************************************/
+	void getBins(const double binSize_,
+				 Bins &_bins) const;
 
 private:
 	std::vector<double> data;

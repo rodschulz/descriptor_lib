@@ -122,7 +122,8 @@ void Writer::generateHistogramScript(const std::string &filename_,
 	output << "set xtics (";
 
 	int binNumber = ceil((upperLimit_ - lowerLimit_) / binSize_);
-	double offset = binNumber % 2 > 0 ? 0 : -0.5 * binSize_;
+	// double offset = binNumber % 2 > 0 ? 0 : -0.5 * binSize_;
+	double offset = 0;
 
 	for (double pos = lowerLimit_ + offset; pos < upperLimit_; pos += binSize_)
 		output << "'[" << round(pos) << ", " << round(pos + binSize_) << ")' " << pos - offset << (pos + binSize_ <= upperLimit_ ? ", " : "");
@@ -214,7 +215,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 
 	// Write histogram data
 	double limit = M_PI;
-	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms_, DEG2RAD(20), -limit, limit);
+	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms_, DEG2RAD(10), -limit, limit);
 }
 
 void Writer::writePlotSSE(const std::string &filename_,

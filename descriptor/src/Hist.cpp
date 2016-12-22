@@ -14,10 +14,6 @@ Hist::Hist(const Dimension _dimension)
 	dimension = _dimension;
 }
 
-Hist::~Hist()
-{
-}
-
 std::ostream& operator<<(std::ostream &_stream, const Bins &_bins)
 {
 	_stream.precision(2);
@@ -53,10 +49,13 @@ void Hist::add(const double _element)
 	maxData = maxData < _element ? _element : maxData;
 }
 
-void Hist::getBins(const double binSize_, const double lowerBound_, const double upperBound_, Bins &_bins) const
+void Hist::getBins(const double binSize_,
+				   const double lowerBound_,
+				   const double upperBound_,
+				   Bins &_bins) const
 {
 	int binNumber = ceil((upperBound_ - lowerBound_) / binSize_);
-	binNumber = binNumber % 2 > 0 ? binNumber : binNumber + 1;
+	// binNumber = binNumber % 2 > 0 ? binNumber : binNumber + 1;
 
 	_bins.bins.clear();
 	_bins.bins.resize(binNumber, 0);

@@ -188,6 +188,7 @@ BOOST_AUTO_TEST_CASE(strToStatType)
 {
 	BOOST_CHECK_EQUAL(toStatType("mean"), STAT_MEAN);
 	BOOST_CHECK_EQUAL(toStatType("median"), STAT_MEDIAN);
+	BOOST_CHECK_EQUAL(toStatType("histogram"), STAT_HISTOGRAM);
 }
 
 BOOST_AUTO_TEST_CASE(strToClusteringImp)
