@@ -45,13 +45,6 @@ public:
 								   const ClusteringParams &params_);
 
 	/**************************************************/
-	static pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr generateClusterRepresentation(const pcl::PointCloud<pcl::PointNormal>::Ptr cloud_,
-			const cv::Mat &labels_,
-			const cv::Mat &centers_,
-			const DCHParams &params_);
-
-
-	/**************************************************/
 	static cv::Mat generatePointDistanceMatrix(const cv::Mat &items_,
 			const MetricPtr &metric_);
 
