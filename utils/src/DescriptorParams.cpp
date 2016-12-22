@@ -4,6 +4,7 @@
  */
 #include "DescriptorParams.hpp"
 #include <plog/Log.h>
+#include <pcl/pcl_macros.h>
 
 
 DescriptorType DescriptorParams::toType(const std::string &type_)
@@ -86,10 +87,13 @@ YAML::Node DCHParams::toNode() const
 	default:
 	case STAT_MEAN:
 		stat = "mean";
+		break;
 	case STAT_MEDIAN:
 		stat = "median";
+		break;
 	case STAT_HISTOGRAM:
 		stat = "histogram";
+		break;
 	}
 
 	YAML::Node node;
@@ -107,7 +111,10 @@ YAML::Node DCHParams::toNode() const
 
 int DCHParams::getSequenceLength() const
 {
-	return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
+	if (sequenceStat != STAT_HISTOGRAM)
+		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
+	else
+		return ceil(((M_PI / 2) - (-M_PI / 2)) / DEG2RAD(20)); // TODO improve this, so can be dynamically calculated
 }
 
 float DCHParams::getBandsAngularRange() const
