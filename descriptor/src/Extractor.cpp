@@ -6,7 +6,6 @@
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/impl/common.hpp>
-#include <eigen3/Eigen/src/Geometry/ParametrizedLine.h>
 #include <boost/algorithm/minmax_element.hpp>
 #include "Utils.hpp"
 #include "Config.hpp"
@@ -79,7 +78,7 @@ Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 
 		// Calculate the normal to a plane going along the band and then define the plane
 		normals.push_back(n.cross(directors.back()).normalized());
-		bands.push_back(BandPtr(new Band(point_, Eigen::Hyperplane<float, 3>(normals.back(), p))));
+		bands.push_back(BandPtr(new Band(point_, Eigen::Hyperplane<float, 3>(normals.back(), p), lines.back())));
 	}
 
 
@@ -89,7 +88,7 @@ Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 			DEBUG_genLine(lines[l],
 						  debugLimit, "axis_band_" + boost::lexical_cast<std::string>(l),
 						  (PointColor)Utils::palette12(l + 1),
-						  false);
+						  params_->bidirectional);
 	/********** Debug **********/
 
 

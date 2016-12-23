@@ -3,14 +3,42 @@
  * 2015
  */
 #include "DCH.hpp"
+#include <pcl/io/pcd_io.h>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 #include <boost/accumulators/statistics/count.hpp>
 #include <map>
+#include "Config.hpp"
+#include "CloudFactory.hpp"
+#include "PointFactory.hpp"
 
 
 using namespace boost::accumulators;
 
+
+void DEBUG_generateAxes(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+						const std::vector<BandPtr> &bands_,
+						const float debugLimit_,
+						const std::string &debugId_,
+						const bool full_)
+{
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr axesCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
+
+
+	for (size_t b = 0; b < bands_.size(); b++)
+	{
+		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr lineCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+		for (float t = (full_ ? -debugLimit_ : 0); t <= debugLimit_; t += debugLimit_ / 50)
+		{
+			Eigen::Vector3f point = bands_[b]->axis.pointAt(t);
+			lineCloud->push_back(PointFactory::createPointXYZRGBNormal(point.x(), point.y(), point.z(), 0, 0, 0, 0, (PointColor)Utils::palette12(b + 1)));
+		}
+
+		*axesCloud += *lineCloud;
+	}
+
+	pcl::io::savePCDFileASCII(DEBUG_DIR DEBUG_PREFIX + debugId_ + CLOUD_FILE_EXTENSION, *axesCloud);
+}
 
 std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 		const DescriptorParamsPtr &params_,
@@ -62,7 +90,8 @@ void DCH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 					   const DescriptorParamsPtr &params_,
 					   const int target_,
-					   Eigen::VectorXf &descriptor_)
+					   Eigen::VectorXf &descriptor_,
+					   const std::string &debugId_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 	int sequenceSize = params->getSequenceLength();
@@ -73,6 +102,9 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	for (size_t j = 0; j < bands.size(); j++)
 		for (size_t k = 0; k < bands[j]->descriptor.size(); k++)
 			descriptor_(j * sequenceSize + k) = bands[j]->descriptor[k];
+
+
+	DEBUG_generateAxes(cloud_, bands, params->searchRadius, debugId_, params->bidirectional);
 }
 
 std::vector<Hist> DCH::generateAngleHistograms(const std::vector<BandPtr> &descriptor_,

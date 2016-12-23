@@ -32,7 +32,8 @@ public:
 	static void computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 							 const DescriptorParamsPtr &params_,
 							 const int target_,
-							 Eigen::VectorXf &descriptor_);
+							 Eigen::VectorXf &descriptor_,
+							 const std::string &debugId_ = "");
 
 	/**************************************************/
 	static std::vector<Hist> generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
