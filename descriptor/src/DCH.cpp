@@ -18,17 +18,24 @@ using namespace boost::accumulators;
 
 void DEBUG_generateAxes(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 						const std::vector<BandPtr> &bands_,
-						const float debugLimit_,
+						const int target_,
 						const std::string &debugId_,
-						const bool full_)
+						const DCHParams *params_)
 {
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr axesCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
+
+
+	pcl::PointCloud<pcl::PointNormal>::Ptr patch = Extractor::getNeighbors(cloud_, cloud_->at(target_), params_->searchRadius);
+	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr patchCloud = CloudFactory::createColorCloud(patch, 255, 0, 0);
+	*axesCloud += *patchCloud;
 
 
 	for (size_t b = 0; b < bands_.size(); b++)
 	{
 		pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr lineCloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
-		for (float t = (full_ ? -debugLimit_ : 0); t <= debugLimit_; t += debugLimit_ / 50)
+		for (float t = (params_->bidirectional ? -params_->searchRadius : 0);
+				t <= params_->searchRadius;
+				t += params_->searchRadius / 50)
 		{
 			Eigen::Vector3f point = bands_[b]->axis.pointAt(t);
 			lineCloud->push_back(PointFactory::createPointXYZRGBNormal(point.x(), point.y(), point.z(), 0, 0, 0, 0, (PointColor)Utils::palette12(b + 1)));
@@ -104,7 +111,8 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 			descriptor_(j * sequenceSize + k) = bands[j]->descriptor[k];
 
 
-	DEBUG_generateAxes(cloud_, bands, params->searchRadius, debugId_, params->bidirectional);
+	DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
+	// DEBUG_generateAxes(patch, bands, params->searchRadius, debugId_, params->bidirectional);
 }
 
 std::vector<Hist> DCH::generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
