@@ -2,17 +2,12 @@
  * Author: rodrigo
  * 2015
  */
-#include "Hist.hpp"
+#include "Histogram.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <cmath>
 #include <pcl/pcl_macros.h>
 
-Hist::Hist(const Dimension _dimension)
-{
-	minData = maxData = 0;
-	dimension = _dimension;
-}
 
 std::ostream& operator<<(std::ostream &_stream, const Bins &_bins)
 {
@@ -41,7 +36,14 @@ void printBins(const Bins &_data)
 	printf("\n");
 }
 
-void Hist::add(const double _element)
+
+Histogram::Histogram(const Dimension _dimension)
+{
+	minData = maxData = 0;
+	dimension = _dimension;
+}
+
+void Histogram::add(const double _element)
 {
 	data.push_back(_element);
 
@@ -49,9 +51,9 @@ void Hist::add(const double _element)
 	maxData = maxData < _element ? _element : maxData;
 }
 
-Bins Hist::getBins(const double binSize_,
-				   const double lowerBound_,
-				   const double upperBound_) const
+Bins Histogram::getBins(const double binSize_,
+						const double lowerBound_,
+						const double upperBound_) const
 {
 	int binNumber = ceil((upperBound_ - lowerBound_) / binSize_);
 	// binNumber = binNumber % 2 > 0 ? binNumber : binNumber + 1;
@@ -79,7 +81,7 @@ Bins Hist::getBins(const double binSize_,
 	return b;
 }
 
-Bins Hist::getBins(const double binSize_) const
+Bins Histogram::getBins(const double binSize_) const
 {
 	return getBins(binSize_, minData, maxData);
 }

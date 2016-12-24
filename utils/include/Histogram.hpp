@@ -33,11 +33,11 @@ struct Bins
 	}
 };
 
-class Hist
+class Histogram
 {
 public:
-	Hist(const Dimension _dimension = OTHER);
-	~Hist() {};
+	Histogram(const Dimension _dimension = OTHER);
+	~Histogram() {};
 
 	/**************************************************/
 	void add(const double _element);

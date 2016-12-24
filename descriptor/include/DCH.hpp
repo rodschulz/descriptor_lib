@@ -7,7 +7,7 @@
 #include <vector>
 #include "Utils.hpp"
 #include "Extractor.hpp"
-#include "Hist.hpp"
+#include "Histogram.hpp"
 
 
 class DCH
@@ -36,7 +36,7 @@ public:
 							 const std::string &debugId_ = "");
 
 	/**************************************************/
-	static std::vector<Hist> generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
+	static std::vector<Histogram> generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
 			const bool useProjection_);
 
 	/**************************************************/

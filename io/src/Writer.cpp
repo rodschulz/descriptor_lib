@@ -30,7 +30,7 @@
 
 void Writer::writeHistogram(const std::string &filename_,
 							const std::string &histogramTitle_,
-							const std::vector<Hist> &histograms_,
+							const std::vector<Histogram> &histograms_,
 							const double binSize_,
 							const double lowerBound_,
 							const double upperBound_)
@@ -217,7 +217,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 
 
 	// Write histogram data
-	std::vector<Hist> angleHistograms = DCH::generateAngleHistograms(bands_, params->useProjection);
+	std::vector<Histogram> angleHistograms = DCH::generateAngleHistograms(bands_, params->useProjection);
 	// getBins(DEG2RAD(20), -M_PI / 2, M_PI / 2)
 	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, DEG2RAD(20), -M_PI / 2, M_PI / 2);
 

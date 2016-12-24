@@ -115,19 +115,19 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	// DEBUG_generateAxes(patch, bands, params->searchRadius, debugId_, params->bidirectional);
 }
 
-std::vector<Hist> DCH::generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
+std::vector<Histogram> DCH::generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
 		const bool useProjection_)
 {
 	// TODO move this method to the output class, since this is only to generate the histogram generated as output
 
-	std::vector<Hist> histograms = std::vector<Hist>();
+	std::vector<Histogram> histograms = std::vector<Histogram>();
 	histograms.reserve(descriptor_.size());
 
 	Eigen::Vector3f targetNormal = descriptor_[0]->origin.getNormalVector3fMap();
 	for (size_t i = 0; i < descriptor_.size(); i++)
 	{
 		BandPtr band = descriptor_[i];
-		histograms.push_back(Hist(ANGLE));
+		histograms.push_back(Histogram(ANGLE));
 
 		for (size_t j = 0; j < band->points->size(); j++)
 		{
@@ -147,7 +147,7 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 
 	if (params->sequenceStat == STAT_HISTOGRAM)
 	{
-		std::vector<Hist> histograms = generateAngleHistograms(descriptor_, params->useProjection);
+		std::vector<Histogram> histograms = generateAngleHistograms(descriptor_, params->useProjection);
 		for (size_t i = 0; i < histograms.size(); i++)
 		{
 			Bins b = histograms[i].getBins(DEG2RAD(20), -M_PI / 2, M_PI / 2);

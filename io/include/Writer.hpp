@@ -6,7 +6,7 @@
 
 #include <string>
 #include <opencv2/core/core.hpp>
-#include "Hist.hpp"
+#include "Histogram.hpp"
 #include "Extractor.hpp"
 #include "Metric.hpp"
 #include "DescriptorParams.hpp"
@@ -17,7 +17,7 @@ public:
 	/**************************************************/
 	static void writeHistogram(const std::string &filename_,
 							   const std::string &histogramTitle_,
-							   const std::vector<Hist> &histograms_,
+							   const std::vector<Histogram> &histograms_,
 							   const double binSize_,
 							   const double lowerBound_ = -1,
 							   const double upperBound_ = -1);
