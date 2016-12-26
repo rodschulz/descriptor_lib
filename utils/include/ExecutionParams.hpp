@@ -15,33 +15,80 @@
 #include "Metric.hpp"
 
 
+namespace Params
+{
 ////////////////////////////////////////////////////////////////////////////////
 // Set of enumerations defining some easy-to-read values for some parameters
 ////////////////////////////////////////////////////////////////////////////////
-enum SequenceStat
+enum Statistic
 {
 	STAT_MEAN,
 	STAT_MEDIAN,
-	STAT_HISTOGRAM
+	STAT_HISTOGRAM_10,
+	STAT_HISTOGRAM_20,
+	STAT_HISTOGRAM_30,
+	STAT_HISTOGRAM_BIN_10,
+	STAT_HISTOGRAM_BIN_20,
+	STAT_HISTOGRAM_BIN_30,
 };
 static std::string seqStat[] =
 {
 	BOOST_STRINGIZE(STAT_MEAN),
 	BOOST_STRINGIZE(STAT_MEDIAN),
-	BOOST_STRINGIZE(STAT_HISTOGRAM)
+	BOOST_STRINGIZE(STAT_HISTOGRAM_10),
+	BOOST_STRINGIZE(STAT_HISTOGRAM_20),
+	BOOST_STRINGIZE(STAT_HISTOGRAM_30),
+	BOOST_STRINGIZE(STAT_HISTOGRAM_BIN_10),
+	BOOST_STRINGIZE(STAT_HISTOGRAM_BIN_20),
+	BOOST_STRINGIZE(STAT_HISTOGRAM_BIN_30),
 };
 
-static inline SequenceStat toStatType(const std::string &type_)
+static inline Statistic toStatType(const std::string &type_)
 {
 	if (boost::iequals(type_, "mean"))
 		return STAT_MEAN;
 	else if (boost::iequals(type_, "median"))
 		return STAT_MEDIAN;
-	else if (boost::iequals(type_, "histogram"))
-		return STAT_HISTOGRAM;
+	else if (boost::iequals(type_, "hist10"))
+		return STAT_HISTOGRAM_10;
+	else if (boost::iequals(type_, "hist20"))
+		return STAT_HISTOGRAM_20;
+	else if (boost::iequals(type_, "hist30"))
+		return STAT_HISTOGRAM_30;
+	else if (boost::iequals(type_, "hb10"))
+		return STAT_HISTOGRAM_BIN_10;
+	else if (boost::iequals(type_, "hb20"))
+		return STAT_HISTOGRAM_BIN_20;
+	else if (boost::iequals(type_, "hb30"))
+		return STAT_HISTOGRAM_BIN_30;
 
 	LOGW << "Wrong stat type, assuming MEAN";
 	return STAT_MEAN;
+}
+
+static inline std::string toString(const Statistic &stat_)
+{
+	switch (stat_)
+	{
+	default:
+		LOGW << "Wrong stat type, assuming MEAN";
+	case STAT_MEAN:
+		return "mean";
+	case STAT_MEDIAN:
+		return "median";
+	case STAT_HISTOGRAM_10:
+		return "hist10";
+	case STAT_HISTOGRAM_20:
+		return "hist20";
+	case STAT_HISTOGRAM_30:
+		return "hist30";
+	case STAT_HISTOGRAM_BIN_10:
+		return "hb10";
+	case STAT_HISTOGRAM_BIN_20:
+		return "hb20";
+	case STAT_HISTOGRAM_BIN_30:
+		return "hb30";
+	}
 }
 
 
@@ -108,6 +155,7 @@ static inline SynCloudType toSynCloudType(const std::string &type_)
 	LOGW << "Wrong synthetic cloud type, assuming SPHERE";
 	return CLOUD_SPHERE;
 }
+}
 
 
 /**************************************************/
@@ -117,7 +165,7 @@ static inline SynCloudType toSynCloudType(const std::string &type_)
  */
 struct ClusteringParams
 {
-	ClusteringImplementation implementation; // Implementation of clustering to be used
+	Params::ClusteringImplementation implementation; // Implementation of clustering to be used
 	MetricPtr metric; // Metric to use in clustering execution
 	int clusterNumber; // Number of clusters used in the clustering test
 	int maxIterations; // Clustering max iterations
@@ -129,7 +177,7 @@ struct ClusteringParams
 	/**************************************************/
 	ClusteringParams()
 	{
-		implementation = CLUSTERING_OPENCV;
+		implementation = Params::CLUSTERING_OPENCV;
 		metric = MetricPtr();
 		clusterNumber = 5;
 		maxIterations = 10000;
@@ -144,7 +192,7 @@ struct ClusteringParams
 	{
 		std::ostringstream stream;
 		stream << std::boolalpha
-			   << "implementation:" << clusteringImp[implementation]
+			   << "implementation:" << Params::clusteringImp[implementation]
 			   << " metric:[" << metricType[metric->getType()] << "," << boost::algorithm::join(metric->getConstructionParams(), ",") << "]"
 			   << " clusterNumber:" << clusterNumber
 			   << " maxIterations:" << maxIterations
@@ -192,13 +240,13 @@ struct CloudSmoothingParams
 struct SyntheticCloudsParams
 {
 	bool useSynthetic; // Flag indicating if a synthetic cloud has to be generated
-	SynCloudType synCloudType; // Desired synthetic cloud
+	Params::SynCloudType synCloudType; // Desired synthetic cloud
 
 	/**************************************************/
 	SyntheticCloudsParams()
 	{
 		useSynthetic = false;
-		synCloudType = CLOUD_SPHERE;
+		synCloudType = Params::CLOUD_SPHERE;
 	}
 
 	/**************************************************/
@@ -207,7 +255,7 @@ struct SyntheticCloudsParams
 		std::stringstream stream;
 		stream << std::boolalpha
 			   << "useSynthetic:" << useSynthetic
-			   << " synCloudType:" << cloudType[synCloudType];
+			   << " synCloudType:" << Params::cloudType[synCloudType];
 		return stream.str();
 	}
 };

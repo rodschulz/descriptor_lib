@@ -56,7 +56,7 @@ public:
 	static void writeCodebook(const std::string &filename_,
 							  const cv::Mat &centers_,
 							  const ClusteringParams &clusteringParams_,
-							  const DescriptorType &type_,
+							  const Params::DescriptorType &type_,
 							  const float searchRadius_,
 							  const int nbands_ = -1,
 							  const int nbins_ = -1,

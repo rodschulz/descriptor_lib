@@ -32,7 +32,7 @@ struct DCHFixture
 		params->bidirectional = false;
 		params->useProjection = false;
 		params->sequenceBin = 1;
-		params->sequenceStat = STAT_MEAN;
+		params->stat = Params::STAT_MEAN;
 
 		paramsPtr = DescriptorParamsPtr(params);
 	}

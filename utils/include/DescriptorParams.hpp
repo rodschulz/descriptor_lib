@@ -12,6 +12,8 @@
 
 /**************************************************/
 /**************************************************/
+namespace Params
+{
 enum DescriptorType
 {
 	DESCRIPTOR_UNKNOWN,
@@ -29,6 +31,7 @@ static std::string descType[] = {
 	BOOST_STRINGIZE(DESCRIPTOR_PFH),
 	BOOST_STRINGIZE(DESCRIPTOR_ROPS)
 };
+}
 
 
 /**************************************************/
@@ -38,11 +41,11 @@ typedef boost::shared_ptr<DescriptorParams> DescriptorParamsPtr;
 
 struct DescriptorParams
 {
-	DescriptorType type; //  Descriptor type
+	Params::DescriptorType type; //  Descriptor type
 
 	DescriptorParams()
 	{
-		type = DESCRIPTOR_UNKNOWN;
+		type = Params::DESCRIPTOR_UNKNOWN;
 	}
 
 	/**************************************************/
@@ -55,10 +58,10 @@ struct DescriptorParams
 	virtual YAML::Node toNode() const = 0;
 
 	/**************************************************/
-	static DescriptorType toType(const std::string &type_);
+	static Params::DescriptorType toType(const std::string &type_);
 
 	/**************************************************/
-	static DescriptorParamsPtr create(const DescriptorType type_);
+	static DescriptorParamsPtr create(const Params::DescriptorType type_);
 };
 
 
@@ -72,7 +75,7 @@ struct DCHParams: public DescriptorParams
 	bool bidirectional; // True if each band is bidirectional
 	bool useProjection; // True if the angle calculation is using a projection
 	float sequenceBin; // Size of the bins used in the sequence construction
-	SequenceStat sequenceStat; // Statistic used in the descriptor
+	Params::Statistic stat; // Statistic used in the descriptor
 
 	float angle; // Orientation of the zero band (run time parameter)
 
@@ -80,14 +83,14 @@ struct DCHParams: public DescriptorParams
 	/**************************************************/
 	DCHParams()
 	{
-		type = DESCRIPTOR_DCH;
+		type = Params::DESCRIPTOR_DCH;
 		searchRadius = 0.05;
 		bandNumber = 4;
 		bandWidth = 0.01;
 		bidirectional = true;
 		useProjection = true;
 		sequenceBin = 0.01;
-		sequenceStat = STAT_MEAN;
+		stat = Params::STAT_MEAN;
 
 		angle  = 0;
 	}
@@ -120,7 +123,7 @@ struct SHOTParams: public DescriptorParams
 
 	SHOTParams()
 	{
-		type = DESCRIPTOR_SHOT;
+		type = Params::DESCRIPTOR_SHOT;
 		searchRadius = 0.03;
 	}
 

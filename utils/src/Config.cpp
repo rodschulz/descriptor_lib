@@ -56,7 +56,7 @@ bool Config::load(const std::string &filename_)
 			YAML::Node clusteringConfig = config["clustering"];
 
 			ClusteringParams *params = new ClusteringParams();
-			params->implementation = toClusteringImp(clusteringConfig["implementation"].as<std::string>());
+			params->implementation = Params::toClusteringImp(clusteringConfig["implementation"].as<std::string>());
 			std::vector<std::string> metricDetails = clusteringConfig["metric"].as<std::vector<std::string> >();
 			params->metric = MetricFactory::create(Metric::toType(metricDetails[0]), metricDetails);
 			params->clusterNumber = clusteringConfig["clusterNumber"].as<int>();
@@ -88,7 +88,7 @@ bool Config::load(const std::string &filename_)
 
 			SyntheticCloudsParams *params = new SyntheticCloudsParams();
 			params->useSynthetic = synthCloudConfig["generateCloud"].as<bool>();
-			params->synCloudType = toSynCloudType(synthCloudConfig["type"].as<std::string>());
+			params->synCloudType = Params::toSynCloudType(synthCloudConfig["type"].as<std::string>());
 
 			instance->syntheticCloudParams = params;
 		}

@@ -20,15 +20,15 @@ void Clustering::searchClusters(const cv::Mat &items_,
 	default:
 		std::cout << "WARNING: invalid clustering method. Falling back to OpenCV" << std::endl;
 
-	case CLUSTERING_OPENCV:
+	case Params::CLUSTERING_OPENCV:
 		cv::kmeans(items_, params_.clusterNumber, results_.labels, cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, params_.maxIterations, params_.stopThreshold), params_.attempts, cv::KMEANS_PP_CENTERS, results_.centers);
 		break;
 
-	case CLUSTERING_KMEANS:
+	case Params::CLUSTERING_KMEANS:
 		KMeans::searchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold);
 		break;
 
-	case CLUSTERING_STOCHASTIC:
+	case Params::CLUSTERING_STOCHASTIC:
 		KMeans::stochasticSearchClusters(results_, items_, params_.metric, params_.clusterNumber, params_.attempts, params_.maxIterations, params_.stopThreshold, items_.rows / 10);
 		break;
 	}
@@ -54,7 +54,7 @@ void Clustering::generateElbowGraph(const cv::Mat &items_,
 		searchClusters(items_, params_, results);
 
 		double sse;
-		if (params.implementation == CLUSTERING_OPENCV)
+		if (params.implementation == Params::CLUSTERING_OPENCV)
 			sse = Utils::getSSE(items_, results.centers, results.labels);
 		else
 			sse = ClusteringUtils::getSSE(items_, results.labels, results.centers, params_.metric);

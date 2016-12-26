@@ -179,23 +179,28 @@ BOOST_AUTO_TEST_SUITE(ExecutionParams_suite)
 
 BOOST_AUTO_TEST_CASE(strToSynCloudType)
 {
-	BOOST_CHECK_EQUAL(toSynCloudType("cube"), CLOUD_CUBE);
-	BOOST_CHECK_EQUAL(toSynCloudType("cylinder"), CLOUD_CYLINDER);
-	BOOST_CHECK_EQUAL(toSynCloudType("sphere"), CLOUD_SPHERE);
+	BOOST_CHECK_EQUAL(Params::toSynCloudType("cube"), Params::CLOUD_CUBE);
+	BOOST_CHECK_EQUAL(Params::toSynCloudType("cylinder"), Params::CLOUD_CYLINDER);
+	BOOST_CHECK_EQUAL(Params::toSynCloudType("sphere"), Params::CLOUD_SPHERE);
 }
 
 BOOST_AUTO_TEST_CASE(strToStatType)
 {
-	BOOST_CHECK_EQUAL(toStatType("mean"), STAT_MEAN);
-	BOOST_CHECK_EQUAL(toStatType("median"), STAT_MEDIAN);
-	BOOST_CHECK_EQUAL(toStatType("histogram"), STAT_HISTOGRAM);
+	BOOST_CHECK_EQUAL(Params::toStatType("mean"), Params::STAT_MEAN);
+	BOOST_CHECK_EQUAL(Params::toStatType("median"), Params::STAT_MEDIAN);
+	BOOST_CHECK_EQUAL(Params::toStatType("hist10"), Params::STAT_HISTOGRAM_10);
+	BOOST_CHECK_EQUAL(Params::toStatType("hist20"), Params::STAT_HISTOGRAM_20);
+	BOOST_CHECK_EQUAL(Params::toStatType("hist30"), Params::STAT_HISTOGRAM_30);
+	BOOST_CHECK_EQUAL(Params::toStatType("hb10"), Params::STAT_HISTOGRAM_BIN_10);
+	BOOST_CHECK_EQUAL(Params::toStatType("hb20"), Params::STAT_HISTOGRAM_BIN_20);
+	BOOST_CHECK_EQUAL(Params::toStatType("hb30"), Params::STAT_HISTOGRAM_BIN_30);
 }
 
 BOOST_AUTO_TEST_CASE(strToClusteringImp)
 {
-	BOOST_CHECK_EQUAL(toClusteringImp("opencv"), CLUSTERING_OPENCV);
-	BOOST_CHECK_EQUAL(toClusteringImp("kmeans"), CLUSTERING_KMEANS);
-	BOOST_CHECK_EQUAL(toClusteringImp("stochastic"), CLUSTERING_STOCHASTIC);
+	BOOST_CHECK_EQUAL(Params::toClusteringImp("opencv"), Params::CLUSTERING_OPENCV);
+	BOOST_CHECK_EQUAL(Params::toClusteringImp("kmeans"), Params::CLUSTERING_KMEANS);
+	BOOST_CHECK_EQUAL(Params::toClusteringImp("stochastic"), Params::CLUSTERING_STOCHASTIC);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -216,7 +221,7 @@ BOOST_AUTO_TEST_CASE(DCH_constructor)
 	BOOST_CHECK_EQUAL(params.bidirectional, true);
 	BOOST_CHECK_EQUAL(params.useProjection, true);
 	BOOST_CHECK_CLOSE(params.sequenceBin, 0.01, 1e-5);
-	BOOST_CHECK_EQUAL(params.sequenceStat, STAT_MEAN);
+	BOOST_CHECK_EQUAL(params.stat, Params::STAT_MEAN);
 }
 
 BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularRange)
@@ -270,7 +275,7 @@ BOOST_AUTO_TEST_CASE(constructor)
 
 	ClusteringParams params;
 
-	BOOST_CHECK_EQUAL(params.implementation, CLUSTERING_OPENCV);
+	BOOST_CHECK_EQUAL(params.implementation, Params::CLUSTERING_OPENCV);
 	BOOST_CHECK_EQUAL(params.metric, MetricPtr());
 	BOOST_CHECK_EQUAL(params.clusterNumber, 5);
 	BOOST_CHECK_EQUAL(params.maxIterations, 10000);
@@ -312,7 +317,7 @@ BOOST_AUTO_TEST_CASE(constructor)
 	SyntheticCloudsParams params;
 
 	BOOST_CHECK_EQUAL(params.useSynthetic, false);
-	BOOST_CHECK_EQUAL(params.synCloudType, CLOUD_SPHERE);
+	BOOST_CHECK_EQUAL(params.synCloudType, Params::CLOUD_SPHERE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -145,7 +145,7 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
 
 
-	if (params->sequenceStat == STAT_HISTOGRAM)
+	if (params->stat == Params::STAT_HISTOGRAM_20)
 	{
 		std::vector<Histogram> histograms = generateAngleHistograms(descriptor_, params->useProjection);
 		for (size_t i = 0; i < histograms.size(); i++)
@@ -191,7 +191,7 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 			{
 				if (dataMap.find(j) != dataMap.end())
 				{
-					float value = params->sequenceStat == STAT_MEAN
+					float value = params->stat == Params::STAT_MEAN
 								  ? (float) mean(dataMap[j])
 								  : (float) median(dataMap[j]);
 					band->descriptor.push_back(value);

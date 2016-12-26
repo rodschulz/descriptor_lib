@@ -412,29 +412,29 @@ void Writer::writeClustersCenters(const std::string &filename_,
 void Writer::writeCodebook(const std::string &filename_,
 						   const cv::Mat &centers_,
 						   const ClusteringParams &clusteringParams_,
-						   const DescriptorType &type_,
+						   const Params::DescriptorType &type_,
 						   const float searchRadius_,
 						   const int nbands_,
 						   const int nbins_,
 						   const bool bidirectional_)
 {
-	std::string str = "type:" + descType[type_];
+	std::string str = "type:" + Params::descType[type_];
 	switch (type_)
 	{
 	default:
 		std::runtime_error("Wrong descriptor type to generate codebook");
 
-	case DESCRIPTOR_DCH:
+	case Params::DESCRIPTOR_DCH:
 		str += " searchRadius:" + boost::lexical_cast<std::string>(searchRadius_)
 			   + " bandNumber:" + boost::lexical_cast<std::string>(nbands_)
 			   + " binNumber:" + boost::lexical_cast<std::string>(nbins_)
 			   + " bidirectional:" + (bidirectional_ ? "true" : "false");
 		break;
 
-	case DESCRIPTOR_SHOT:
-	case DESCRIPTOR_USC:
-	case DESCRIPTOR_PFH:
-	case DESCRIPTOR_ROPS:
+	case Params::DESCRIPTOR_SHOT:
+	case Params::DESCRIPTOR_USC:
+	case Params::DESCRIPTOR_PFH:
+	case Params::DESCRIPTOR_ROPS:
 		str += " searchRadius:" + boost::lexical_cast<std::string>(searchRadius_);
 		break;
 	}

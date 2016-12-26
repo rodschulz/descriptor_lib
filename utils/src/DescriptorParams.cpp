@@ -7,44 +7,44 @@
 #include <pcl/pcl_macros.h>
 
 
-DescriptorType DescriptorParams::toType(const std::string &type_)
+Params::DescriptorType DescriptorParams::toType(const std::string &type_)
 {
-	if (boost::iequals(type_, "DCH") || boost::iequals(type_, descType[DESCRIPTOR_DCH]))
-		return DESCRIPTOR_DCH;
-	else if (boost::iequals(type_, "SHOT") || boost::iequals(type_, descType[DESCRIPTOR_SHOT]))
-		return DESCRIPTOR_SHOT;
-	else if (boost::iequals(type_, "USC") || boost::iequals(type_, descType[DESCRIPTOR_USC]))
-		return DESCRIPTOR_USC;
-	else if (boost::iequals(type_, "PFH") || boost::iequals(type_, descType[DESCRIPTOR_PFH]))
-		return DESCRIPTOR_PFH;
-	else if (boost::iequals(type_, "ROPS") || boost::iequals(type_, descType[DESCRIPTOR_ROPS]))
-		return DESCRIPTOR_ROPS;
+	if (boost::iequals(type_, "DCH") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_DCH]))
+		return Params::DESCRIPTOR_DCH;
+	else if (boost::iequals(type_, "SHOT") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_SHOT]))
+		return Params::DESCRIPTOR_SHOT;
+	else if (boost::iequals(type_, "USC") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_USC]))
+		return Params::DESCRIPTOR_USC;
+	else if (boost::iequals(type_, "PFH") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_PFH]))
+		return Params::DESCRIPTOR_PFH;
+	else if (boost::iequals(type_, "ROPS") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_ROPS]))
+		return Params::DESCRIPTOR_ROPS;
 
 	LOGW << "Wrong descriptor type, assuming DCH";
-	return DESCRIPTOR_DCH;
+	return Params::DESCRIPTOR_DCH;
 }
 
-DescriptorParamsPtr DescriptorParams::create(const DescriptorType type_)
+DescriptorParamsPtr DescriptorParams::create(const Params::DescriptorType type_)
 {
 	switch (type_)
 	{
 	default:
-	case DESCRIPTOR_UNKNOWN:
+	case Params::DESCRIPTOR_UNKNOWN:
 		LOGW << "Bad descriptor type for params instantiation, assuming DCH";
 
-	case DESCRIPTOR_DCH:
+	case Params::DESCRIPTOR_DCH:
 		return DescriptorParamsPtr(new DCHParams());
 
-	case DESCRIPTOR_SHOT:
+	case Params::DESCRIPTOR_SHOT:
 		return DescriptorParamsPtr(new SHOTParams());
 
-	case DESCRIPTOR_USC:
+	case Params::DESCRIPTOR_USC:
 		return DescriptorParamsPtr();
 
-	case DESCRIPTOR_PFH:
+	case Params::DESCRIPTOR_PFH:
 		return DescriptorParamsPtr();
 
-	case DESCRIPTOR_ROPS:
+	case Params::DESCRIPTOR_ROPS:
 		return DescriptorParamsPtr();
 	}
 }
@@ -60,41 +60,28 @@ void DCHParams::load(const YAML::Node &config_)
 	bidirectional = config_["bidirectional"].as<bool>();
 	useProjection = config_["useProjection"].as<bool>();
 	sequenceBin = config_["sequenceBin"].as<float>();
-	sequenceStat = toStatType(config_["sequenceStat"].as<std::string>());
+	stat = Params::toStatType(config_["stat"].as<std::string>());
 }
 
 std::string DCHParams::toString() const
 {
 	std::stringstream stream;
 	stream << std::boolalpha
-		   << "type:" << descType[type]
+		   << "type:" << Params::descType[type]
 		   << " searchRadius:" << searchRadius
 		   << " bandNumber:" << bandNumber
 		   << " bandWidth:" << bandWidth
 		   << " bidirectional:" << bidirectional
 		   << " useProjection:" << useProjection
 		   << " sequenceBin:" << sequenceBin
-		   << " sequenceStat:" << seqStat[sequenceStat];
+		   << " stat:" << Params::seqStat[stat];
 	return stream.str();
 }
 
 YAML::Node DCHParams::toNode() const
 {
-	std::string sType = descType[type].substr(11);
-	std::string stat;
-	switch (sequenceStat)
-	{
-	default:
-	case STAT_MEAN:
-		stat = "mean";
-		break;
-	case STAT_MEDIAN:
-		stat = "median";
-		break;
-	case STAT_HISTOGRAM:
-		stat = "histogram";
-		break;
-	}
+	std::string sType = Params::descType[type].substr(11);
+	std::string statString = Params::toString(stat);
 
 	YAML::Node node;
 	node["type"] = sType;
@@ -104,17 +91,38 @@ YAML::Node DCHParams::toNode() const
 	node[sType]["bidirectional"] = bidirectional;
 	node[sType]["useProjection"] = useProjection;
 	node[sType]["sequenceBin"] = sequenceBin;
-	node[sType]["sequenceStat"] = stat;
+	node[sType]["stat"] = statString;
 
 	return node;
 }
 
 int DCHParams::getSequenceLength() const
 {
-	if (sequenceStat != STAT_HISTOGRAM)
+	switch (stat)
+	{
+	default:
+	case Params::STAT_MEAN:
+	case Params::STAT_MEDIAN:
 		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
-	else
-		return ceil(((M_PI / 2) - (-M_PI / 2)) / DEG2RAD(20)); // TODO improve this, so can be dynamically calculated
+
+	case Params::STAT_HISTOGRAM_10:
+		return ceil(M_PI / DEG2RAD(10));
+
+	case Params::STAT_HISTOGRAM_20:
+		return ceil(M_PI / DEG2RAD(20));
+
+	case Params::STAT_HISTOGRAM_30:
+		return ceil(M_PI / DEG2RAD(30));
+
+	case Params::STAT_HISTOGRAM_BIN_10:
+		return ceil(M_PI / DEG2RAD(10)) * 2;
+
+	case Params::STAT_HISTOGRAM_BIN_20:
+		return ceil(M_PI / DEG2RAD(20)) * 2;
+
+	case Params::STAT_HISTOGRAM_BIN_30:
+		return ceil(M_PI / DEG2RAD(30)) * 2;
+	}
 }
 
 float DCHParams::getBandsAngularRange() const
@@ -142,14 +150,14 @@ std::string SHOTParams::toString() const
 {
 	std::stringstream stream;
 	stream << std::boolalpha
-		   << "type:" << descType[type]
+		   << "type:" << Params::descType[type]
 		   << " searchRadius:" << searchRadius;
 	return stream.str();
 }
 
 YAML::Node SHOTParams::toNode() const
 {
-	std::string sType = descType[type].substr(11);
+	std::string sType = Params::descType[type].substr(11);
 
 	YAML::Node node;
 	node["type"] = sType;
