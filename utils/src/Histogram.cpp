@@ -64,19 +64,23 @@ Bins Histogram::getBins(const double binSize_,
 	b.dimension = dimension;
 
 	// Put elements in bins
-	int outElements = 0;
-	for (size_t i = 0; i < data.size(); i++)
+	if (!data.empty())
 	{
-		int index = ((data[i] - lowerBound_) / binSize_);
-		if (index >= binNumber)
-			outElements++;
-		else
-			b.bins[index]++;
-	}
+		int outElements = 0;
+		for (size_t i = 0; i < data.size(); i++)
+		{
+			int index = ((data[i] - lowerBound_) / binSize_);
+			if (index >= binNumber)
+				outElements++;
+			else
+				b.bins[index]++;
+		}
 
-	// Normalize
-	for (int i = 0; i < binNumber; i++)
-		b.bins[i] /= (data.size() - outElements);
+		// Normalize
+		int size = data.size() - outElements;
+		for (int i = 0; i < binNumber && size > 0; i++)
+			b.bins[i] /= size;
+	}
 
 	return b;
 }

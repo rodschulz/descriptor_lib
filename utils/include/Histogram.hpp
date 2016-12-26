@@ -12,6 +12,8 @@ enum Dimension
 	ANGLE, OTHER
 };
 
+
+/**************************************************/
 struct Bins
 {
 	std::vector<double> bins;
@@ -33,6 +35,8 @@ struct Bins
 	}
 };
 
+
+/**************************************************/
 class Histogram
 {
 public:
