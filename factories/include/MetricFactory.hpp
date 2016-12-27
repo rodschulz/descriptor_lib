@@ -38,7 +38,7 @@ public:
 
 				DCHParams *params = dynamic_cast<DCHParams *>(Config::getDescriptorParams().get());
 				if (params)
-					size = params->getSequenceLength();
+					size = params->sizePerBand();
 				else
 				{
 					LOGW << "'conf' arg incompatible with selected descriptor, changing to EuclideanMetric";

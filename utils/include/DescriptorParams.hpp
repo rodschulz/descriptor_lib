@@ -105,13 +105,13 @@ struct DCHParams: public DescriptorParams
 	YAML::Node toNode() const;
 
 	/**************************************************/
-	int getSequenceLength() const;
+	int sizePerBand() const;
 
 	/**************************************************/
-	float getBandsAngularRange() const;
+	float bandsAngleRange() const;
 
 	/**************************************************/
-	float getBandsAngularStep() const;
+	float bandsAngleStep() const;
 };
 
 

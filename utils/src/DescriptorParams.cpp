@@ -74,7 +74,7 @@ std::string DCHParams::toString() const
 		   << " bidirectional:" << bidirectional
 		   << " useProjection:" << useProjection
 		   << " sequenceBin:" << sequenceBin
-		   << " stat:" << Params::seqStat[stat];
+		   << " stat:" << Params::stat[stat];
 	return stream.str();
 }
 
@@ -96,7 +96,7 @@ YAML::Node DCHParams::toNode() const
 	return node;
 }
 
-int DCHParams::getSequenceLength() const
+int DCHParams::sizePerBand() const
 {
 	switch (stat)
 	{
@@ -125,7 +125,7 @@ int DCHParams::getSequenceLength() const
 	}
 }
 
-float DCHParams::getBandsAngularRange() const
+float DCHParams::bandsAngleRange() const
 {
 	if (bidirectional)
 		return M_PI;
@@ -133,9 +133,9 @@ float DCHParams::getBandsAngularRange() const
 		return 2 * M_PI;
 }
 
-float DCHParams::getBandsAngularStep() const
+float DCHParams::bandsAngleStep() const
 {
-	return getBandsAngularRange() / bandNumber;
+	return bandsAngleRange() / bandNumber;
 }
 
 

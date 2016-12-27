@@ -66,7 +66,7 @@ BOOST_FIXTURE_TEST_CASE(calculateDescriptor, DCHFixture)
 		BOOST_CHECK(!descriptor1[i]->descriptor.empty());
 }
 
-BOOST_FIXTURE_TEST_CASE(fillSequences_plane, DCHFixture)
+BOOST_FIXTURE_TEST_CASE(fillDescriptor_plane, DCHFixture)
 {
 	targetPoint = 10081;
 
@@ -76,17 +76,17 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_plane, DCHFixture)
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	DCH::fillSequences(bands, paramsPtr);
+	DCH::fillDescriptor(bands, paramsPtr);
 
-	int sequenceSize = params->getSequenceLength();
+	int bandSize = params->sizePerBand();
 	for (int i = 0; i < params->bandNumber; i++)
 	{
-		BOOST_CHECK_EQUAL(bands[i]->descriptor.size(), sequenceSize);
+		BOOST_CHECK_EQUAL(bands[i]->descriptor.size(), bandSize);
 		BOOST_CHECK(std::find_if(bands[i]->descriptor.begin(), bands[i]->descriptor.end(), diffThanZero) == bands[i]->descriptor.end());
 	}
 }
 
-BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, DCHFixture)
+BOOST_FIXTURE_TEST_CASE(fillDescriptor_halfSphere, DCHFixture)
 {
 	targetPoint = 10577;
 	params->sequenceBin = 0.5;
@@ -97,12 +97,12 @@ BOOST_FIXTURE_TEST_CASE(fillSequences_halfSphere, DCHFixture)
 	// Extract bands
 	pcl::PointNormal point = cloud->at(targetPoint);
 	std::vector<BandPtr> bands = Extractor::getBands(cloud, point, params);
-	DCH::fillSequences(bands, paramsPtr);
+	DCH::fillDescriptor(bands, paramsPtr);
 
-	int sequenceSize = params->getSequenceLength();
+	int bandSize = params->sizePerBand();
 	for (int i = 0; i < params->bandNumber; i++)
 	{
-		BOOST_CHECK_EQUAL(bands[i]->descriptor.size(), sequenceSize);
+		BOOST_CHECK_EQUAL(bands[i]->descriptor.size(), bandSize);
 		BOOST_CHECK(std::find_if(bands[i]->descriptor.begin(), bands[i]->descriptor.end(), diffThanZero) != bands[i]->descriptor.end());
 	}
 }
@@ -149,9 +149,9 @@ BOOST_FIXTURE_TEST_CASE(getBands_no_bidirectional, DCHFixture)
 		Eigen::Vector3f nextNormal = bands[(i + 1) % params->bandNumber]->plane.normal();
 
 		// Check the angular difference is less than a 0.5 percent
-		BOOST_CHECK_CLOSE(Utils::angle(normal, nextNormal), params->getBandsAngularStep(), 0.5);
+		BOOST_CHECK_CLOSE(Utils::angle(normal, nextNormal), params->bandsAngleStep(), 0.5);
 		// Check the angular difference is less than 0.005 radians (0.28 degrees aprox)
-		BOOST_CHECK_SMALL(fabs(Utils::angle(normal, nextNormal) - params->getBandsAngularStep()), 5E-3);
+		BOOST_CHECK_SMALL(fabs(Utils::angle(normal, nextNormal) - params->bandsAngleStep()), 5E-3);
 
 		// Check each band's plane is perpendicular (goes along splitting the band in two)
 		BOOST_CHECK_SMALL(pointNormal.dot(normal), 1E-10f);
@@ -182,7 +182,7 @@ BOOST_FIXTURE_TEST_CASE(getBands_bidirectional, DCHFixture)
 		Eigen::Vector3f normal = bands[i]->plane.normal();
 		Eigen::Vector3f nextNormal = bands[(i + 1) % params->bandNumber]->plane.normal();
 
-		float step = i != params->bandNumber - 1 ? params->getBandsAngularStep() : M_PI - params->getBandsAngularStep();
+		float step = i != params->bandNumber - 1 ? params->bandsAngleStep() : M_PI - params->bandsAngleStep();
 
 		// Check the angular difference is less than a 0.5 percent
 		BOOST_CHECK_CLOSE(Utils::angle(normal, nextNormal), step, 0.5);

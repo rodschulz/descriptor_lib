@@ -224,42 +224,50 @@ BOOST_AUTO_TEST_CASE(DCH_constructor)
 	BOOST_CHECK_EQUAL(params.stat, Params::STAT_MEAN);
 }
 
-BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularRange)
+BOOST_AUTO_TEST_CASE(DCHParams_bandsAngleRange)
 {
 	DCHParams params;
 
 	params.bidirectional = true;
-	BOOST_CHECK_CLOSE(params.getBandsAngularRange(), M_PI, 1e-5);
+	BOOST_CHECK_CLOSE(params.bandsAngleRange(), M_PI, 1e-5);
 	params.bidirectional = false;
-	BOOST_CHECK_CLOSE(params.getBandsAngularRange(), 2 * M_PI, 1e-5);
+	BOOST_CHECK_CLOSE(params.bandsAngleRange(), 2 * M_PI, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(DCHParams_getBandsAngularStep)
+BOOST_AUTO_TEST_CASE(DCHParams_bandsAngleStep)
 {
 	DCHParams params;
 
 	params.bidirectional = true;
 	params.bandNumber = 10;
-	BOOST_CHECK_CLOSE(params.getBandsAngularStep(), M_PI / 10, 1e-5);
+	BOOST_CHECK_CLOSE(params.bandsAngleStep(), M_PI / 10, 1e-5);
 
 	params.bidirectional = false;
 	params.bandNumber = 10;
-	BOOST_CHECK_CLOSE(params.getBandsAngularStep(), M_PI / 5, 1e-5);
+	BOOST_CHECK_CLOSE(params.bandsAngleStep(), M_PI / 5, 1e-5);
 }
 
-BOOST_AUTO_TEST_CASE(DCHParams_getSequenceLength)
+BOOST_AUTO_TEST_CASE(DCHParams_sizePerBand)
 {
 	DCHParams params;
 
 	params.bidirectional = true;
 	params.searchRadius = 10;
 	params.sequenceBin = 2;
-	BOOST_CHECK_EQUAL(params.getSequenceLength(), 10);
-
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 10);
 	params.bidirectional = false;
 	params.searchRadius = 10;
 	params.sequenceBin = 2;
-	BOOST_CHECK_EQUAL(params.getSequenceLength(), 5);
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 5);
+
+	params.stat = Params::STAT_HISTOGRAM_10;
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 18);
+
+	params.stat = Params::STAT_HISTOGRAM_20;
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 9);
+
+	params.stat = Params::STAT_HISTOGRAM_30;
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -69,7 +69,7 @@ Extractor::getBands(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	// Create the lines defining each band and also each band's longitudinal plane
 	std::vector<Eigen::ParametrizedLine<float, 3> > lines;
 	std::vector<Eigen::Vector3f> normals, directors;
-	double angleStep = params_->getBandsAngularStep();
+	double angleStep = params_->bandsAngleStep();
 	for (int i = 0; i < params_->bandNumber; i++)
 	{
 		// Calculate the line's director std::vector and define the line

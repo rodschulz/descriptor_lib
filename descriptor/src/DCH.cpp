@@ -7,7 +7,7 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
 #include <boost/accumulators/statistics/count.hpp>
-#include <map>
+#include <plog/Log.h>
 #include "Config.hpp"
 #include "CloudFactory.hpp"
 #include "PointFactory.hpp"
@@ -66,7 +66,7 @@ std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNo
 
 	// Extract bands
 	std::vector<BandPtr> bands = Extractor::getBands(patch, target_, params);
-	DCH::fillSequences(bands, params_);
+	DCH::fillDescriptor(bands, params_);
 
 	return bands;
 }
@@ -76,7 +76,7 @@ void DCH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 					   cv::Mat &descriptors_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
-	int sequenceSize = params->getSequenceLength();
+	int sequenceSize = params->sizePerBand();
 
 	// Resize the matrix in case it doesn't match the required dimensions
 	int rows = cloud_->size();
@@ -101,7 +101,7 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 					   const std::string &debugId_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
-	int sequenceSize = params->getSequenceLength();
+	int sequenceSize = params->sizePerBand();
 
 	std::vector<BandPtr> bands = DCH::calculateDescriptor(cloud_, params_, target_);
 	descriptor_.resize(sequenceSize * bands.size(), 1);
@@ -112,21 +112,20 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 
 
 	DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
-	// DEBUG_generateAxes(patch, bands, params->searchRadius, debugId_, params->bidirectional);
 }
 
-std::vector<Histogram> DCH::generateAngleHistograms(const std::vector<BandPtr> &descriptor_,
+std::vector<Histogram> DCH::generateAngleHistograms(const std::vector<BandPtr> &bands_,
 		const bool useProjection_)
 {
 	// TODO move this method to the output class, since this is only to generate the histogram generated as output
 
 	std::vector<Histogram> histograms = std::vector<Histogram>();
-	histograms.reserve(descriptor_.size());
+	histograms.reserve(bands_.size());
 
-	Eigen::Vector3f targetNormal = descriptor_[0]->origin.getNormalVector3fMap();
-	for (size_t i = 0; i < descriptor_.size(); i++)
+	Eigen::Vector3f targetNormal = bands_[0]->origin.getNormalVector3fMap();
+	for (size_t i = 0; i < bands_.size(); i++)
 	{
-		BandPtr band = descriptor_[i];
+		BandPtr band = bands_[i];
 		histograms.push_back(Histogram(ANGLE));
 
 		for (size_t j = 0; j < band->points->size(); j++)
@@ -139,31 +138,23 @@ std::vector<Histogram> DCH::generateAngleHistograms(const std::vector<BandPtr> &
 	return histograms;
 }
 
-void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
-						const DescriptorParamsPtr &params_)
+void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
+						 const DescriptorParamsPtr &params_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
+	LOGD << "Filling " << Params::stat[params->stat];
 
 
-	if (params->stat == Params::STAT_HISTOGRAM_20)
+	switch (params->stat)
 	{
-		std::vector<Histogram> histograms = generateAngleHistograms(descriptor_, params->useProjection);
-		for (size_t i = 0; i < histograms.size(); i++)
-		{
-			Bins b = histograms[i].getBins(DEG2RAD(20), -M_PI / 2, M_PI / 2);
-			descriptor_[i]->descriptor.clear();
-			descriptor_[i]->descriptor.insert(descriptor_[i]->descriptor.begin(), b.bins.begin(), b.bins.end());
-		}
-	}
-	else
+	default:
+	case Params::STAT_MEAN:
+	case Params::STAT_MEDIAN:
 	{
-		double binSize = params->sequenceBin;
-		int binsNumber = params->getSequenceLength();
-
-
-		for (size_t i = 0; i < descriptor_.size(); i++)
+		int nbins = params->sizePerBand();
+		for (size_t i = 0; i < bands_.size(); i++)
 		{
-			BandPtr band = descriptor_[i];
+			BandPtr band = bands_[i];
 
 			Eigen::Vector3f pointNormal = band->origin.getNormalVector3fMap();
 			Eigen::Vector3f planeNormal = band->plane.normal();
@@ -177,7 +168,7 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 			{
 				pcl::PointNormal p = band->points->at(j);
 				double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, params->useProjection);
-				int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / binSize;
+				int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / params->sequenceBin;
 
 				if (dataMap.find(index) == dataMap.end())
 					dataMap[index] = accumulator_set<double, features<tag::mean, tag::median, tag::min> >();
@@ -187,7 +178,7 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 
 
 			// Fill the descriptor
-			for (int j = 0; j < binsNumber; j++)
+			for (int j = 0; j < nbins; j++)
 			{
 				if (dataMap.find(j) != dataMap.end())
 				{
@@ -200,5 +191,32 @@ void DCH::fillSequences(std::vector<BandPtr> &descriptor_,
 					band->descriptor.push_back(5);
 			}
 		}
+	}
+	break;
+
+	case Params::STAT_HISTOGRAM_10:
+	case Params::STAT_HISTOGRAM_20:
+	case Params::STAT_HISTOGRAM_30:
+	{
+		float angleStep = params->stat == Params::STAT_HISTOGRAM_10
+						  ? 10
+						  : (params->stat == Params::STAT_HISTOGRAM_20 ? 20 : 30);
+		LOGD << "...angle step " << angleStep;
+
+		std::vector<Histogram> histograms = generateAngleHistograms(bands_, params->useProjection);
+		for (size_t i = 0; i < histograms.size(); i++)
+		{
+			Bins b = histograms[i].getBins(DEG2RAD(angleStep), -M_PI / 2, M_PI / 2);
+			bands_[i]->descriptor.clear();
+			bands_[i]->descriptor.insert(bands_[i]->descriptor.begin(), b.bins.begin(), b.bins.end());
+		}
+	}
+	break;
+
+	case Params::STAT_HISTOGRAM_BIN_10:
+	case Params::STAT_HISTOGRAM_BIN_20:
+	case Params::STAT_HISTOGRAM_BIN_30:
+	{}
+	break;
 	}
 }

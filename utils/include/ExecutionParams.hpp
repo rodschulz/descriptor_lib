@@ -31,7 +31,7 @@ enum Statistic
 	STAT_HISTOGRAM_BIN_20,
 	STAT_HISTOGRAM_BIN_30,
 };
-static std::string seqStat[] =
+static std::string stat[] =
 {
 	BOOST_STRINGIZE(STAT_MEAN),
 	BOOST_STRINGIZE(STAT_MEDIAN),

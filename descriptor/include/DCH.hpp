@@ -40,8 +40,8 @@ public:
 			const bool useProjection_);
 
 	/**************************************************/
-	static void fillSequences(std::vector<BandPtr> &descriptor_,
-							  const DescriptorParamsPtr &params_);
+	static void fillDescriptor(std::vector<BandPtr> &descriptor_,
+							   const DescriptorParamsPtr &params_);
 
 	/**************************************************/
 	static inline char getSequenceChar(const double value_,
