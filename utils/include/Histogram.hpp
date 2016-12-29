@@ -54,6 +54,12 @@ public:
 	/**************************************************/
 	Bins getBins(const double binSize_) const;
 
+	/**************************************************/
+	Dimension getDimension() const
+	{
+		return dimension;
+	};
+
 private:
 	std::vector<double> data;
 	double minData;

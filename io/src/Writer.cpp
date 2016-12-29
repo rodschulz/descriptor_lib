@@ -22,10 +22,10 @@
 
 
 #define MATRIX_DIMENSIONS			"dims"
-#define SCRIPT_HISTOGRAM_NAME       OUTPUT_DIR "histogramPlot.script"
-#define SCRIPT_SSE_NAME             OUTPUT_DIR "ssePlot.script"
-#define HISTOGRAM_DATA_FILE         OUTPUT_DIR "histogram.dat"
-#define SSE_DATA_FILE               OUTPUT_DIR "sse.dat"
+#define SCRIPT_HISTOGRAM_NAME		OUTPUT_DIR "histogram.script"
+#define SCRIPT_SSE_NAME				OUTPUT_DIR "sse.script"
+#define HISTOGRAM_DATA_FILE			OUTPUT_DIR "histogram.dat"
+#define SSE_DATA_FILE				OUTPUT_DIR "sse.dat"
 
 
 void Writer::writeHistogram(const std::string &filename_,
@@ -37,54 +37,43 @@ void Writer::writeHistogram(const std::string &filename_,
 {
 	if (!histograms_.empty())
 	{
-		bool axesCreated = false;
+		bool labelsDone = false;
+		Dimension dimension = histograms_[0].getDimension();
+
 		std::vector<std::string> rows;
-		std::ostringstream stream;
-		Dimension dimension = ANGLE;
+		// rows.resize(histograms_.size() + 1);
 
-
-		// Precision for the plot data
-		stream << std::fixed << std::setprecision(4);
-
+		// Generate header row
+		rows.push_back("Angle");
+		for (size_t i = 0; i < histograms_.size(); i++)
+			rows[0] += "\tBand" + boost::lexical_cast<std::string>(i + 1);
 
 		// Generate data to plot
+		double limit = dimension == ANGLE ? RAD2DEG(lowerBound_) : lowerBound_;
 		for (size_t i = 0; i < histograms_.size(); i++)
 		{
-			Bins b = (lowerBound_ == -1 || upperBound_ == -1)
-					 ? histograms_[i].getBins(binSize_)
-					 : histograms_[i].getBins(binSize_, lowerBound_, upperBound_);
-			int binsNumber = b.bins.size();
+			Bins b = histograms_[i].getBins(binSize_, lowerBound_, upperBound_);
+			double step = dimension == ANGLE ? RAD2DEG(b.step) : b.step;
+			int nbins = b.bins.size();
 
-			// Create axes if not already created
-			if (!axesCreated)
+			if (!labelsDone)
+				rows.resize(rows.size() + b.bins.size());
+
+			for (int j = 0; j < nbins; j++)
 			{
-				rows.resize(binsNumber);
-				dimension = b.dimension;
-
-				double step = dimension == ANGLE ? RAD2DEG(b.step) : b.step;
-				double boundary = dimension == ANGLE ? RAD2DEG(lowerBound_) : lowerBound_;
-				for (int j = 0; j < binsNumber; j++)
+				if (!labelsDone)
 				{
-					stream.str(std::string());
-					stream << (step * j + boundary);
-					rows[j] = stream.str();
+					rows[j + 1] = "[" + boost::lexical_cast<std::string>(round(limit)) + ","
+								  + boost::lexical_cast<std::string>(round(limit + step)) + ")";
+					limit += step;
 				}
-				axesCreated = true;
-			}
 
-			for (int j = 0; j < binsNumber; j++)
-			{
-				stream.str(std::string());
-				stream << "\t" << b.bins[j];
-				rows[j] += stream.str();
+				rows[j + 1] += "\t" + boost::lexical_cast<std::string>( b.bins[j]);
 			}
+			labelsDone = true;
 		}
 
-		// Generate the plotting script
-		double step = dimension == ANGLE ? RAD2DEG(binSize_) : binSize_;
-		double lower = dimension == ANGLE ? RAD2DEG(lowerBound_) : lowerBound_;
-		double upper = dimension == ANGLE ? RAD2DEG(upperBound_) : upperBound_;
-		generateHistogramScript(filename_, histogramTitle_, histograms_.size(), step, lower, upper);
+		generateHistogramScript(filename_, histogramTitle_, histograms_.size());
 
 		// Generate data file
 		std::ofstream output;
@@ -103,48 +92,57 @@ void Writer::writeHistogram(const std::string &filename_,
 
 void Writer::generateHistogramScript(const std::string &filename_,
 									 const std::string &histogramTitle_,
-									 const int bandsNumber_,
-									 const double binSize_,
-									 const double lowerLimit_,
-									 const double upperLimit_)
+									 const int nbands_)
 {
 	std::ofstream output;
 	output.open(SCRIPT_HISTOGRAM_NAME, std::fstream::out);
 
-	output << "set title '" << histogramTitle_ << "'\n";
-	output << "set ylabel 'Percentage'\n";
-	output << "set xlabel 'Degrees'\n\n";
+	output << "clear\n"
+		   << "reset\n\n";
 
-	output << "set xrange [" << lowerLimit_ << ":" << upperLimit_ << "]\n";
-	output << "set yrange [0:1]\n";
-	output << "set grid ytics xtics\n\n";
+	output << "set term png size 1024,768\n"
+		   << "set output '" << OUTPUT_DIR << filename_ << ".png'\n\n\n";
 
-	output << "set xtics " << binSize_ << "\n";
-	output << "set xtics font 'Verdana,9'\n";
-	output << "set xtics rotate by -50\n";
-	output << "set xtics (";
+	output << "set style data histogram\n"
+		   << "set style fill solid border\n"
+		   << "set style histogram clustered gap 1\n\n\n";
 
-	// int binNumber = ceil((upperLimit_ - lowerLimit_) / binSize_);
-	// double offset = binNumber % 2 > 0 ? 0 : -0.5 * binSize_;
-	double offset = 0;
+	output << "set tmargin 0\n"
+		   << "set bmargin 0\n"
+		   << "set lmargin 5\n"
+		   << "set rmargin 9\n\n\n";
 
-	for (double pos = lowerLimit_ + offset; pos < upperLimit_; pos += binSize_)
-		output << "'[" << round(pos) << ", " << round(pos + binSize_) << ")' " << pos - offset << (pos + binSize_ <= upperLimit_ ? ", " : "");
-	output << ")\n\n";
+	output << "set multiplot layout 9,1 title '" << histogramTitle_ << "' font \"Verdana, 14\"\n\n\n";
 
-	output << "set style data linespoints\n\n";
+	output << "set yrange [0:1]\n"
+		   << "set xrange [-0.5:8.5]\n\n\n";
 
-	output << "set term png  size 1024,768\n";
-	output << "set output '" << OUTPUT_DIR << filename_ << ".png'\n\n";
+	output << "set format x \"\"\n"
+		   << "set xtics nomirror  scale 0.5\n"
+		   << "set ytics (0.25, 0.5, 0.75) font \"Verdana,8\" scale 0.5\n"
+		   << "set grid ytics xtics\n\n\n";
 
-	output << "plot \\\n";
-	for (int i = 0; i < bandsNumber_; i++)
-		output << "'" << HISTOGRAM_DATA_FILE
-			   << "' using 1:" << i + 2 << " title 'Band "
-			   << i
-			   << "' with linespoints lw 2 lc rgb '#" << Utils::num2Hex(Utils::palette12(i + 1)) << "' pt 2"
-			   << (i == bandsNumber_ - 1 ? "\n" : ", \\\n") ;
+	output << "set key outside right font \"Verdana,10\" samplen 0\n"
+		   << "set ylabel '[%]' rotate by 0 offset 5.8,3\n\n\n";
 
+	for (int i = 0; i < nbands_; i++)
+	{
+		std::string aux = "";
+		if (i == nbands_ - 1)
+		{
+			output << "set xtics nomirror rotate by -30 scale 0.5 font \"Verdana,8\"\n"
+				   << "set xlabel 'Bins [°]' font \"Verdana,11\" offset 0,1.25\n";
+
+			aux = ":xticlabels(1)";
+		}
+
+		output << "plot '" << HISTOGRAM_DATA_FILE << "' using " << (i + 2) << aux << " lc rgb '#" << Utils::num2Hex(Utils::palette12(i + 1)) << "' title columnheader\n";
+
+		if (i == 0)
+			output << "unset ylabel\n";
+	}
+
+	output << "\nunset multiplot\n";
 	output.close();
 }
 

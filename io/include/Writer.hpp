@@ -19,8 +19,8 @@ public:
 							   const std::string &histogramTitle_,
 							   const std::vector<Histogram> &histograms_,
 							   const double binSize_,
-							   const double lowerBound_ = -1,
-							   const double upperBound_ = -1);
+							   const double lowerBound_,
+							   const double upperBound_);
 
 	/**************************************************/
 	static void writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
@@ -88,10 +88,7 @@ private:
 	/**************************************************/
 	static void generateHistogramScript(const std::string &outputFolder_,
 										const std::string &histogramTitle_,
-										const int bandsNumber_,
-										const double binSize_,
-										const double lowerLimit_,
-										const double upperLimit_);
+										const int nbands_);
 
 	static std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr>
 	generatePlanes(const std::vector<BandPtr> &bands_,
