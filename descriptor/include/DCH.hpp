@@ -44,17 +44,6 @@ public:
 							   const DescriptorParamsPtr &params_);
 
 	/**************************************************/
-	static inline char getSequenceChar(const double value_,
-									   const double step_)
-	{
-		int index = value_ / step_;
-		if (index == 0)
-			return '0';
-
-		return index > 0 ? 'A' + (index - 1) : 'a' - (index + 1);
-	}
-
-	/**************************************************/
 	static inline double calculateAngle(const Eigen::Vector3f &vector1_,
 										const Eigen::Vector3f &vector2_,
 										const Eigen::Hyperplane<float, 3> &plane_,

@@ -107,20 +107,6 @@ BOOST_FIXTURE_TEST_CASE(fillDescriptor_halfSphere, DCHFixture)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(getSequenceChar)
-{
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(1, 5), '0');
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-1, 5), '0');
-
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(7, 5), 'A');
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(12, 5), 'B');
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(19, 5), 'C');
-
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-7, 5), 'a');
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-12, 5), 'b');
-	BOOST_CHECK_EQUAL(DCH::getSequenceChar(-19, 5), 'c');
-}
-
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
 
