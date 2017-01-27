@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(DCH_constructor)
 	BOOST_CHECK_CLOSE(params.bandWidth, 0.01, 1e-5);
 	BOOST_CHECK_EQUAL(params.bidirectional, true);
 	BOOST_CHECK_EQUAL(params.useProjection, true);
-	BOOST_CHECK_CLOSE(params.sequenceBin, 0.01, 1e-5);
+	BOOST_CHECK_EQUAL(params.binNumber, 1);
 	BOOST_CHECK_EQUAL(params.stat, Params::STAT_MEAN);
 }
 
@@ -253,12 +253,12 @@ BOOST_AUTO_TEST_CASE(DCHParams_sizePerBand)
 
 	params.bidirectional = true;
 	params.searchRadius = 10;
-	params.sequenceBin = 2;
-	BOOST_CHECK_EQUAL(params.sizePerBand(), 10);
+	params.binNumber = 2;
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 2);
 	params.bidirectional = false;
 	params.searchRadius = 10;
-	params.sequenceBin = 2;
-	BOOST_CHECK_EQUAL(params.sizePerBand(), 5);
+	params.binNumber = 1;
+	BOOST_CHECK_EQUAL(params.sizePerBand(), 1);
 
 	params.stat = Params::STAT_HISTOGRAM_10;
 	BOOST_CHECK_EQUAL(params.sizePerBand(), 18);
@@ -269,7 +269,6 @@ BOOST_AUTO_TEST_CASE(DCHParams_sizePerBand)
 	params.stat = Params::STAT_HISTOGRAM_30;
 	BOOST_CHECK_EQUAL(params.sizePerBand(), 6);
 }
-
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
 

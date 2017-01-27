@@ -59,7 +59,7 @@ void DCHParams::load(const YAML::Node &config_)
 	bandWidth = config_["bandWidth"].as<float>();
 	bidirectional = config_["bidirectional"].as<bool>();
 	useProjection = config_["useProjection"].as<bool>();
-	sequenceBin = config_["sequenceBin"].as<float>();
+	binNumber = config_["binNumber"].as<float>();
 	stat = Params::toStatType(config_["stat"].as<std::string>());
 }
 
@@ -73,7 +73,7 @@ std::string DCHParams::toString() const
 		   << " bandWidth:" << bandWidth
 		   << " bidirectional:" << bidirectional
 		   << " useProjection:" << useProjection
-		   << " sequenceBin:" << sequenceBin
+		   << " binNumber:" << binNumber
 		   << " stat:" << Params::stat[stat];
 	return stream.str();
 }
@@ -90,7 +90,7 @@ YAML::Node DCHParams::toNode() const
 	node[sType]["bandWidth"] = bandWidth;
 	node[sType]["bidirectional"] = bidirectional;
 	node[sType]["useProjection"] = useProjection;
-	node[sType]["sequenceBin"] = sequenceBin;
+	node[sType]["binNumber"] = binNumber;
 	node[sType]["stat"] = statString;
 
 	return node;
@@ -103,7 +103,7 @@ int DCHParams::sizePerBand() const
 	default:
 	case Params::STAT_MEAN:
 	case Params::STAT_MEDIAN:
-		return (bidirectional ? searchRadius * 2.0 : searchRadius) / sequenceBin;
+		return binNumber;
 
 	case Params::STAT_HISTOGRAM_10:
 		return ceil(M_PI / DEG2RAD(10));
@@ -115,14 +115,19 @@ int DCHParams::sizePerBand() const
 		return ceil(M_PI / DEG2RAD(30));
 
 	case Params::STAT_HISTOGRAM_BIN_10:
-		return ceil(M_PI / DEG2RAD(10)) * 2;
+		return ceil(M_PI / DEG2RAD(10)) * binNumber;
 
 	case Params::STAT_HISTOGRAM_BIN_20:
-		return ceil(M_PI / DEG2RAD(20)) * 2;
+		return ceil(M_PI / DEG2RAD(20)) * binNumber;
 
 	case Params::STAT_HISTOGRAM_BIN_30:
-		return ceil(M_PI / DEG2RAD(30)) * 2;
+		return ceil(M_PI / DEG2RAD(30)) * binNumber;
 	}
+}
+
+float DCHParams::binSize() const
+{
+	return searchRadius / binNumber;
 }
 
 float DCHParams::bandsAngleRange() const

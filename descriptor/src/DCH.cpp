@@ -76,11 +76,11 @@ void DCH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 					   cv::Mat &descriptors_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
-	int sequenceSize = params->sizePerBand();
+	int bandSize = params->sizePerBand();
 
 	// Resize the matrix in case it doesn't match the required dimensions
 	int rows = cloud_->size();
-	int cols = sequenceSize * params->bandNumber;
+	int cols = bandSize * params->bandNumber;
 	if (descriptors_.rows != rows || descriptors_.cols != cols)
 		descriptors_ = cv::Mat::zeros(rows, cols, CV_32FC1);
 
@@ -90,7 +90,7 @@ void DCH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 		std::vector<BandPtr> bands = DCH::calculateDescriptor(cloud_, params_, cloud_->points[i]);
 
 		for (size_t j = 0; j < bands.size(); j++)
-			memcpy(&descriptors_.at<float>(i, j * sequenceSize), &bands[j]->descriptor[0], sizeof(float) * sequenceSize);
+			memcpy(&descriptors_.at<float>(i, j * bandSize), &bands[j]->descriptor[0], sizeof(float) * bandSize);
 	}
 }
 
@@ -101,14 +101,14 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 					   const std::string &debugId_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
-	int sequenceSize = params->sizePerBand();
+	int bandSize = params->sizePerBand();
 
 	std::vector<BandPtr> bands = DCH::calculateDescriptor(cloud_, params_, target_);
-	descriptor_.resize(sequenceSize * bands.size(), 1);
+	descriptor_.resize(bandSize * bands.size(), 1);
 
 	for (size_t j = 0; j < bands.size(); j++)
 		for (size_t k = 0; k < bands[j]->descriptor.size(); k++)
-			descriptor_(j * sequenceSize + k) = bands[j]->descriptor[k];
+			descriptor_(j * bandSize + k) = bands[j]->descriptor[k];
 
 
 	DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
@@ -151,7 +151,7 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 	case Params::STAT_MEAN:
 	case Params::STAT_MEDIAN:
 	{
-		int nbins = params->sizePerBand();
+		float binSize = params->binSize();
 		for (size_t i = 0; i < bands_.size(); i++)
 		{
 			BandPtr band = bands_[i];
@@ -168,7 +168,7 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 			{
 				pcl::PointNormal p = band->points->at(j);
 				double theta = calculateAngle(pointNormal, (Eigen::Vector3f) p.getNormalVector3fMap(), band->plane, params->useProjection);
-				int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / params->sequenceBin;
+				int index = plane.signedDistance((Eigen::Vector3f) p.getVector3fMap()) / binSize;
 
 				if (dataMap.find(index) == dataMap.end())
 					dataMap[index] = accumulator_set<double, features<tag::mean, tag::median, tag::min> >();
@@ -178,7 +178,7 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 
 
 			// Fill the descriptor
-			for (int j = 0; j < nbins; j++)
+			for (int j = 0; j < params->sizePerBand(); j++)
 			{
 				if (dataMap.find(j) != dataMap.end())
 				{

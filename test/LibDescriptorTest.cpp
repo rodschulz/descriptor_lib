@@ -31,7 +31,7 @@ struct DCHFixture
 		params->bandWidth = 1;
 		params->bidirectional = false;
 		params->useProjection = false;
-		params->sequenceBin = 1;
+		params->binNumber = 5;
 		params->stat = Params::STAT_MEAN;
 
 		paramsPtr = DescriptorParamsPtr(params);
@@ -89,7 +89,7 @@ BOOST_FIXTURE_TEST_CASE(fillDescriptor_plane, DCHFixture)
 BOOST_FIXTURE_TEST_CASE(fillDescriptor_halfSphere, DCHFixture)
 {
 	targetPoint = 10577;
-	params->sequenceBin = 0.5;
+	// params->sequenceBin = 0.5;
 
 	// Generate cloud
 	pcl::PointCloud<pcl::PointNormal>::Ptr cloud = CloudFactory::createSphereSection(M_PI, 10, Eigen::Vector3f(0, 0, 0), 20000);

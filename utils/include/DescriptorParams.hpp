@@ -74,7 +74,7 @@ struct DCHParams: public DescriptorParams
 	float bandWidth; // Width of each band
 	bool bidirectional; // True if each band is bidirectional
 	bool useProjection; // True if the angle calculation is using a projection
-	float sequenceBin; // Size of the bins used in the sequence construction
+	int binNumber; // Number of bins per band
 	Params::Statistic stat; // Statistic used in the descriptor
 
 	float angle; // Orientation of the zero band (run time parameter)
@@ -89,7 +89,7 @@ struct DCHParams: public DescriptorParams
 		bandWidth = 0.01;
 		bidirectional = true;
 		useProjection = true;
-		sequenceBin = 0.01;
+		binNumber = 1;
 		stat = Params::STAT_MEAN;
 
 		angle  = 0;
@@ -106,6 +106,9 @@ struct DCHParams: public DescriptorParams
 
 	/**************************************************/
 	int sizePerBand() const;
+
+	/**************************************************/
+	float binSize() const;
 
 	/**************************************************/
 	float bandsAngleRange() const;
