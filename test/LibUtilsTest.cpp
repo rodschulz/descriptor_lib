@@ -362,6 +362,17 @@ BOOST_AUTO_TEST_CASE(SHOTParams_constructor)
 	BOOST_CHECK_CLOSE(params.searchRadius, 0.03, 1e-5);
 }
 
+BOOST_AUTO_TEST_CASE(SHOTParams_load)
+{
+	YAML::Node node;
+	node["searchRadius"] = 3.234;
+
+	SHOTParams params;
+	params.load(node);
+
+	BOOST_CHECK_CLOSE(params.searchRadius, 3.234, 1e-5);
+}
+
 BOOST_AUTO_TEST_CASE(SHOTParams_toString)
 {
 	SHOTParams params;
@@ -378,6 +389,191 @@ BOOST_AUTO_TEST_CASE(SHOTParams_toNode)
 	BOOST_CHECK_EQUAL(node["type"].as<std::string>(), "SHOT");
 	BOOST_CHECK(node["SHOT"]["searchRadius"]);
 	BOOST_CHECK_CLOSE(node["SHOT"]["searchRadius"].as<float>(), 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(USC_suite)
+
+BOOST_AUTO_TEST_CASE(USCParams_constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(USCParams), 16);
+	BOOST_CHECK_MESSAGE(sizeof(USCParams) == 16, "USCParams size changed, check that new members are properly initialized in the constructor");
+
+	USCParams params;
+	BOOST_CHECK_EQUAL(params.type, Params::DESCRIPTOR_USC);
+	BOOST_CHECK_CLOSE(params.searchRadius, 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(USCParams_load)
+{
+	YAML::Node node;
+	node["searchRadius"] = 3.234;
+
+	USCParams params;
+	params.load(node);
+
+	BOOST_CHECK_CLOSE(params.searchRadius, 3.234, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(USCParams_toString)
+{
+	USCParams params;
+	std::string str = params.toString();
+	BOOST_CHECK_EQUAL(str, "type:DESCRIPTOR_USC searchRadius:0.03");
+}
+
+BOOST_AUTO_TEST_CASE(USCParams_toNode)
+{
+	USCParams params;
+	YAML::Node  node = params.toNode();
+
+	BOOST_CHECK(node["type"]);
+	BOOST_CHECK_EQUAL(node["type"].as<std::string>(), "USC");
+	BOOST_CHECK(node["USC"]["searchRadius"]);
+	BOOST_CHECK_CLOSE(node["USC"]["searchRadius"].as<float>(), 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(PFH_suite)
+
+BOOST_AUTO_TEST_CASE(PFHParams_constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(PFHParams), 16);
+	BOOST_CHECK_MESSAGE(sizeof(PFHParams) == 16, "PFHParams size changed, check that new members are properly initialized in the constructor");
+
+	PFHParams params;
+	BOOST_CHECK_EQUAL(params.type, Params::DESCRIPTOR_PFH);
+	BOOST_CHECK_CLOSE(params.searchRadius, 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(PFHParams_load)
+{
+	YAML::Node node;
+	node["searchRadius"] = 3.234;
+
+	PFHParams params;
+	params.load(node);
+
+	BOOST_CHECK_CLOSE(params.searchRadius, 3.234, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(PFHParams_toString)
+{
+	PFHParams params;
+	std::string str = params.toString();
+	BOOST_CHECK_EQUAL(str, "type:DESCRIPTOR_PFH searchRadius:0.03");
+}
+
+BOOST_AUTO_TEST_CASE(PFHParams_toNode)
+{
+	PFHParams params;
+	YAML::Node  node = params.toNode();
+
+	BOOST_CHECK(node["type"]);
+	BOOST_CHECK_EQUAL(node["type"].as<std::string>(), "PFH");
+	BOOST_CHECK(node["PFH"]["searchRadius"]);
+	BOOST_CHECK_CLOSE(node["PFH"]["searchRadius"].as<float>(), 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(FPFH_suite)
+
+BOOST_AUTO_TEST_CASE(FPFHParams_constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(FPFHParams), 16);
+	BOOST_CHECK_MESSAGE(sizeof(FPFHParams) == 16, "FPFHParams size changed, check that new members are properly initialized in the constructor");
+
+	FPFHParams params;
+	BOOST_CHECK_EQUAL(params.type, Params::DESCRIPTOR_FPFH);
+	BOOST_CHECK_CLOSE(params.searchRadius, 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(FPFHParams_load)
+{
+	YAML::Node node;
+	node["searchRadius"] = 3.234;
+
+	FPFHParams params;
+	params.load(node);
+
+	BOOST_CHECK_CLOSE(params.searchRadius, 3.234, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(FPFHParams_toString)
+{
+	FPFHParams params;
+	std::string str = params.toString();
+	BOOST_CHECK_EQUAL(str, "type:DESCRIPTOR_FPFH searchRadius:0.03");
+}
+
+BOOST_AUTO_TEST_CASE(FPFHParams_toNode)
+{
+	FPFHParams params;
+	YAML::Node  node = params.toNode();
+
+	BOOST_CHECK(node["type"]);
+	BOOST_CHECK_EQUAL(node["type"].as<std::string>(), "FPFH");
+	BOOST_CHECK(node["FPFH"]["searchRadius"]);
+	BOOST_CHECK_CLOSE(node["FPFH"]["searchRadius"].as<float>(), 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(SpinImage_suite)
+
+BOOST_AUTO_TEST_CASE(SpinImageParams_constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(SpinImageParams), 24);
+	BOOST_CHECK_MESSAGE(sizeof(SpinImageParams) == 24, "SpinImageParams size changed, check that new members are properly initialized in the constructor");
+
+	SpinImageParams params;
+	BOOST_CHECK_EQUAL(params.type, Params::DESCRIPTOR_SPIN_IMAGE);
+	BOOST_CHECK_CLOSE(params.searchRadius, 0.03, 1e-5);
+	BOOST_CHECK_EQUAL(params.imageWidth, 8);
+}
+
+BOOST_AUTO_TEST_CASE(SpinImageParams_load)
+{
+	YAML::Node node;
+	node["searchRadius"] = 3.234;
+	node["imageWidth"] = 42;
+
+	SpinImageParams params;
+	params.load(node);
+
+	BOOST_CHECK_CLOSE(params.searchRadius, 3.234, 1e-5);
+	BOOST_CHECK_EQUAL(params.imageWidth, 42);
+}
+
+BOOST_AUTO_TEST_CASE(SpinImageParams_toString)
+{
+	SpinImageParams params;
+	std::string str = params.toString();
+	BOOST_CHECK_EQUAL(str, "type:DESCRIPTOR_SPIN_IMAGE searchRadius:0.03 imageWidth:8");
+}
+
+BOOST_AUTO_TEST_CASE(SpinImageParams_toNode)
+{
+	SpinImageParams params;
+	YAML::Node  node = params.toNode();
+
+	BOOST_CHECK(node["type"]);
+	BOOST_CHECK_EQUAL(node["type"].as<std::string>(), "SPIN_IMAGE");
+	BOOST_CHECK(node["SPIN_IMAGE"]["searchRadius"]);
+	BOOST_CHECK_CLOSE(node["SPIN_IMAGE"]["searchRadius"].as<float>(), 0.03, 1e-5);
+	BOOST_CHECK(node["SPIN_IMAGE"]["imageWidth"]);
+	BOOST_CHECK_EQUAL(node["SPIN_IMAGE"]["imageWidth"].as<int>(), 8);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
