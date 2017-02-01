@@ -3,6 +3,7 @@
  * 2016
  */
 #include <boost/test/unit_test.hpp>
+#include <typeinfo>
 #include "Utils.hpp"
 #include "ExecutionParams.hpp"
 
@@ -208,6 +209,59 @@ BOOST_AUTO_TEST_SUITE_END()
 
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(DescriptorParams_class_suite)
+
+BOOST_AUTO_TEST_CASE(DescriptorParams_toType)
+{
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DCH"), Params::DESCRIPTOR_DCH);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("dch"), Params::DESCRIPTOR_DCH);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_DCH"), Params::DESCRIPTOR_DCH);
+
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("SHOT"), Params::DESCRIPTOR_SHOT);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("shot"), Params::DESCRIPTOR_SHOT);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_SHOT"), Params::DESCRIPTOR_SHOT);
+
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("USC"), Params::DESCRIPTOR_USC);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("usc"), Params::DESCRIPTOR_USC);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_USC"), Params::DESCRIPTOR_USC);
+
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("PFH"), Params::DESCRIPTOR_PFH);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("pfh"), Params::DESCRIPTOR_PFH);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_PFH"), Params::DESCRIPTOR_PFH);
+
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("ROPS"), Params::DESCRIPTOR_ROPS);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("rops"), Params::DESCRIPTOR_ROPS);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_ROPS"), Params::DESCRIPTOR_ROPS);
+
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("dummy"), Params::DESCRIPTOR_DCH);
+}
+
+BOOST_AUTO_TEST_CASE(DescriptorParams_create)
+{
+	DescriptorParamsPtr params1 = DescriptorParams::create(Params::DESCRIPTOR_DCH);
+	DescriptorParamsPtr params2 = DescriptorParamsPtr(new DCHParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_SHOT);
+	params2 = DescriptorParamsPtr(new SHOTParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_USC);
+	params2 = DescriptorParamsPtr(new USCParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_PFH);
+	params2 = DescriptorParamsPtr(new PFHParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_ROPS);
+	params2 = DescriptorParamsPtr(new ROPSParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_UNKNOWN);
+	params2 = DescriptorParamsPtr(new DCHParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+}
 
 BOOST_AUTO_TEST_CASE(DCH_constructor)
 {
