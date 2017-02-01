@@ -2,15 +2,15 @@
  * Author: rodrigo
  * 2017
  */
-#include "PFH.hpp"
+#include "ROPS.hpp"
 #include <pcl/filters/filter.h>
 
 
-void PFH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-					   const DescriptorParamsPtr &params_,
-					   cv::Mat &descriptors_)
+void ROPS::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+						const DescriptorParamsPtr &params_,
+						cv::Mat &descriptors_)
 {
-	LOGD << "Computing PFH dense";
+	LOGD << "Computing ROPS dense";
 
 	throw std::runtime_error("Not implemented yet");
 
@@ -61,12 +61,12 @@ void PFH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	// 	memcpy(&descriptors_.at<float>(i, 0), &descriptorCloud->at(i).histogram, sizeof(float) * cols);
 }
 
-void PFH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
-					   const DescriptorParamsPtr &params_,
-					   const int target_,
-					   Eigen::VectorXf &descriptor_)
+void ROPS::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
+						const DescriptorParamsPtr &params_,
+						const int target_,
+						Eigen::VectorXf &descriptor_)
 {
-	LOGD << "Computing PFH point";
+	LOGD << "Computing ROPS point";
 
 	throw std::runtime_error("Not implemented yet");
 
@@ -98,7 +98,7 @@ void PFH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	// 	LOGW << "Invalid descriptor";
 }
 
-void PFH::removeNaN(pcl::PointCloud<ROPS135>::Ptr &descriptors_)
+void ROPS::removeNaN(pcl::PointCloud<ROPS135>::Ptr &descriptors_)
 {
 	size_t size = sizeof(ROPS135::histogram) / sizeof(float);
 	size_t dest = 0;

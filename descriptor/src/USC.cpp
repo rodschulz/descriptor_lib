@@ -78,29 +78,32 @@ void USC::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	// 	LOGW << "Invalid descriptor";
 }
 
-void USC::removeNaN(pcl::PointCloud<pcl::PFHSignature125>::Ptr &descriptors_)
+// void USC::removeNaN(pcl::PointCloud<pcl::PFHSignature125>::Ptr &descriptors_)
+void USC::removeNaN(pcl::PointCloud<pcl::ShapeContext1980>::Ptr &descriptors_)
 {
-	size_t size = sizeof(pcl::PFHSignature125::histogram) / sizeof(float);
-	size_t dest = 0;
+	throw std::runtime_error("Not implemented yet");
 
-	for (size_t i = 0; i < descriptors_->size(); i++)
-	{
-		bool remove = false;
-		for (size_t j = 0; j < size; j++)
-		{
-			if (!pcl_isfinite((*descriptors_).points[i].histogram[j]))
-			{
-				remove = true;
-				break;
-			}
-		}
+	// size_t size = sizeof(pcl::PFHSignature125::histogram) / sizeof(float);
+	// size_t dest = 0;
 
-		if (remove)
-			continue;
+	// for (size_t i = 0; i < descriptors_->size(); i++)
+	// {
+	// 	bool remove = false;
+	// 	for (size_t j = 0; j < size; j++)
+	// 	{
+	// 		if (!pcl_isfinite((*descriptors_).points[i].histogram[j]))
+	// 		{
+	// 			remove = true;
+	// 			break;
+	// 		}
+	// 	}
 
-		memcpy(&(*descriptors_).points[dest].histogram, &(*descriptors_).points[i].histogram, sizeof(float) * size);
-		dest++;
-	}
+	// 	if (remove)
+	// 		continue;
 
-	descriptors_->resize(dest);
+	// 	memcpy(&(*descriptors_).points[dest].histogram, &(*descriptors_).points[i].histogram, sizeof(float) * size);
+	// 	dest++;
+	// }
+
+	// descriptors_->resize(dest);
 }

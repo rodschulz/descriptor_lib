@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <pcl/features/pfh.h>
+#include <pcl/features/spin_image.h>
 #include "DescriptorParams.hpp"
 
 

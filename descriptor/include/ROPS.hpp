@@ -4,7 +4,9 @@
  */
 #pragma once
 
-#include <pcl/features/rops_estimation.h>
+// #include <pcl/features/rops_estimation.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 #include "DescriptorParams.hpp"
 
 

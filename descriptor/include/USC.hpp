@@ -27,5 +27,6 @@ private:
 	~USC() {};
 
 	/**************************************************/
-	static void removeNaN(pcl::PointCloud<pcl::UniqueShapeContext1960>::Ptr &descriptors_);
+	// static void removeNaN(pcl::PointCloud<pcl::UniqueShapeContext1960>::Ptr &descriptors_);
+	static void removeNaN(pcl::PointCloud<pcl::ShapeContext1980>::Ptr &descriptors_);
 };
