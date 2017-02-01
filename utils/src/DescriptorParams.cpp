@@ -17,8 +17,12 @@ Params::DescriptorType DescriptorParams::toType(const std::string &type_)
 		return Params::DESCRIPTOR_USC;
 	else if (boost::iequals(type_, "PFH") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_PFH]))
 		return Params::DESCRIPTOR_PFH;
+	else if (boost::iequals(type_, "FPFH") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_FPFH]))
+		return Params::DESCRIPTOR_FPFH;
 	else if (boost::iequals(type_, "ROPS") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_ROPS]))
 		return Params::DESCRIPTOR_ROPS;
+	else if (boost::iequals(type_, "SpinImage") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_SPIN_IMAGE]))
+		return Params::DESCRIPTOR_SPIN_IMAGE;
 
 	LOGW << "Wrong descriptor type, assuming DCH";
 	return Params::DESCRIPTOR_DCH;
@@ -39,13 +43,19 @@ DescriptorParamsPtr DescriptorParams::create(const Params::DescriptorType type_)
 		return DescriptorParamsPtr(new SHOTParams());
 
 	case Params::DESCRIPTOR_USC:
-		return DescriptorParamsPtr();
+		return DescriptorParamsPtr(new USCParams());
 
 	case Params::DESCRIPTOR_PFH:
-		return DescriptorParamsPtr();
+		return DescriptorParamsPtr(new PFHParams());
+
+	case Params::DESCRIPTOR_FPFH:
+		return DescriptorParamsPtr(new FPFHParams());
 
 	case Params::DESCRIPTOR_ROPS:
-		return DescriptorParamsPtr();
+		return DescriptorParamsPtr(new ROPSParams());
+
+	case Params::DESCRIPTOR_SPIN_IMAGE:
+		return DescriptorParamsPtr(new SpinImageParams());
 	}
 }
 
@@ -167,6 +177,149 @@ YAML::Node SHOTParams::toNode() const
 	YAML::Node node;
 	node["type"] = sType;
 	node[sType]["searchRadius"] = searchRadius;
+
+	return node;
+}
+
+
+/**************************************************/
+/**************************************************/
+void USCParams::load(const YAML::Node &config_)
+{
+	searchRadius = config_["searchRadius"].as<float>();
+}
+
+std::string USCParams::toString() const
+{
+	std::stringstream stream;
+	stream << std::boolalpha
+		   << "type:" << Params::descType[type]
+		   << " searchRadius:" << searchRadius;
+	return stream.str();
+}
+
+YAML::Node USCParams::toNode() const
+{
+	std::string sType = Params::descType[type].substr(11);
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+
+	return node;
+}
+
+
+/**************************************************/
+/**************************************************/
+void PFHParams::load(const YAML::Node &config_)
+{
+	searchRadius = config_["searchRadius"].as<float>();
+}
+
+std::string PFHParams::toString() const
+{
+	std::stringstream stream;
+	stream << std::boolalpha
+		   << "type:" << Params::descType[type]
+		   << " searchRadius:" << searchRadius;
+	return stream.str();
+}
+
+YAML::Node PFHParams::toNode() const
+{
+	std::string sType = Params::descType[type].substr(11);
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+
+	return node;
+}
+
+
+/**************************************************/
+/**************************************************/
+void FPFHParams::load(const YAML::Node &config_)
+{
+	searchRadius = config_["searchRadius"].as<float>();
+}
+
+std::string FPFHParams::toString() const
+{
+	std::stringstream stream;
+	stream << std::boolalpha
+		   << "type:" << Params::descType[type]
+		   << " searchRadius:" << searchRadius;
+	return stream.str();
+}
+
+YAML::Node FPFHParams::toNode() const
+{
+	std::string sType = Params::descType[type].substr(11);
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+
+	return node;
+}
+
+
+/**************************************************/
+/**************************************************/
+void ROPSParams::load(const YAML::Node &config_)
+{
+	searchRadius = config_["searchRadius"].as<float>();
+}
+
+std::string ROPSParams::toString() const
+{
+	std::stringstream stream;
+	stream << std::boolalpha
+		   << "type:" << Params::descType[type]
+		   << " searchRadius:" << searchRadius;
+	return stream.str();
+}
+
+YAML::Node ROPSParams::toNode() const
+{
+	std::string sType = Params::descType[type].substr(11);
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+
+	return node;
+}
+
+
+/**************************************************/
+/**************************************************/
+void SpinImageParams::load(const YAML::Node &config_)
+{
+	searchRadius = config_["searchRadius"].as<float>();
+	imageWidth = config_["imageWidth"].as<int>();
+}
+
+std::string SpinImageParams::toString() const
+{
+	std::stringstream stream;
+	stream << std::boolalpha
+		   << "type:" << Params::descType[type]
+		   << " searchRadius:" << searchRadius
+		   << " imageWidth:" << imageWidth;
+	return stream.str();
+}
+
+YAML::Node SpinImageParams::toNode() const
+{
+	std::string sType = Params::descType[type].substr(11);
+
+	YAML::Node node;
+	node["type"] = sType;
+	node[sType]["searchRadius"] = searchRadius;
+	node[sType]["imageWidth"] = imageWidth;
 
 	return node;
 }

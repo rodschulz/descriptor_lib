@@ -228,9 +228,17 @@ BOOST_AUTO_TEST_CASE(DescriptorParams_toType)
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("pfh"), Params::DESCRIPTOR_PFH);
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_PFH"), Params::DESCRIPTOR_PFH);
 
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("FPFH"), Params::DESCRIPTOR_FPFH);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("fpfh"), Params::DESCRIPTOR_FPFH);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_FPFH"), Params::DESCRIPTOR_FPFH);
+
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("ROPS"), Params::DESCRIPTOR_ROPS);
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("rops"), Params::DESCRIPTOR_ROPS);
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_ROPS"), Params::DESCRIPTOR_ROPS);
+
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("SpinImage"), Params::DESCRIPTOR_SPIN_IMAGE);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("spinimage"), Params::DESCRIPTOR_SPIN_IMAGE);
+	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_SPIN_IMAGE"), Params::DESCRIPTOR_SPIN_IMAGE);
 
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("dummy"), Params::DESCRIPTOR_DCH);
 }
@@ -253,15 +261,27 @@ BOOST_AUTO_TEST_CASE(DescriptorParams_create)
 	params2 = DescriptorParamsPtr(new PFHParams());
 	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
 
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_FPFH);
+	params2 = DescriptorParamsPtr(new FPFHParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
 	params1 = DescriptorParams::create(Params::DESCRIPTOR_ROPS);
 	params2 = DescriptorParamsPtr(new ROPSParams());
+	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+
+	params1 = DescriptorParams::create(Params::DESCRIPTOR_SPIN_IMAGE);
+	params2 = DescriptorParamsPtr(new SpinImageParams());
 	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
 
 	params1 = DescriptorParams::create(Params::DESCRIPTOR_UNKNOWN);
 	params2 = DescriptorParamsPtr(new DCHParams());
 	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
-
 }
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(DCH_suite)
 
 BOOST_AUTO_TEST_CASE(DCH_constructor)
 {

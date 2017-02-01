@@ -5,11 +5,15 @@
 #include "SHOT.hpp"
 #include <pcl/filters/filter.h>
 
+typedef pcl::Histogram<153> SpinImage;
+
 
 void SHOT::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 						const DescriptorParamsPtr &params_,
 						cv::Mat &descriptors_)
 {
+	LOGD << "Computing SHOT dense";
+
 	SHOTParams *params = dynamic_cast<SHOTParams *>(params_.get());
 
 	// Compute the descriptor
@@ -40,6 +44,8 @@ void SHOT::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 						const int target_,
 						Eigen::VectorXf &descriptor_)
 {
+	LOGD << "Computing SHOT point";
+
 	SHOTParams *params = dynamic_cast<SHOTParams *>(params_.get());
 
 	pcl::PointCloud<pcl::SHOT352>::Ptr descriptorCloud(new pcl::PointCloud<pcl::SHOT352>());

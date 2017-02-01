@@ -21,7 +21,9 @@ enum DescriptorType
 	DESCRIPTOR_SHOT,
 	DESCRIPTOR_USC,
 	DESCRIPTOR_PFH,
+	DESCRIPTOR_FPFH,
 	DESCRIPTOR_ROPS,
+	DESCRIPTOR_SPIN_IMAGE,
 };
 static std::string descType[] = {
 	BOOST_STRINGIZE(DESCRIPTOR_UNKNOWN),
@@ -29,7 +31,9 @@ static std::string descType[] = {
 	BOOST_STRINGIZE(DESCRIPTOR_SHOT),
 	BOOST_STRINGIZE(DESCRIPTOR_USC),
 	BOOST_STRINGIZE(DESCRIPTOR_PFH),
-	BOOST_STRINGIZE(DESCRIPTOR_ROPS)
+	BOOST_STRINGIZE(DESCRIPTOR_FPFH),
+	BOOST_STRINGIZE(DESCRIPTOR_ROPS),
+	BOOST_STRINGIZE(DESCRIPTOR_SPIN_IMAGE)
 };
 }
 
@@ -128,6 +132,126 @@ struct SHOTParams: public DescriptorParams
 	{
 		type = Params::DESCRIPTOR_SHOT;
 		searchRadius = 0.03;
+	}
+
+	/**************************************************/
+	void load(const YAML::Node &config_);
+
+	/**************************************************/
+	std::string toString() const;
+
+	/**************************************************/
+	YAML::Node toNode() const;
+};
+
+
+/**************************************************/
+/**************************************************/
+struct USCParams: public DescriptorParams
+{
+	float searchRadius;
+
+	USCParams()
+	{
+		type = Params::DESCRIPTOR_USC;
+		searchRadius = 0.03;
+	}
+
+	/**************************************************/
+	void load(const YAML::Node &config_);
+
+	/**************************************************/
+	std::string toString() const;
+
+	/**************************************************/
+	YAML::Node toNode() const;
+};
+
+
+/**************************************************/
+/**************************************************/
+struct PFHParams: public DescriptorParams
+{
+	float searchRadius;
+
+	PFHParams()
+	{
+		type = Params::DESCRIPTOR_PFH;
+		searchRadius = 0.03;
+	}
+
+	/**************************************************/
+	void load(const YAML::Node &config_);
+
+	/**************************************************/
+	std::string toString() const;
+
+	/**************************************************/
+	YAML::Node toNode() const;
+};
+
+
+/**************************************************/
+/**************************************************/
+struct FPFHParams: public DescriptorParams
+{
+	float searchRadius;
+
+	FPFHParams()
+	{
+		type = Params::DESCRIPTOR_FPFH;
+		searchRadius = 0.03;
+	}
+
+	/**************************************************/
+	void load(const YAML::Node &config_);
+
+	/**************************************************/
+	std::string toString() const;
+
+	/**************************************************/
+	YAML::Node toNode() const;
+};
+
+
+/**************************************************/
+/**************************************************/
+struct ROPSParams: public DescriptorParams
+{
+	float searchRadius;
+	int partitionsNumber;
+	int rotationsNumber;
+	float supportRadius;
+
+	ROPSParams()
+	{
+		type = Params::DESCRIPTOR_ROPS;
+		searchRadius = 0.03;
+	}
+
+	/**************************************************/
+	void load(const YAML::Node &config_);
+
+	/**************************************************/
+	std::string toString() const;
+
+	/**************************************************/
+	YAML::Node toNode() const;
+};
+
+
+/**************************************************/
+/**************************************************/
+struct SpinImageParams: public DescriptorParams
+{
+	float searchRadius;
+	int imageWidth;
+
+	SpinImageParams()
+	{
+		type = Params::DESCRIPTOR_SPIN_IMAGE;
+		searchRadius = 0.03;
+		imageWidth = 8;
 	}
 
 	/**************************************************/
