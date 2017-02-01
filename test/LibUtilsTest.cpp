@@ -245,50 +245,52 @@ BOOST_AUTO_TEST_CASE(DescriptorParams_toType)
 
 BOOST_AUTO_TEST_CASE(DescriptorParams_create)
 {
-	DescriptorParamsPtr params1 = DescriptorParams::create(Params::DESCRIPTOR_DCH);
-	DescriptorParamsPtr params2 = DescriptorParamsPtr(new DCHParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	DescriptorParamsPtr params = DescriptorParams::create(Params::DESCRIPTOR_DCH);
+	DCHParams *dch = dynamic_cast<DCHParams *>(params.get());
+	BOOST_CHECK(dch != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_SHOT);
-	params2 = DescriptorParamsPtr(new SHOTParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_SHOT);
+	SHOTParams *shot = dynamic_cast<SHOTParams *>(params.get());
+	BOOST_CHECK(shot != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_USC);
-	params2 = DescriptorParamsPtr(new USCParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_USC);
+	USCParams *usc = dynamic_cast<USCParams *>(params.get());
+	BOOST_CHECK(usc != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_PFH);
-	params2 = DescriptorParamsPtr(new PFHParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_PFH);
+	PFHParams *pfh = dynamic_cast<PFHParams *>(params.get());
+	BOOST_CHECK(pfh != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_FPFH);
-	params2 = DescriptorParamsPtr(new FPFHParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_FPFH);
+	FPFHParams *fpfh = dynamic_cast<FPFHParams *>(params.get());
+	BOOST_CHECK(fpfh != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_ROPS);
-	params2 = DescriptorParamsPtr(new ROPSParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_ROPS);
+	ROPSParams *rops = dynamic_cast<ROPSParams *>(params.get());
+	BOOST_CHECK(rops != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_SPIN_IMAGE);
-	params2 = DescriptorParamsPtr(new SpinImageParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_SPIN_IMAGE);
+	SpinImageParams *si = dynamic_cast<SpinImageParams *>(params.get());
+	BOOST_CHECK(si != NULL);
 
-	params1 = DescriptorParams::create(Params::DESCRIPTOR_UNKNOWN);
-	params2 = DescriptorParamsPtr(new DCHParams());
-	BOOST_CHECK_EQUAL(typeid(*params1.get()).name(), typeid(*params2.get()).name());
+	params = DescriptorParams::create(Params::DESCRIPTOR_UNKNOWN);
+	DCHParams *unknown = dynamic_cast<DCHParams *>(params.get());
+	BOOST_CHECK(unknown != NULL);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
 
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(DCH_suite)
 
-BOOST_AUTO_TEST_CASE(DCH_constructor)
+BOOST_AUTO_TEST_CASE(DCHParams_constructor)
 {
 	BOOST_CHECK_EQUAL(sizeof(DCHParams), 40);
-	BOOST_CHECK_MESSAGE(sizeof(DCHParams) == 40, "DescriptorParams size changed, check that any new member is being properly initialized in the constructor");
+	BOOST_CHECK_MESSAGE(sizeof(DCHParams) == 40, "DCHParams size changed, check that new members are properly initialized in the constructor");
 
 	DCHParams params;
+	BOOST_CHECK_EQUAL(params.type, Params::DESCRIPTOR_DCH);
 	BOOST_CHECK_CLOSE(params.searchRadius, 0.05, 1e-5);
 	BOOST_CHECK_EQUAL(params.bandNumber, 4);
 	BOOST_CHECK_CLOSE(params.bandWidth, 0.01, 1e-5);
@@ -343,6 +345,41 @@ BOOST_AUTO_TEST_CASE(DCHParams_sizePerBand)
 	params.stat = Params::STAT_HISTOGRAM_30;
 	BOOST_CHECK_EQUAL(params.sizePerBand(), 6);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(SHOT_suite)
+
+BOOST_AUTO_TEST_CASE(SHOTParams_constructor)
+{
+	BOOST_CHECK_EQUAL(sizeof(SHOTParams), 16);
+	BOOST_CHECK_MESSAGE(sizeof(SHOTParams) == 16, "SHOTParams size changed, check that new members are properly initialized in the constructor");
+
+	SHOTParams params;
+	BOOST_CHECK_EQUAL(params.type, Params::DESCRIPTOR_SHOT);
+	BOOST_CHECK_CLOSE(params.searchRadius, 0.03, 1e-5);
+}
+
+BOOST_AUTO_TEST_CASE(SHOTParams_toString)
+{
+	SHOTParams params;
+	std::string str = params.toString();
+	BOOST_CHECK_EQUAL(str, "type:DESCRIPTOR_SHOT searchRadius:0.03");
+}
+
+BOOST_AUTO_TEST_CASE(SHOTParams_toNode)
+{
+	SHOTParams params;
+	YAML::Node  node = params.toNode();
+
+	BOOST_CHECK(node["type"]);
+	BOOST_CHECK_EQUAL(node["type"].as<std::string>(), "SHOT");
+	BOOST_CHECK(node["SHOT"]["searchRadius"]);
+	BOOST_CHECK_CLOSE(node["SHOT"]["searchRadius"].as<float>(), 0.03, 1e-5);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 /**************************************************/
 
