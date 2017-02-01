@@ -43,7 +43,7 @@ void SpinImage::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud
 							 const int target_,
 							 Eigen::VectorXf &descriptor_)
 {
-	LOGD << "Computing PFH point";
+	LOGD << "Computing SpinImage point";
 
 	SpinImageParams *params = dynamic_cast<SpinImageParams *>(params_.get());
 

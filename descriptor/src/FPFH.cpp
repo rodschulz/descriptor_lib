@@ -46,7 +46,7 @@ void FPFH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 {
 	LOGD << "Computing FPFH point";
 
-	PFHParams *params = dynamic_cast<PFHParams *>(params_.get());
+	FPFHParams *params = dynamic_cast<FPFHParams *>(params_.get());
 
 	// Compute the descriptor
 	pcl::PointCloud<pcl::FPFHSignature33>::Ptr descriptorCloud(new pcl::PointCloud<pcl::FPFHSignature33>());
