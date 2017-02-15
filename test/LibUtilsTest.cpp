@@ -240,7 +240,10 @@ BOOST_AUTO_TEST_CASE(DescriptorParams_toType)
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("spinimage"), Params::DESCRIPTOR_SPIN_IMAGE);
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("DESCRIPTOR_SPIN_IMAGE"), Params::DESCRIPTOR_SPIN_IMAGE);
 
+	plog::Severity maxSeverity = plog::get()->getMaxSeverity();
+	plog::get()->setMaxSeverity(plog::error);
 	BOOST_CHECK_EQUAL(DescriptorParams::toType("dummy"), Params::DESCRIPTOR_DCH);
+	plog::get()->setMaxSeverity(maxSeverity);
 }
 
 BOOST_AUTO_TEST_CASE(DescriptorParams_create)
@@ -273,9 +276,12 @@ BOOST_AUTO_TEST_CASE(DescriptorParams_create)
 	SpinImageParams *si = dynamic_cast<SpinImageParams *>(params.get());
 	BOOST_CHECK(si != NULL);
 
+	plog::Severity maxSeverity = plog::get()->getMaxSeverity();
+	plog::get()->setMaxSeverity(plog::error);
 	params = DescriptorParams::create(Params::DESCRIPTOR_UNKNOWN);
 	DCHParams *unknown = dynamic_cast<DCHParams *>(params.get());
 	BOOST_CHECK(unknown != NULL);
+	plog::get()->setMaxSeverity(maxSeverity);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -24,7 +24,7 @@ Params::DescriptorType DescriptorParams::toType(const std::string &type_)
 	else if (boost::iequals(type_, "SpinImage") || boost::iequals(type_, Params::descType[Params::DESCRIPTOR_SPIN_IMAGE]))
 		return Params::DESCRIPTOR_SPIN_IMAGE;
 
-	LOGW << "Wrong descriptor type, assuming DCH";
+	LOGW << "Wrong descriptor type (" << type_ << "), assuming DCH";
 	return Params::DESCRIPTOR_DCH;
 }
 
