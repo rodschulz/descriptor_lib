@@ -3,10 +3,11 @@
  * 2016
  */
 #include <boost/test/unit_test.hpp>
-#include "DCH.hpp"
+#include <pcl/io/pcd_io.h>
 #include "Extractor.hpp"
 #include "CloudFactory.hpp"
-#include <pcl/io/pcd_io.h>
+#include "DCH.hpp"
+#include "FPFH.hpp"
 
 /**************************************************/
 // Auxiliary method defined to be used while testing
@@ -104,6 +105,68 @@ BOOST_FIXTURE_TEST_CASE(fillDescriptor_halfSphere, DCHFixture)
 	{
 		BOOST_CHECK_EQUAL(bands[i]->descriptor.size(), bandSize);
 		BOOST_CHECK(std::find_if(bands[i]->descriptor.begin(), bands[i]->descriptor.end(), diffThanZero) != bands[i]->descriptor.end());
+	}
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(FPFH_class_suite)
+
+BOOST_AUTO_TEST_CASE(FPFH_copyCloud)
+{
+	size_t descriptorSize = sizeof(pcl::FPFHSignature33) / sizeof(float);
+	BOOST_CHECK_EQUAL(descriptorSize, 33);
+
+	pcl::PointCloud<pcl::FPFHSignature33>::Ptr cloud(new pcl::PointCloud<pcl::FPFHSignature33>());
+
+	for (int k = 0; k < 5; k++)
+	{
+		pcl::FPFHSignature33 point;
+		size_t j = 0;
+		for (size_t i = k * descriptorSize; i < (k + 1) * descriptorSize; i++)
+			point.histogram[j++] = 0.0 + i;
+
+		cloud->push_back(point);
+	}
+
+	cv::Mat descriptors;
+	FPFH::copyCloud(cloud, descriptors);
+
+	for (size_t i = 0; i < cloud->size(); i++)
+	{
+		for (size_t j = 0; j < descriptorSize; j++)
+			BOOST_CHECK_CLOSE(descriptors.at<float>(i, j), i * descriptorSize + j, 1e-5);
+	}
+}
+
+BOOST_AUTO_TEST_CASE(FPFH_point_cpy)
+{
+	size_t descriptorSize = sizeof(pcl::FPFHSignature33) / sizeof(float);
+	BOOST_CHECK_EQUAL(descriptorSize, 33);
+
+	pcl::PointCloud<pcl::FPFHSignature33>::Ptr cloud(new pcl::PointCloud<pcl::FPFHSignature33>());
+
+	for (int k = 0; k < 5; k++)
+	{
+		pcl::FPFHSignature33 point;
+		size_t j = 0;
+		for (size_t i = k * descriptorSize; i < (k + 1) * descriptorSize; i++)
+			point.histogram[j++] = 0.0 + i;
+
+		cloud->push_back(point);
+	}
+
+
+	for (size_t i = 0; i < cloud->size(); i++)
+	{
+		Eigen::VectorXf descriptor_ = Eigen::VectorXf(descriptorSize);
+		FPFH_POINT_CPY(descriptor_, cloud->at(i), descriptorSize);
+
+		for (size_t j = 0; j < descriptorSize; j++)
+			BOOST_CHECK_CLOSE(descriptor_(j), i * descriptorSize + j, 1e-5);
+
 	}
 }
 

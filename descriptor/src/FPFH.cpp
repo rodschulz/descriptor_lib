@@ -4,6 +4,7 @@
  */
 #include "FPFH.hpp"
 #include <pcl/filters/filter.h>
+#include <pcl/features/normal_3d.h>
 
 
 void FPFH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
@@ -26,17 +27,10 @@ void FPFH::computeDense(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 	fpfh.compute(*descriptorCloud);
 
 	// Remove any NaN
-	removeNaN(descriptorCloud);
-
-	// Prepare matrix to copy data
-	int rows = descriptorCloud->size();
-	int cols = sizeof(pcl::FPFHSignature33::histogram) / sizeof(float);
-	if (descriptors_.rows != rows || descriptors_.cols != cols)
-		descriptors_ = cv::Mat::zeros(rows, cols, CV_32FC1);
+	FPFH::removeNaN(descriptorCloud);
 
 	// Copy data to matrix
-	for (int i = 0; i < rows; i++)
-		memcpy(&descriptors_.at<float>(i, 0), &descriptorCloud->at(i).histogram, sizeof(float) * cols);
+	FPFH::copyCloud(descriptorCloud, descriptors_);
 }
 
 void FPFH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
@@ -48,13 +42,25 @@ void FPFH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 
 	FPFHParams *params = dynamic_cast<FPFHParams *>(params_.get());
 
+
+	pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+	pcl::NormalEstimation<pcl::PointNormal, pcl::Normal> normalEstimation;
+	normalEstimation.setInputCloud(cloud_);
+	normalEstimation.setRadiusSearch(0.03);
+	pcl::search::KdTree<pcl::PointNormal>::Ptr kdtreeN(new pcl::search::KdTree<pcl::PointNormal>);
+	normalEstimation.setSearchMethod(kdtreeN);
+	normalEstimation.compute(*normals);
+
+
+
 	// Compute the descriptor
 	pcl::PointCloud<pcl::FPFHSignature33>::Ptr descriptorCloud(new pcl::PointCloud<pcl::FPFHSignature33>());
 	pcl::search::KdTree<pcl::PointNormal>::Ptr kdtree(new pcl::search::KdTree<pcl::PointNormal>);
 
-	pcl::FPFHEstimation<pcl::PointNormal, pcl::PointNormal, pcl::FPFHSignature33> fpfh;
+	// pcl::FPFHEstimation<pcl::PointNormal, pcl::PointNormal, pcl::FPFHSignature33> fpfh;
+	pcl::FPFHEstimation<pcl::PointNormal, pcl::Normal, pcl::FPFHSignature33> fpfh;
 	fpfh.setInputCloud (cloud_);
-	fpfh.setInputNormals (cloud_);
+	fpfh.setInputNormals (normals);
 	fpfh.setSearchMethod(kdtree);
 	fpfh.setRadiusSearch(params->searchRadius);
 	fpfh.compute(*descriptorCloud);
@@ -69,7 +75,7 @@ void FPFH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 
 	descriptor_ = Eigen::VectorXf(size);
 	if (isValid)
-		memcpy(descriptor_.data(), &d.histogram, sizeof(float) * size);
+		FPFH_POINT_CPY(descriptor_, d, size);
 	else
 		LOGW << "Invalid descriptor";
 }
