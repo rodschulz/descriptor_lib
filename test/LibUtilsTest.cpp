@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE(DCHParams_bandsAngleStep)
 
 BOOST_AUTO_TEST_CASE(DCHParams_sizePerBand)
 {
-	DCHParams params;
+	DCHParams params = DCHParams();
 
 	params.bidirectional = true;
 	params.searchRadius = 10;
