@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <pcl/pcl_macros.h>
+#include <plog/Log.h>
 
 
 std::ostream& operator<<(std::ostream &_stream, const Bins &_bins)
@@ -56,7 +57,6 @@ Bins Histogram::getBins(const double binSize_,
 						const double upperBound_) const
 {
 	int binNumber = ceil((upperBound_ - lowerBound_) / binSize_);
-	// binNumber = binNumber % 2 > 0 ? binNumber : binNumber + 1;
 
 	Bins b;
 	b.bins.resize(binNumber, 0);
@@ -70,7 +70,7 @@ Bins Histogram::getBins(const double binSize_,
 		for (size_t i = 0; i < data.size(); i++)
 		{
 			int index = ((data[i] - lowerBound_) / binSize_);
-			if (index >= binNumber)
+			if (index < 0 || index >= binNumber)
 				outElements++;
 			else
 				b.bins[index]++;

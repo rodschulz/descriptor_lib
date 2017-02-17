@@ -201,7 +201,6 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 		float angleStep = params->stat == Params::STAT_HISTOGRAM_10
 						  ? 10
 						  : (params->stat == Params::STAT_HISTOGRAM_20 ? 20 : 30);
-		LOGD << "...angle step " << angleStep;
 
 		std::vector<Histogram> histograms = generateAngleHistograms(bands_, params->useProjection);
 		for (size_t i = 0; i < histograms.size(); i++)
