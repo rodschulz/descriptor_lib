@@ -10,6 +10,7 @@
 #include <plog/Log.h>
 #include "CloudUtils.hpp"
 #include "Utils.hpp"
+#include "Config.hpp"
 
 
 enum ReadingState
@@ -137,6 +138,17 @@ bool Loader::loadCloud(const std::string &filename_,
 	{
 		// Remove NANs
 		CloudUtils::removeNANs(cloudXYZ);
+
+
+		// Generate debug data
+		if (Config::debugEnabled())
+		{
+			pcl::PointCloud<pcl::Normal>::Ptr rawNormals = CloudUtils::estimateNormals(cloudXYZ, normalEstimationRadius_);
+			pcl::PointCloud<pcl::PointNormal>::Ptr rawCloud(new pcl::PointCloud<pcl::PointNormal>());
+			pcl::concatenateFields(*cloudXYZ, *rawNormals, *rawCloud);
+			pcl::io::savePCDFileASCII(DEBUG_DIR DEBUG_PREFIX + std::string("raw_normals") + CLOUD_FILE_EXTENSION, *rawCloud);
+		}
+
 
 		// Apply smoothing
 		if (params_.useSmoothing)
