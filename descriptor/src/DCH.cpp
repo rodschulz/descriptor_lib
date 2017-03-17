@@ -111,7 +111,8 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 			descriptor_(j * bandSize + k) = bands[j]->descriptor[k];
 
 
-	DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
+	if (Config::debugEnabled())
+		DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
 }
 
 std::vector<Histogram> DCH::generateAngleHistograms(const std::vector<BandPtr> &bands_,
