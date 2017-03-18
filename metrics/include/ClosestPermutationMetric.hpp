@@ -67,6 +67,7 @@ public:
 			itemCount[cluster] += 1;
 		}
 
+
 		/***** DEBUG *****/
 		if (debugEnabled)
 		{
@@ -75,6 +76,7 @@ public:
 					std::cout << "Zero!!" << std::endl;
 		}
 		/***** DEBUG *****/
+
 
 		for (int i = 0; i < newMeans.rows; i++)
 		{
@@ -92,19 +94,6 @@ public:
 		return newMeans;
 	}
 
-	/**************************************************/
-	// inline cv::Mat calculateMedoids(const int clusterNumber_,
-	// 								const cv::Mat &items_,
-	// 								const cv::Mat &labels_,
-	// 								const cv::Mat &currentMedoids_ = cv::Mat())
-	// {
-	// 	cv::Mat newMedoids = cv::Mat::zeros(clusterNumber_, items_.cols, CV_32FC1);
-	// 	for (int i = 0; i < labels_.rows; i++)
-	// 	{
-	// 	}
-
-	// 	return newMedoids;
-	// }
 
 	/**************************************************/
 	inline Permutation getClosestPermutation(const cv::Mat &vector1_,
@@ -153,11 +142,13 @@ public:
 		return Permutation(minDistance, minIndex);
 	}
 
+
 	/**************************************************/
 	MetricType getType() const
 	{
 		return METRIC_CLOSEST_PERMUTATION;
 	}
+
 
 	/**************************************************/
 	std::vector<std::string> getConstructionParams() const
@@ -166,6 +157,7 @@ public:
 		params.push_back(boost::lexical_cast<std::string>(permutationSize));
 		return params;
 	}
+
 
 	/**************************************************/
 	inline void validateMeans(cv::Mat &means_) const
@@ -181,13 +173,15 @@ public:
 			{
 				for (int j = i + 1; j < means_.rows; j++)
 				{
-					// If there's an image center, then the closest permutarion should be quite close
+					// If there's an image center, then the closest permutation should be quite close
 					Permutation permutation = getClosestPermutation(means_.row(i), means_.row(j));
+
 
 					/***** DEBUG *****/
 					if (debugEnabled && permutation.distance < 1)
 						std::cout << i << "-" << j << ": " << permutation.distance << std::endl;
 					/***** DEBUG *****/
+
 
 					if (permutation.distance < 1e-5)
 					{
@@ -205,6 +199,7 @@ public:
 			}
 		} while (!valid);
 	}
+
 
 protected:
 	int permutationSize;

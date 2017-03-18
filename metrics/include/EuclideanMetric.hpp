@@ -23,6 +23,7 @@ public:
 		return cv::norm(vector1_, vector2_);
 	}
 
+
 	/**************************************************/
 	inline cv::Mat calculateMeans(const int clusterNumber_,
 								  const cv::Mat &items_,
@@ -47,11 +48,13 @@ public:
 		return newCenters;
 	}
 
+
 	/**************************************************/
 	inline MetricType getType() const
 	{
 		return METRIC_EUCLIDEAN;
 	}
+
 
 	/**************************************************/
 	inline std::vector<std::string> getConstructionParams() const

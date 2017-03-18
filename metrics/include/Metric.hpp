@@ -33,26 +33,32 @@ public:
 	virtual double distance(const cv::Mat &vector1_,
 							const cv::Mat &vector2_) const = 0;
 
+
 	/**************************************************/
 	virtual cv::Mat calculateMeans(const int clusterNumber_,
 								   const cv::Mat &items_,
 								   const cv::Mat &labels_,
 								   const cv::Mat &currentMeans_ = cv::Mat()) const = 0;
 
+
 	/**************************************************/
 	virtual MetricType getType() const = 0;
+
 
 	/**************************************************/
 	virtual std::vector<std::string> getConstructionParams() const = 0;
 
+
 	/**************************************************/
 	virtual void validateMeans(cv::Mat &means_) const = 0;
+
 
 	/**************************************************/
 	void setDebug(const bool &status_)
 	{
 		debugEnabled = status_;
 	}
+
 
 	/**************************************************/
 	static MetricType toType(const std::string &type_)
@@ -67,6 +73,7 @@ public:
 		LOGW << "Wrong metric type, assuming EUCLIDEAN";
 		return METRIC_EUCLIDEAN;
 	}
+
 
 protected:
 	Metric()

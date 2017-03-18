@@ -224,10 +224,12 @@ void KMeans::run(ClusteringResults &results_,
 		ClusteringUtils::getSampleItems(items_, centers);
 		metric_->validateMeans(centers);
 
+
 		/***** DEBUG *****/
 		if (debugKmeans)
 			updateLogFile << "Att: " << i << " - It: initial_values\n" << centers << "\n" << std::endl;
 		/***** DEBUG *****/
+
 
 		// Iterate until the desired max iterations
 		for (int j = 0; j < maxIterations_; j++)
@@ -242,6 +244,7 @@ void KMeans::run(ClusteringResults &results_,
 			// Set labels
 			for (int k = 0; k < sample.rows; k++)
 				labels.at<int>(k) = findClosestCenter(sample.row(k), centers, metric_);
+
 
 			/***** DEBUG *****/
 			if (debugKmeans)
@@ -260,6 +263,7 @@ void KMeans::run(ClusteringResults &results_,
 			if (debug2D)
 				DEBUG_generateImage("Data labeling", sample, centers, labels, limits, center, i);
 			/***** DEBUG *****/
+
 
 			// Store SSE evolution
 			errorCurve.push_back(ClusteringUtils::getSSE(items_, labels, centers, metric_));
