@@ -220,7 +220,7 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 
 	// Write histogram data
 	std::vector<Histogram> angleHistograms = DCH::generateAngleHistograms(bands_, params->useProjection);
-	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, DEG2RAD(20), -M_PI / 2, M_PI / 2);
+	Writer::writeHistogram("angle_distribution", "Angle Distribution Across the Bands", angleHistograms, DEG2RAD(20), -M_PI / 2, M_PI / 2);
 
 
 	// Write the descriptor to a file
