@@ -41,7 +41,6 @@ void Writer::writeHistogram(const std::string &filename_,
 		Dimension dimension = histograms_[0].getDimension();
 
 		std::vector<std::string> rows;
-		// rows.resize(histograms_.size() + 1);
 
 		// Generate header row
 		rows.push_back("Angle");
@@ -184,7 +183,12 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 							const DescriptorParamsPtr &params_,
 							const int targetPoint_)
 {
-	DCHParams *params = dynamic_cast<DCHParams *>(params_.get()); // FIX THIS !! => do something when the cast fails because is another descriptor
+	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
+	if (params == NULL)
+	{
+		LOGW << "Output data generation only for DCH, skipping";
+		return;
+	}
 
 
 	pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr colorCloud = CloudFactory::createColorCloud(cloud_, Utils::palette12(0));
@@ -216,7 +220,6 @@ void Writer::writeOuputData(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_
 
 	// Write histogram data
 	std::vector<Histogram> angleHistograms = DCH::generateAngleHistograms(bands_, params->useProjection);
-	// getBins(DEG2RAD(20), -M_PI / 2, M_PI / 2)
 	Writer::writeHistogram("angles", "Angle Distribution", angleHistograms, DEG2RAD(20), -M_PI / 2, M_PI / 2);
 
 

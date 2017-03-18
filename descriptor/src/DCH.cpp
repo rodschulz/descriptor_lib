@@ -115,8 +115,9 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 		DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
 }
 
-std::vector<Histogram> DCH::generateAngleHistograms(const std::vector<BandPtr> &bands_,
-		const bool useProjection_)
+std::vector<Histogram>
+DCH::generateAngleHistograms(const std::vector<BandPtr> &bands_,
+							 const bool useProjection_)
 {
 	// TODO move this method to the output class, since this is only to generate the histogram generated as output
 
@@ -143,6 +144,12 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 						 const DescriptorParamsPtr &params_)
 {
 	DCHParams *params = dynamic_cast<DCHParams *>(params_.get());
+	if (params == NULL)
+	{
+		LOGE << "Wrong parameters type (DCH::fillDescriptor)";
+		throw std::runtime_error("Unable to cast the given parameters");
+	}
+
 	LOGD << "Filling " << Params::stat[params->stat];
 
 
@@ -199,16 +206,30 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 	case Params::STAT_HISTOGRAM_20:
 	case Params::STAT_HISTOGRAM_30:
 	{
-		float angleStep = params->stat == Params::STAT_HISTOGRAM_10
-						  ? 10
-						  : (params->stat == Params::STAT_HISTOGRAM_20 ? 20 : 30);
+		float angleStep = params->stat == Params::STAT_HISTOGRAM_10 ? 10 :
+						  (params->stat == Params::STAT_HISTOGRAM_20 ? 20 : 30);
 
+
+		// compute the total number of points and the ratio per band
+		// float totalPoints = 0;
+		// for (size_t i = 0; i < bands_.size(); i++)
+		// 	totalPoints += bands_[i]->points->size();
+		// std::vector<float> ratio;
+		// for (size_t i = 0; i < bands_.size(); i++)
+		// 	ratio.push_back(bands_[i]->points->size() / totalPoints);
+
+
+		// compute the histograms
 		std::vector<Histogram> histograms = generateAngleHistograms(bands_, params->useProjection);
 		for (size_t i = 0; i < histograms.size(); i++)
 		{
 			Bins b = histograms[i].getBins(DEG2RAD(angleStep), -M_PI / 2, M_PI / 2);
 			bands_[i]->descriptor.clear();
 			bands_[i]->descriptor.insert(bands_[i]->descriptor.begin(), b.bins.begin(), b.bins.end());
+
+			// // scale the band's descriptor according to the computed ratios
+			// for (size_t j = 0; j < bands_[i]->descriptor.size(); j++)
+			// 	bands_[i]->descriptor[j] *= ratio[i];
 		}
 	}
 	break;
