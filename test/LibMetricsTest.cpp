@@ -6,6 +6,13 @@
 #include "MetricFactory.hpp"
 
 
+/** Dummy function to evaluate exceptions */
+bool dummyCritical(std::runtime_error const& ex)
+{
+	return true;
+}
+
+
 /**************************************************/
 BOOST_AUTO_TEST_SUITE(MetricFactory_class_suite)
 
@@ -147,6 +154,26 @@ BOOST_AUTO_TEST_CASE(closestPermutation)
 	permutation = metric->getClosestPermutation(vector1, vector2);
 	BOOST_CHECK_CLOSE(sqrt(40), permutation.distance, 0.01);
 	BOOST_CHECK_EQUAL(1, permutation.index);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+/**************************************************/
+
+/**************************************************/
+BOOST_AUTO_TEST_SUITE(ClosestPermutationWithConfidenceMetric_class_suite)
+
+BOOST_AUTO_TEST_CASE(testExceptions)
+{
+	std::vector<std::string> args = std::vector<std::string>();
+	args.push_back("");
+	args.push_back("1");
+
+	MetricPtr metricPtr = MetricFactory::create(METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE, args);
+	ClosestPermutationWithConfidenceMetric *metric = (ClosestPermutationWithConfidenceMetric *)metricPtr.get();
+
+	BOOST_CHECK_EXCEPTION(metric->distance(cv::Mat(), cv::Mat()), std::runtime_error, dummyCritical);
+	BOOST_CHECK_EXCEPTION(metric->getClosestPermutation(cv::Mat(), cv::Mat()), std::runtime_error, dummyCritical);
+	BOOST_CHECK_EXCEPTION(metric->calculateMeans(1, cv::Mat(), cv::Mat()), std::runtime_error, dummyCritical);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
