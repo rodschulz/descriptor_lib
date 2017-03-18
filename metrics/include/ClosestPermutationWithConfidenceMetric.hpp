@@ -42,17 +42,4 @@ public:
 	{
 		return METRIC_CLOSEST_PERMUTATION_WITH_CONFIDENCE;
 	}
-
-	/**************************************************/
-	std::vector<std::string> getConstructionParams() const
-	{
-		std::vector<std::string> params;
-		params.push_back(boost::lexical_cast<std::string>(permutationSize));
-		return params;
-	}
-
-	/**************************************************/
-	// void validateMeans(cv::Mat &means_) const
-	// {
-	// }
 };

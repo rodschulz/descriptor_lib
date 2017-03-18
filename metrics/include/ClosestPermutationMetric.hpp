@@ -201,6 +201,13 @@ public:
 	}
 
 
+	/**************************************************/
+	int getPermutationSize() const
+	{
+		return permutationSize;
+	}
+
+
 protected:
 	int permutationSize;
 };
