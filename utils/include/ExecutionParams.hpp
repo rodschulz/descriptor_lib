@@ -45,21 +45,21 @@ static std::string stat[] =
 
 static inline Statistic toStatType(const std::string &type_)
 {
-	if (boost::iequals(type_, "mean"))
+	if (boost::iequals(type_, "mean") || boost::iequals(type_, stat[STAT_MEAN]))
 		return STAT_MEAN;
-	else if (boost::iequals(type_, "median"))
+	else if (boost::iequals(type_, "median") || boost::iequals(type_, stat[STAT_MEDIAN]))
 		return STAT_MEDIAN;
-	else if (boost::iequals(type_, "hist10"))
+	else if (boost::iequals(type_, "hist10") || boost::iequals(type_, stat[STAT_HISTOGRAM_10]))
 		return STAT_HISTOGRAM_10;
-	else if (boost::iequals(type_, "hist20"))
+	else if (boost::iequals(type_, "hist20") || boost::iequals(type_, stat[STAT_HISTOGRAM_20]))
 		return STAT_HISTOGRAM_20;
-	else if (boost::iequals(type_, "hist30"))
+	else if (boost::iequals(type_, "hist30") || boost::iequals(type_, stat[STAT_HISTOGRAM_30]))
 		return STAT_HISTOGRAM_30;
-	else if (boost::iequals(type_, "hb10"))
+	else if (boost::iequals(type_, "hb10") || boost::iequals(type_, stat[STAT_HISTOGRAM_BIN_10]))
 		return STAT_HISTOGRAM_BIN_10;
-	else if (boost::iequals(type_, "hb20"))
+	else if (boost::iequals(type_, "hb20") || boost::iequals(type_, stat[STAT_HISTOGRAM_BIN_20]))
 		return STAT_HISTOGRAM_BIN_20;
-	else if (boost::iequals(type_, "hb30"))
+	else if (boost::iequals(type_, "hb30") || boost::iequals(type_, stat[STAT_HISTOGRAM_BIN_30]))
 		return STAT_HISTOGRAM_BIN_30;
 
 	LOGW << "Wrong stat type, assuming MEAN";
