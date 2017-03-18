@@ -216,7 +216,9 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 	case Params::STAT_HISTOGRAM_BIN_10:
 	case Params::STAT_HISTOGRAM_BIN_20:
 	case Params::STAT_HISTOGRAM_BIN_30:
-	{}
+	{
+		throw std::runtime_error("Not yet implemented (DCH::fillDescriptor)");
+	}
 	break;
 	}
 }
