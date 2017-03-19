@@ -227,7 +227,7 @@ void DCH::fillDescriptor(std::vector<BandPtr> &bands_,
 			bands_[i]->descriptor.clear();
 			bands_[i]->descriptor.insert(bands_[i]->descriptor.begin(), b.bins.begin(), b.bins.end());
 
-			// // scale the band's descriptor according to the computed ratios
+			// scale the band's descriptor according to the computed ratios
 			// for (size_t j = 0; j < bands_[i]->descriptor.size(); j++)
 			// 	bands_[i]->descriptor[j] *= ratio[i];
 		}
