@@ -51,6 +51,22 @@ bool Config::load(const std::string &filename_)
 		}
 
 
+		if (config["labeler"] && config["labeler"]["descriptor"])
+		{
+			std::string nodeName = config["labeler"]["descriptor"]["type"].as<std::string>();
+			instance->labelingDescriptorParams = DescriptorParams::create(DescriptorParams::toType(nodeName));
+			instance->labelingDescriptorParams->load(config["labeler"]["descriptor"][nodeName]);
+		}
+
+
+		if (config["grasper"] && config["grasper"]["descriptor"])
+		{
+			std::string nodeName = config["grasper"]["descriptor"]["type"].as<std::string>();
+			instance->graspingDescriptorParams = DescriptorParams::create(DescriptorParams::toType(nodeName));
+			instance->graspingDescriptorParams->load(config["grasper"]["descriptor"][nodeName]);
+		}
+
+
 		if (config["clustering"])
 		{
 			YAML::Node clusteringConfig = config["clustering"];
@@ -81,6 +97,7 @@ bool Config::load(const std::string &filename_)
 
 			instance->cloudSmoothingParams = params;
 		}
+
 
 		if (config["syntheticCloud"])
 		{

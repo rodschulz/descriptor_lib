@@ -72,6 +72,24 @@ public:
 	}
 
 	/**************************************************/
+	static DescriptorParamsPtr getLabelingDescriptorParams()
+	{
+		if (!getInstance()->labelingDescriptorParams)
+			throw std::runtime_error("descriptor params for labeling not loaded");
+
+		return getInstance()->labelingDescriptorParams;
+	}
+
+	/**************************************************/
+	static DescriptorParamsPtr getGraspingDescriptorParams()
+	{
+		if (!getInstance()->graspingDescriptorParams)
+			throw std::runtime_error("descriptor params for grasping not loaded");
+
+		return getInstance()->graspingDescriptorParams;
+	}
+
+	/**************************************************/
 	static ClusteringParams getClusteringParams()
 	{
 		if (getInstance()->clusteringParams == NULL)
@@ -107,6 +125,9 @@ private:
 	CloudSmoothingParams *cloudSmoothingParams;
 	SyntheticCloudsParams *syntheticCloudParams;
 	YAML::Node config;
+
+	DescriptorParamsPtr labelingDescriptorParams;
+	DescriptorParamsPtr graspingDescriptorParams;
 
 	bool debug; // Flag indicating if the debug generation is enabled or not
 	int targetPoint; // Target point
