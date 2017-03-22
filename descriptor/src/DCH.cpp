@@ -44,7 +44,11 @@ void DEBUG_generateAxes(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 		*axesCloud += *lineCloud;
 	}
 
-	pcl::io::savePCDFileASCII(DEBUG_DIR DEBUG_PREFIX + debugId_ + CLOUD_FILE_EXTENSION, *axesCloud);
+	if (Config::debugEnabled())
+	{
+		std::string id = !debugId_.compare("") ? "noId" : debugId_;
+		pcl::io::savePCDFileASCII(DEBUG_DIR DEBUG_PREFIX + id + CLOUD_FILE_EXTENSION, *axesCloud);
+	}
 }
 
 std::vector<BandPtr> DCH::calculateDescriptor(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
@@ -112,7 +116,10 @@ void DCH::computePoint(const pcl::PointCloud<pcl::PointNormal>::Ptr &cloud_,
 
 
 	if (Config::debugEnabled())
-		DEBUG_generateAxes(cloud_, bands, target_, debugId_, params);
+	{
+		std::string id = !debugId_.compare("") ? "noId" : debugId_;
+		DEBUG_generateAxes(cloud_, bands, target_, id, params);
+	}
 }
 
 std::vector<Histogram>
