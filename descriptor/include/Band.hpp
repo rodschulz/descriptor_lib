@@ -34,3 +34,20 @@ public:
 
 // Declaration to define a band's shared pointer
 typedef boost::shared_ptr<Band> BandPtr;
+
+// Stream operators
+inline std::ostream& operator << (std::ostream &out_, const BandPtr &band_)
+{
+	for (size_t i = 0; i < band_->descriptor.size(); i++)
+		out_ << band_->descriptor[i] << " ";
+	return out_;
+}
+
+inline std::ostream& operator << (std::ostream &out_, const std::vector<BandPtr> &descriptor_)
+{
+	out_ << "[";
+	for (size_t band = 0; band < descriptor_.size(); band++)
+		out_ << " " << descriptor_[band];
+	out_ << " ]";
+	return out_;
+}
